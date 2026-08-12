@@ -1,0 +1,36 @@
+# Python
+host/.venv/
+host/**/__pycache__/
+host/**/*.egg-info/
+host/dist/
+host/build/
+*.pyc
+
+# PlatformIO
+firmware/.pio/
+firmware/.vscode/.browse.c_cpp.db*
+firmware/.vscode/c_cpp_properties.json
+firmware/.vscode/launch.json
+firmware/.vscode/ipch
+
+# IDE
+.idea/
+*.swp
+*.swo
+.DS_Store
+
+# Build artifacts
+*.o
+*.elf
+*.bin
+*.hex
+
+# Data captures
+*.pcd
+*.ply
+*.bag
+captures/
+
+# Secrets
+.env
+secrets.h
