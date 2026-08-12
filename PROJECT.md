@@ -91,11 +91,17 @@ Cinq pièces imprimées en PETG, paramétriques (OpenSCAD), avec insert laiton
 | `lidar_task` | Décodage des trames LD19 (47 octets, CRC8 polynôme 0x4D) |
 | `motion_task` | Nivellement, homing StallGuard, profil de balayage |
 | `network_task` | Agrégation et émission UDP |
+| `ota_task` | Mise à jour par le réseau : espota (3232) et page web (80) |
 
 Les points sont transmis en **polaire brut** $(\rho, \theta)$, avec l'azimut en
 en-tête de datagramme. La conversion cartésienne est faite côté hôte, ce qui
 permet de corriger la calibration et de rejouer un scan **sans reflasher ni
 rescanner**.
+
+Les mises à jour se font par le réseau, le port USB étant peu accessible une
+fois l'appareil monté. Le moteur est coupé avant toute écriture en flash,
+l'OTA est refusé pendant un balayage, et une fenêtre de 10 s au démarrage
+garantit qu'un firmware défectueux reste rattrapable.
 
 ### Station hôte (Python)
 

@@ -12,6 +12,7 @@
  *   lidar_task    coeur 1  UART LD19 -> file de points
  *   network_task  coeur 0  agrégation -> datagrammes UDP
  *   motion_task   coeur 1  profil moteur, nivellement, homing
+ *   ota_task      coeur 0  mise à jour par le réseau (voir ota.cpp)
  */
 
 #include <Arduino.h>
@@ -21,6 +22,7 @@
 
 #include "config.h"
 #include "ld19.h"
+#include "ota.h"
 #include "protocol.h"
 #include "scanner.h"
 #include "wifi_setup.h"
@@ -28,12 +30,20 @@
 namespace {
 
 WiFiUDP udp;
-String udp_host = UDP_HOST_DEFAULT;
+NetworkSettings net_settings;
 
 QueueHandle_t point_queue = nullptr;
+TaskHandle_t lidar_task_handle = nullptr;
+TaskHandle_t network_task_handle = nullptr;
+
 uint32_t packet_sequence = 0;
 volatile uint16_t lidar_speed_dhz = 0;
 volatile uint16_t pending_flags = 0;
+
+/// Posé par l'OTA : interdit à motion_task d'entamer ou de poursuivre un
+/// balayage. Préféré à une suspension de tâche, car motion_task se
+/// supprime elle-même en fin de scan et son handle deviendrait pendant.
+volatile bool ota_lock = false;
 
 struct QueuedPoint {
     RawPoint pt;
@@ -121,7 +131,7 @@ void networkTask(void *) {
         pending_flags = 0;
         memcpy(buffer, &h, sizeof(h));
 
-        udp.beginPacket(udp_host.c_str(), UDP_PORT);
+        udp.beginPacket(net_settings.udp_host.c_str(), UDP_PORT);
         udp.write(buffer, sizeof(PacketHeader) + count * sizeof(RawPoint));
         udp.endPacket();
     }
@@ -131,7 +141,19 @@ void networkTask(void *) {
 //  Tâche mouvement
 // ------------------------------------------------------------
 void motionTask(void *) {
-    delay(2000);
+    // Fenêtre de sécurité : tant qu'aucun balayage n'a commencé, l'OTA est
+    // joignable. C'est ce qui permet de rattraper un firmware défectueux
+    // sans rebrancher l'USB.
+    Serial.printf("[main] fenêtre OTA de %d s avant le balayage\n",
+                  OTA_BOOT_WINDOW_S);
+    for (int i = 0; i < OTA_BOOT_WINDOW_S * 10 && !ota_lock; i++)
+        vTaskDelay(pdMS_TO_TICKS(100));
+
+    if (ota_lock) {
+        Serial.println("[main] balayage annulé : mise à jour en cours");
+        vTaskDelete(nullptr);
+        return;
+    }
 
     pending_flags |= PKT_FLAG_SCAN_START;
     if (!scannerHome()) {
@@ -155,12 +177,44 @@ void motionTask(void *) {
     vTaskDelete(nullptr);
 }
 
+// ------------------------------------------------------------
+//  Accroches OTA
+// ------------------------------------------------------------
+bool otaIsBusy() {
+    switch (scannerState()) {
+        case ScanState::Homing:
+        case ScanState::Spinup:
+        case ScanState::Scanning:
+            return true;
+        default:
+            return false;
+    }
+}
+
+void otaOnBegin() {
+    // Priorité absolue : couper le moteur. Écrire en flash avec un axe
+    // sous tension puis redémarrer laisserait la mécanique en charge.
+    ota_lock = true;
+    scannerEmergencyStop();
+
+    // Libère la bande passante et le CPU pendant l'écriture.
+    if (lidar_task_handle) vTaskSuspend(lidar_task_handle);
+    if (network_task_handle) vTaskSuspend(network_task_handle);
+}
+
+void otaOnAbort() {
+    if (lidar_task_handle) vTaskResume(lidar_task_handle);
+    if (network_task_handle) vTaskResume(network_task_handle);
+    ota_lock = false;
+    Serial.println("[main] mise à jour abandonnée — redémarrer pour rescanner");
+}
+
 }  // namespace
 
 void setup() {
     Serial.begin(115200);
     delay(500);
-    Serial.println("\n[lidar-scanner] démarrage");
+    Serial.printf("\n[lidar-scanner] démarrage — firmware %s\n", FIRMWARE_VERSION);
 
     Serial1.begin(LIDAR_BAUD, SERIAL_8N1, LIDAR_RX_PIN, -1);
     Serial1.setRxBufferSize(4096);
@@ -169,12 +223,15 @@ void setup() {
     scannerInit();
 
     wifiCheckResetButton();
-    if (!wifiSetup(udp_host)) {
+    if (!wifiSetup(net_settings)) {
         Serial.println("[wifi] redémarrage dans 3 s");
         delay(3000);
         ESP.restart();
     }
     udp.begin(UDP_PORT);
+
+    otaInit(OTA_HOSTNAME, net_settings.ota_password,
+            OtaHooks{otaIsBusy, otaOnBegin, otaOnAbort});
 
     point_queue = xQueueCreate(2048, sizeof(QueuedPoint));
     if (!point_queue) {
@@ -182,8 +239,10 @@ void setup() {
         ESP.restart();
     }
 
-    xTaskCreatePinnedToCore(lidarTask, "lidar", 4096, nullptr, 5, nullptr, 1);
-    xTaskCreatePinnedToCore(networkTask, "network", 4096, nullptr, 3, nullptr, 0);
+    xTaskCreatePinnedToCore(lidarTask, "lidar", 4096, nullptr, 5,
+                            &lidar_task_handle, 1);
+    xTaskCreatePinnedToCore(networkTask, "network", 4096, nullptr, 3,
+                            &network_task_handle, 0);
     xTaskCreatePinnedToCore(motionTask, "motion", 4096, nullptr, 4, nullptr, 1);
 
     Serial.println("[lidar-scanner] prêt");
@@ -193,10 +252,11 @@ void loop() {
     static uint32_t last = 0;
     if (millis() - last > 2000) {
         last = millis();
-        Serial.printf("[stat] psi=%.2f deg  file=%u  paquets=%u\n",
+        Serial.printf("[stat] psi=%.2f deg  file=%u  paquets=%u%s\n",
                       scannerPsiMdeg() / 1000.0f,
                       static_cast<unsigned>(uxQueueMessagesWaiting(point_queue)),
-                      static_cast<unsigned>(packet_sequence));
+                      static_cast<unsigned>(packet_sequence),
+                      otaInProgress() ? "  [OTA]" : "");
     }
     vTaskDelay(pdMS_TO_TICKS(100));
 }

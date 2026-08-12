@@ -28,6 +28,10 @@ void scannerStartSweep();
 /// À appeler périodiquement : avance le moteur selon le profil.
 void scannerTick();
 
+/// Coupe l'alimentation du moteur et abandonne le mouvement en cours.
+/// Le driver est désactivé : la tête devient libre en rotation.
+void scannerEmergencyStop();
+
 /// Azimut courant en millidegrés, sûr en lecture concurrente.
 int32_t scannerPsiMdeg();
 

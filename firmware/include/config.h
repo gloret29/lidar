@@ -5,12 +5,33 @@
 //  Voir docs/wiring.md pour la justification du brochage.
 // ============================================================
 
+#define FIRMWARE_VERSION "0.3.0"
+
 // ---- WiFiManager : portail captif, aucun identifiant en dur ----
 #define WIFIMANAGER_AP_NAME "LiDAR-Scanner-Setup"
 #define WIFIMANAGER_AP_PASSWORD ""
 #define WIFIMANAGER_PORTAL_TIMEOUT_S 180
 #define WIFIMANAGER_CONNECT_TIMEOUT_S 20
 #define WIFI_RESET_PIN 0  // bouton BOOT : maintenu au démarrage = reset Wi-Fi
+
+// ---- Mise à jour par le réseau (OTA) ----
+// Le mot de passe se configure dans le portail WiFiManager et est
+// persisté en NVS. La valeur ci-dessous n'est qu'un repli au premier
+// démarrage : la changer est vivement conseillé.
+#define OTA_HOSTNAME "lidar-scanner"
+#define OTA_PASSWORD_DEFAULT "lidar-ota"
+#define OTA_PORT 3232
+#define OTA_WEB_PORT 80
+
+// L'OTA est volontairement injoignable pendant un balayage : flasher en
+// pleine acquisition perdrait le scan et laisserait la mécanique dans un
+// état indéterminé. Mettre à 1 pour passer outre.
+#define OTA_ALLOW_DURING_SCAN 0
+
+// Délai d'attente avant le premier balayage, pendant lequel l'OTA est
+// joignable. C'est le filet de sécurité : sans lui, un firmware qui
+// plante en cours de scan ne serait plus récupérable que par USB.
+#define OTA_BOOT_WINDOW_S 10
 
 // ---- Diffusion UDP ----
 #define UDP_HOST_DEFAULT "192.168.1.100"

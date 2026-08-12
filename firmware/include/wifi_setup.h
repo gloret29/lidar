@@ -2,14 +2,24 @@
 
 #include <Arduino.h>
 
+/** Réglages réseau saisis au portail et persistés en NVS. */
+struct NetworkSettings {
+    String udp_host;
+    String ota_password;
+};
+
 /**
- * Démarre WiFiManager : connexion aux credentials sauvegardés,
- * ou ouverture d'un portail captif pour configurer SSID / mot de passe / IP UDP.
+ * Démarre WiFiManager : connexion aux identifiants sauvegardés, ou
+ * ouverture d'un portail captif pour configurer le réseau, l'adresse de
+ * la station hôte et le mot de passe OTA.
  *
- * @param udp_host_out  IP hôte remplie depuis le portail (paramètre persistant)
+ * Les paramètres du portail sont relus depuis NVS au démarrage et
+ * réécrits dès qu'ils sont soumis : ils survivent donc aux redémarrages,
+ * ce que WiFiManager ne fait pas de lui-même.
+ *
  * @return false si le portail a échoué (l'appelant doit redémarrer)
  */
-bool wifiSetup(String& udp_host_out);
+bool wifiSetup(NetworkSettings& out);
 
-/** Efface les credentials WiFi si le bouton BOOT est maintenu au démarrage. */
+/** Efface les identifiants Wi-Fi si BOOT est maintenu au démarrage. */
 void wifiCheckResetButton();

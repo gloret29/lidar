@@ -15,6 +15,9 @@
    │        ▲                                               │
    │   motion_task ──► TMC2209 ──► NEMA 17                  │
    │   (coeur 1)                                            │
+   │                                                        │
+   │   ota_task    ──► ArduinoOTA (3232) + web (80)         │
+   │   (coeur 0)                                            │
    └────────────────────────┬───────────────────────────────┘
                             │ UDP, points POLAIRES BRUTS
    ┌────────────────────────┴───────────────────────────────┐
@@ -45,6 +48,7 @@ une erreur de conception s'était glissée initialement (voir
 | `lidar_task` | 1 | 5 | Lecture UART, décodage des trames LD19, mise en file |
 | `motion_task` | 1 | 4 | Nivellement, homing, profil de balayage |
 | `network_task` | 0 | 3 | Agrégation en datagrammes, émission UDP |
+| `ota_task` | 0 | 2 | Mise à jour par le réseau ([ota.md](ota.md)) |
 | `loop()` | 0 | 1 | Télémétrie sur le port série |
 
 La file entre `lidar_task` et `network_task` compte 2 048 entrées, soit environ
@@ -61,6 +65,24 @@ la synchronisation de l'UART corromprait toute une salve de trames.
 Les bornes `psi_start` et `psi_end` sont néanmoins transmises à chaque
 datagramme, et l'hôte interpole selon l'horodatage : la chaîne reste correcte
 si l'on décide un jour d'accélérer le balayage.
+
+## Ports réseau
+
+| Port | Protocole | Rôle |
+|---|---|---|
+| 9000 | UDP, sortant | Flux de points vers la station hôte |
+| 3232 | TCP | Mise à jour ArduinoOTA / espota |
+| 80 | TCP | Page de mise à jour et point d'accès `/info` |
+
+Le port 3232 n'est pas servi pendant un balayage, et le port 80 renvoie alors
+503 sur `/update` : une mise à jour en pleine acquisition perdrait le scan et
+laisserait la mécanique dans un état indéterminé.
+
+Une mise à jour relâche `EN` du TMC2209 **avant** la première écriture en
+flash, puis suspend `lidar_task` et `network_task`. Et parce qu'un firmware
+défectueux qui plante en cours de scan ne serait plus joignable, `motion_task`
+ménage une fenêtre de 10 s au démarrage pendant laquelle le scanner reste au
+repos. Détails dans [ota.md](ota.md).
 
 ## Protocole UDP, version 2
 

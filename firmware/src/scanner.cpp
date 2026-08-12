@@ -118,6 +118,14 @@ void scannerTick() {
     if (now > next_step_us + step_interval_us) next_step_us = now + step_interval_us;
 }
 
+void scannerEmergencyStop() {
+    digitalWrite(EN_PIN, HIGH);  // driver désactivé, moteur non alimenté
+    if (state == ScanState::Scanning || state == ScanState::Homing ||
+        state == ScanState::Spinup)
+        state = ScanState::Fault;
+    Serial.println("[scanner] arrêt d'urgence : moteur désactivé");
+}
+
 int32_t scannerPsiMdeg() {
     const int32_t steps = position_steps;
     return static_cast<int32_t>(steps * 1000.0f / STEPS_PER_DEGREE);
