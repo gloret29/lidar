@@ -24,10 +24,11 @@ scan, à ±5 cm, en 45 à 180 secondes.
 
 | Document | Contenu |
 |---|---|
+| [docs/build.md](docs/build.md) | **Guide pas à pas** : de la commande au premier scan |
 | [docs/bom.md](docs/bom.md) | Nomenclature complète, y compris les pièces manquantes |
 | [docs/printing.md](docs/printing.md) | Réglages d'impression, calibration des ajustements |
 | [docs/mechanical.md](docs/mechanical.md) | Conception cotée, justification des choix |
-| [docs/assembly.md](docs/assembly.md) | Montage pas à pas |
+| [docs/assembly.md](docs/assembly.md) | Montage mécanique détaillé |
 | [docs/wiring.md](docs/wiring.md) | Brochage, alimentation, réglage du TMC2209 |
 | [docs/wifi.md](docs/wifi.md) | Configuration réseau par portail captif |
 | [docs/web.md](docs/web.md) | Panneau web : commande, diagnostics, réglages |
@@ -79,6 +80,9 @@ lidar/
 ```
 
 ## Démarrage rapide
+
+Le parcours complet (commande → impression → montage → firmware → premier
+scan) est dans **[docs/build.md](docs/build.md)**.
 
 ### 1. Pièces mécaniques
 

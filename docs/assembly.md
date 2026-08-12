@@ -6,6 +6,9 @@ opérations deviennent impossibles une fois l'étape suivante réalisée.
 Prérequis : [`printing.md`](printing.md) terminé, ajustements calibrés,
 nomenclature [`bom.md`](bom.md) complète.
 
+Pour l’ordre global du projet (logiciel, câblage, premier scan), voir
+[`build.md`](build.md).
+
 ---
 
 ## Étape 1 — Préparation de la tige
