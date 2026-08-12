@@ -41,9 +41,20 @@ Dans un autre :
 lidar-simulate --host 127.0.0.1 --port 9000 --fast
 ```
 
-Le simulateur envoie une pièce rectangulaire synthétique (protocole UDP v2).
+Le simulateur envoie une pièce rectangulaire synthétique (protocole UDP v2)
+**et enregistre** le nuage dans `scans/simulate.pcd` par défaut.
+
+```bash
+# Fichier seul, sans UDP
+lidar-simulate --fast --no-udp --output scans/sim.pcd
+
+# UDP sans fichier
+lidar-simulate --fast --no-save
+```
+
 Options : `--width`, `--depth`, `--height`, `--speed`, `--psi-end`, `--loops 0`
-(infini). Détails dans [docs/open3d.md](../docs/open3d.md#flux-de-test-sans-matériel).
+(infini), `--calibration`. Détails dans
+[docs/open3d.md](../docs/open3d.md#flux-de-test-sans-matériel).
 
 ### Enregistrement
 
@@ -80,7 +91,7 @@ pytest -q
 
 37 tests, sans matériel. Ils couvrent le décodage du protocole, la
 transformation géométrique (garde-fou contre la formule sphérique naïve) et
-le simulateur UDP.
+le simulateur UDP (dont l'enregistrement du nuage).
 
 ## Organisation
 

@@ -1,13 +1,17 @@
 """Générateur UDP de paquets v2 — valide la station hôte sans matériel.
 
 Simule un balayage dans une pièce rectangulaire (rayons contre un pavé
-axis-aligned), encode le protocole firmware et envoie vers l'hôte.
+axis-aligned), encode le protocole firmware, envoie vers l'hôte et
+enregistre le nuage en .pcd (défaut : scans/simulate.pcd).
 
 Terminal A :
     lidar-visualize --port 9000
 
 Terminal B :
-    lidar-simulate --host 127.0.0.1 --port 9000
+    lidar-simulate --host 127.0.0.1 --port 9000 --fast
+
+Sans récepteur (fichier seul) :
+    lidar-simulate --fast --no-udp --output scans/sim.pcd
 """
 
 from __future__ import annotations
@@ -17,6 +21,7 @@ import math
 import socket
 import struct
 import time
+from pathlib import Path
 
 import numpy as np
 
@@ -27,6 +32,9 @@ from lidar_host import (
     PACKET_MAGIC,
     PROTOCOL_VERSION,
 )
+from lidar_host.protocol import parse_packet
+from lidar_host.receiver import save_cloud
+from lidar_host.transform import Calibration, polar_to_cartesian, valid_mask
 
 _HEADER = struct.Struct("<IHHIHHQii")
 assert _HEADER.size == HEADER_SIZE
@@ -221,6 +229,36 @@ def iter_scan_packets(
     )
 
 
+def accumulate_points(datagrams: list[bytes], calib: Calibration) -> np.ndarray:
+    """Décode les datagrammes et renvoie le nuage XYZ (même chaîne que l'hôte)."""
+    chunks: list[np.ndarray] = []
+    for raw in datagrams:
+        packet = parse_packet(raw)
+        if packet is None or len(packet) == 0:
+            continue
+        mask = valid_mask(packet.rho_m, packet.intensity, calib)
+        if not mask.any():
+            continue
+        chunks.append(
+            polar_to_cartesian(
+                packet.rho_m[mask],
+                packet.theta_deg[mask],
+                packet.psi_deg[mask],
+                calib,
+            )
+        )
+    if not chunks:
+        return np.empty((0, 3))
+    return np.concatenate(chunks, axis=0)
+
+
+def output_path_for_loop(base: Path, loop: int, loops: int) -> Path:
+    if loops == 1:
+        return base
+    stem, suffix = base.stem, base.suffix or ".pcd"
+    return base.with_name(f"{stem}_{loop:02d}{suffix}")
+
+
 def main() -> None:
     ap = argparse.ArgumentParser(
         description="Flux UDP de test (pièce synthétique) pour la station hôte"
@@ -241,23 +279,56 @@ def main() -> None:
         help="envoyer au plus vite (ignorer le temps réel LD19)",
     )
     ap.add_argument("--loops", type=int, default=1, help="nombre de balayages (0 = infini)")
+    ap.add_argument(
+        "--output",
+        type=Path,
+        default=Path("scans/simulate.pcd"),
+        help="fichier .pcd du nuage simulé (vide = ne pas enregistrer)",
+    )
+    ap.add_argument(
+        "--no-save",
+        action="store_true",
+        help="ne pas écrire de fichier (UDP uniquement)",
+    )
+    ap.add_argument(
+        "--no-udp",
+        action="store_true",
+        help="ne pas envoyer d'UDP (enregistrement local uniquement)",
+    )
+    ap.add_argument(
+        "--calibration",
+        type=Path,
+        default=Path("calibration.json"),
+        help="calibration appliquée au .pcd enregistré",
+    )
     args = ap.parse_args()
 
-    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    save = not args.no_save and args.output is not None and str(args.output) != ""
+    send_udp = not args.no_udp
+    if not save and not send_udp:
+        ap.error("rien à faire : retirez --no-save ou --no-udp")
+
+    calib = Calibration.load(args.calibration) if save else None
+    sock = None
     dest = (args.host, args.port)
+    if send_udp:
+        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
     print(
-        f"[simulate] → {args.host}:{args.port}  "
-        f"pièce {args.width}×{args.depth}×{args.height} m  "
+        f"[simulate] pièce {args.width}×{args.depth}×{args.height} m  "
         f"ψ 0…{args.psi_end}° @ {args.speed}°/s"
     )
-    print("[simulate] lancer lidar-visualize ou lidar-receive dans un autre terminal")
+    if send_udp:
+        print(f"[simulate] UDP → {args.host}:{args.port}")
+        print("[simulate] lancer lidar-visualize ou lidar-receive dans un autre terminal")
+    if save:
+        print(f"[simulate] enregistrement → {args.output}")
 
     loop = 0
     try:
         while args.loops == 0 or loop < args.loops:
             loop += 1
-            n = 0
+            datagrams: list[bytes] = []
             for datagram in iter_scan_packets(
                 psi_end_deg=args.psi_end,
                 psi_speed_deg_s=args.speed,
@@ -269,13 +340,25 @@ def main() -> None:
                 sensor_z=args.sensor_z,
                 realtime=not args.fast,
             ):
-                sock.sendto(datagram, dest)
-                n += 1
-            print(f"[simulate] balayage {loop} terminé ({n} datagrammes)")
+                datagrams.append(datagram)
+                if sock is not None:
+                    sock.sendto(datagram, dest)
+
+            print(f"[simulate] balayage {loop} terminé ({len(datagrams)} datagrammes)")
+
+            if save and calib is not None:
+                points = accumulate_points(datagrams, calib)
+                out = output_path_for_loop(args.output, loop, args.loops or loop)
+                if len(points):
+                    save_cloud(points, out)
+                    print(f"[simulate] {len(points):,} points → {out}")
+                else:
+                    print(f"[simulate] aucun point valide, {out} non écrit")
     except KeyboardInterrupt:
         print("\n[simulate] interrompu")
     finally:
-        sock.close()
+        if sock is not None:
+            sock.close()
 
 
 if __name__ == "__main__":

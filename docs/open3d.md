@@ -113,6 +113,14 @@ Le simulateur raytrace une pièce axis-aligned (défaut 4×5×2,5 m, capteur à
 | `--speed` | 2 °/s | Vitesse azimut (temps réel) |
 | `--width` `--depth` `--height` | 4 / 5 / 2,5 | Dimensions de la pièce (m) |
 | `--loops` | 1 | `0` = balayages en boucle |
+| `--output` | `scans/simulate.pcd` | Nuage XYZ enregistré en fin de scan |
+| `--no-save` | off | UDP uniquement, pas de fichier |
+| `--no-udp` | off | Fichier uniquement, pas d’émission réseau |
+| `--calibration` | `calibration.json` | Appliquée au `.pcd` écrit |
+
+Par défaut, **UDP + fichier** : inutile de lancer `lidar-receive` juste pour
+garder le résultat. Avec plusieurs `--loops`, les fichiers sont numérotés
+(`simulate_01.pcd`, …).
 
 On doit voir des **murs plans** et des **angles droits**. Si ce n’est pas le
 cas avec le simulateur, le bug est côté hôte (calibration / transform), pas
