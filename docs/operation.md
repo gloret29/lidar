@@ -124,6 +124,7 @@ Ne pas toucher au trépied pendant le balayage — pas même pour le stabiliser.
 
 ```bash
 cd host && source .venv/bin/activate
+# WSL2 : export DISPLAY=:0 si besoin
 lidar-visualize --port 9000
 ```
 
@@ -134,8 +135,11 @@ Le nuage se construit à l'écran pendant le balayage. Surveiller :
 - Les angles doivent être **droits**.
 - Aucune bande manquante hors du cône du nadir.
 
-Guide détaillé Open3D (navigation, enregistrement, recalage, maillage) :
+Guide détaillé Open3D (navigation, enregistrement, recalage, maillage, WSL) :
 [open3d.md](open3d.md).
+
+Sans matériel, le même pipeline se valide avec
+`lidar-simulate --host 127.0.0.1 --port 9000 --fast` dans un second terminal.
 
 ### Enregistrement
 

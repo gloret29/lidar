@@ -67,8 +67,8 @@ lidar/
 │   ├── include/         config, protocole, pilotes
 │   └── src/             tâches, parseur LD19, axe de lacet
 ├── host/                Station hôte Python
-│   ├── src/lidar_host/  protocole, transformation, visualisation
-│   ├── tests/           35 tests, sans matériel
+│   ├── src/lidar_host/  protocole, transformation, visualisation, simulateur
+│   ├── tests/           tests protocole / géométrie / simulateur (sans matériel)
 │   └── calibration.json paramètres de calibration
 ├── mechanical/
 │   ├── openscad/        sources paramétriques
@@ -121,8 +121,24 @@ Voir [docs/ota.md](docs/ota.md).
 cd host
 python -m venv .venv && source .venv/bin/activate
 pip install -e .
-lidar-visualize --port 9000
 ```
+
+Sans matériel, valider la chaîne avec le simulateur UDP (deux terminaux) :
+
+```bash
+# A — sous WSL : export DISPLAY=:0 si la fenêtre Open3D échoue
+lidar-visualize --port 9000
+
+# B
+lidar-simulate --host 127.0.0.1 --port 9000 --fast
+```
+
+Sans fenêtre graphique : `lidar-receive --port 9000 --output scans/sim.pcd --auto-stop`.
+
+Avec le scanner : lancer d'abord `lidar-visualize` / `lidar-receive`, puis le
+balayage depuis `http://lidar-scanner.local/`.
+
+Guide Open3D : [docs/open3d.md](docs/open3d.md).
 
 ### 4. Post-traitement
 

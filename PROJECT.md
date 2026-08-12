@@ -107,6 +107,8 @@ réseau ; le moteur est coupé avant toute écriture en flash.
 Décodage vectorisé NumPy, transformation avec calibration (bras de levier,
 décalages angulaires, redressement sur la gravité), visualisation temps réel
 Open3D, recalage ICP multi-positions, maillage Poisson, export `.pcd` / `.ply`.
+Un simulateur UDP (`lidar-simulate`) permet de valider toute la chaîne sans
+scanner.
 
 ## Contraintes de conception
 

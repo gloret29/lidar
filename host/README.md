@@ -9,9 +9,12 @@ post-traitement du nuage de points.
 python -m venv .venv
 source .venv/bin/activate
 pip install -e .
+# sous WSL2 + WSLg, si lidar-visualize échoue :
+export DISPLAY=:0
 ```
 
-Python ≥ 3.10. Dépendances : NumPy et Open3D.
+Python ≥ 3.10. Dépendances : NumPy et Open3D. Les commandes `lidar-*` sont
+installées par `pip install -e .` (pas besoin de `PYTHONPATH`).
 
 ## Utilisation
 
@@ -20,6 +23,9 @@ Python ≥ 3.10. Dépendances : NumPy et Open3D.
 ```bash
 lidar-visualize --port 9000
 ```
+
+Sous WSL sans affichage : `--headless --output scans/out.pcd`, ou
+`lidar-receive` (voir [docs/open3d.md](../docs/open3d.md)).
 
 ### Flux de test sans matériel
 
@@ -69,12 +75,12 @@ Guide Open3D (fenêtre live, fichiers, ICP, Poisson, dépannage) :
 ## Tests
 
 ```bash
-PYTHONPATH=src python -m pytest tests/ -q
+pytest -q
 ```
 
-35 tests, sans matériel ni Open3D — seul NumPy est requis. Ils couvrent le
-décodage du protocole et la transformation géométrique, avec un garde-fou
-explicite contre le retour à la formule sphérique naïve.
+37 tests, sans matériel. Ils couvrent le décodage du protocole, la
+transformation géométrique (garde-fou contre la formule sphérique naïve) et
+le simulateur UDP.
 
 ## Organisation
 
