@@ -39,6 +39,7 @@ scan, à ±5 cm, en 45 à 180 secondes.
 |---|---|
 | [docs/calibration.md](docs/calibration.md) | Les cinq mesures à effectuer une fois |
 | [docs/operation.md](docs/operation.md) | Préparation des lieux, conduite d'un scan, dépannage |
+| [docs/open3d.md](docs/open3d.md) | Visualisation, `.pcd`, recalage et maillage avec Open3D |
 
 ## Principe
 

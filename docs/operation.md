@@ -134,6 +134,9 @@ Le nuage se construit à l'écran pendant le balayage. Surveiller :
 - Les angles doivent être **droits**.
 - Aucune bande manquante hors du cône du nadir.
 
+Guide détaillé Open3D (navigation, enregistrement, recalage, maillage) :
+[open3d.md](open3d.md).
+
 ### Enregistrement
 
 ```bash
