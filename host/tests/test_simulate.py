@@ -38,11 +38,12 @@ def test_scan_emits_start_and_end():
             psi_speed_deg_s=10.0,
             points_per_packet=12,
             theta_step_deg=30.0,
-            width=4.0,
-            depth=5.0,
-            height=2.5,
+            width=5.0,
+            depth=4.5,
+            height=2.6,
             sensor_z=1.5,
             realtime=False,
+            scene="apartment",
         )
     )
     assert len(packets) >= 2
@@ -61,17 +62,26 @@ def test_accumulate_builds_cloud():
             psi_speed_deg_s=20.0,
             points_per_packet=12,
             theta_step_deg=15.0,
-            width=4.0,
-            depth=5.0,
-            height=2.5,
+            width=5.0,
+            depth=4.5,
+            height=2.6,
             sensor_z=1.5,
             realtime=False,
+            scene="apartment",
         )
     )
     pts = accumulate_points(packets, Calibration())
     assert pts.ndim == 2 and pts.shape[1] == 3
     assert len(pts) > 100
-    assert np.abs(pts).max() < 8.0
+    assert np.abs(pts).max() < 12.0
+
+
+def test_apartment_has_more_solids_than_box():
+    from lidar_host.simulate import build_scene_apartment, build_scene_box
+
+    _, apt = build_scene_apartment(5.0, 4.5, 2.6, 1.5)
+    _, box = build_scene_box(5.0, 4.5, 2.6, 1.5)
+    assert len(apt) > len(box) + 5
 
 
 def test_output_path_for_loop():

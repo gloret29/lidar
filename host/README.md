@@ -41,9 +41,9 @@ Dans un autre :
 lidar-simulate --host 127.0.0.1 --port 9000 --fast
 ```
 
-Le simulateur envoie une pièce rectangulaire synthétique (protocole UDP v2)
-**et enregistre** le nuage dans `scans/simulate.pcd` par défaut. Un exemplaire
-est versionné dans le dépôt : on peut l’ouvrir sans relancer la simulation.
+Le simulateur envoie une scène synthétique (protocole UDP v2) — par défaut
+un **appartement en L avec mobilier** (`--scene apartment`) — **et enregistre**
+le nuage dans `scans/simulate.pcd`. Un exemplaire est versionné dans le dépôt.
 
 ```bash
 python -c "import open3d as o3d; o3d.visualization.draw_geometries([o3d.io.read_point_cloud('scans/simulate.pcd')])"
@@ -53,12 +53,15 @@ python -c "import open3d as o3d; o3d.visualization.draw_geometries([o3d.io.read_
 # Fichier seul, sans UDP
 lidar-simulate --fast --no-udp --output scans/sim.pcd
 
+# Pavé vide (ancien comportement)
+lidar-simulate --fast --scene box --no-udp
+
 # UDP sans fichier
 lidar-simulate --fast --no-save
 ```
 
-Options : `--width`, `--depth`, `--height`, `--speed`, `--psi-end`, `--loops 0`
-(infini), `--calibration`. Détails dans
+Options : `--scene`, `--width`, `--depth`, `--height`, `--speed`, `--psi-end`,
+`--loops 0`, `--calibration`. Détails dans
 [docs/open3d.md](../docs/open3d.md#flux-de-test-sans-matériel).
 
 ### Enregistrement

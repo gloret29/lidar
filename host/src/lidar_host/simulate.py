@@ -1,8 +1,8 @@
 """Générateur UDP de paquets v2 — valide la station hôte sans matériel.
 
-Simule un balayage dans une pièce rectangulaire (rayons contre un pavé
-axis-aligned), encode le protocole firmware, envoie vers l'hôte et
-enregistre le nuage en .pcd (défaut : scans/simulate.pcd).
+Simule un balayage dans une scène 3D (pièce en L + mobilier), encode le
+protocole firmware, envoie vers l'hôte et enregistre le nuage en .pcd
+(défaut : scans/simulate.pcd).
 
 Terminal A :
     lidar-visualize --port 9000
@@ -21,6 +21,7 @@ import math
 import socket
 import struct
 import time
+from dataclasses import dataclass
 from pathlib import Path
 
 import numpy as np
@@ -38,6 +39,15 @@ from lidar_host.transform import Calibration, polar_to_cartesian, valid_mask
 
 _HEADER = struct.Struct("<IHHIHHQii")
 assert _HEADER.size == HEADER_SIZE
+
+
+@dataclass(frozen=True)
+class Solid:
+    """Pavé axis-aligned opaque (mur, meuble, sol…)."""
+
+    box_min: tuple[float, float, float]
+    box_max: tuple[float, float, float]
+    albedo: float = 1.0  # 0..1, module l'intensité renvoyée
 
 
 def pack_packet(
@@ -69,14 +79,13 @@ def pack_packet(
     return header + body
 
 
-def ray_hit_box(
+def ray_enter_box(
     origin: np.ndarray,
     direction: np.ndarray,
     box_min: np.ndarray,
     box_max: np.ndarray,
 ) -> float | None:
-    """Intersection rayon / AABB. Renvoie la distance > 0 ou None."""
-    # Méthode des slabs (Kay–Kajiya).
+    """Distance jusqu'à l'entrée d'un AABB (origine à l'extérieur)."""
     tmin, tmax = -np.inf, np.inf
     for i in range(3):
         d = direction[i]
@@ -93,27 +102,148 @@ def ray_hit_box(
         tmax = min(tmax, t2)
         if tmin > tmax:
             return None
-    if tmax < 0:
+    if tmax < 0 or tmin < 1e-4:
+        # Origine à l'intérieur ou derrière : pas d'entrée valide.
         return None
-    hit = tmin if tmin > 1e-4 else tmax
-    return float(hit) if hit > 1e-4 else None
+    return float(tmin)
 
 
 def direction_head_frame(theta_rad: float, psi_rad: float) -> np.ndarray:
     """Direction unitaire cohérente avec transform.polar_to_cartesian."""
-    # Dans la tête : u = (cos θ, 0, sin θ), puis R_z(ψ).
     hx, hy, hz = math.cos(theta_rad), 0.0, math.sin(theta_rad)
     c, s = math.cos(psi_rad), math.sin(psi_rad)
     return np.array([c * hx - s * hy, s * hx + c * hy, hz], dtype=np.float64)
 
 
-def sample_room(
+def _box(
+    x0: float, x1: float, y0: float, y1: float, z0: float, z1: float,
+    albedo: float = 1.0,
+) -> Solid:
+    return Solid(
+        (min(x0, x1), min(y0, y1), min(z0, z1)),
+        (max(x0, x1), max(y0, y1), max(z0, z1)),
+        albedo,
+    )
+
+
+def build_scene_box(
+    width: float, depth: float, height: float, sensor_z: float, wall: float = 0.12
+) -> tuple[np.ndarray, list[Solid]]:
+    """Pièce rectangulaire vide (murs / sol / plafond en coque)."""
+    origin = np.zeros(3)
+    z0, z1 = -sensor_z, height - sensor_z
+    x0, x1 = -width / 2, width / 2
+    y0, y1 = -depth / 2, depth / 2
+    solids = [
+        _box(x0, x1, y0, y1, z0, z0 + wall, 0.85),          # sol
+        _box(x0, x1, y0, y1, z1 - wall, z1, 0.95),          # plafond
+        _box(x0, x0 + wall, y0, y1, z0, z1, 0.9),           # -X
+        _box(x1 - wall, x1, y0, y1, z0, z1, 0.9),           # +X
+        _box(x0, x1, y0, y0 + wall, z0, z1, 0.9),           # -Y
+        _box(x0, x1, y1 - wall, y1, z0, z1, 0.9),           # +Y
+    ]
+    return origin, solids
+
+
+def build_scene_apartment(
+    width: float, depth: float, height: float, sensor_z: float, wall: float = 0.12
+) -> tuple[np.ndarray, list[Solid]]:
+    """Appartement en L : salon + couloir, mobilier, ouverture de porte.
+
+    Plan (vue du dessus, Z vers le haut) — le capteur est à l'origine ::
+
+                    +Y
+                     │
+              ┌──────┴──────┐
+              │   salon     │
+              │      ●      │──────┐
+              │             │ couloir
+              └─────────────┘      │
+                                   └──
+                         +X
+    """
+    origin = np.zeros(3)
+    z0, z1 = -sensor_z, height - sensor_z
+    # Salon (rectangle principal).
+    sx0, sx1 = -width / 2, width / 2
+    sy0, sy1 = -depth / 2, depth / 2
+    # Couloir / aile sur +X (profondeur réduite).
+    wing_w = max(1.8, width * 0.45)
+    wing_d = max(2.2, depth * 0.55)
+    wx0, wx1 = sx1 - wall, sx1 + wing_w
+    wy0, wy1 = -wing_d / 2, wing_d / 2
+
+    solids: list[Solid] = []
+
+    # --- Sol & plafond (salon + aile) ---
+    solids += [
+        _box(sx0, sx1, sy0, sy1, z0, z0 + wall, 0.8),
+        _box(sx1, wx1, wy0, wy1, z0, z0 + wall, 0.8),
+        _box(sx0, sx1, sy0, sy1, z1 - wall, z1, 0.95),
+        _box(sx1, wx1, wy0, wy1, z1 - wall, z1, 0.95),
+    ]
+
+    # --- Murs du salon ---
+    # +X : deux pans de part et d'autre de l'ouverture vers l'aile
+    solids += [
+        _box(sx0, sx0 + wall, sy0, sy1, z0, z1, 0.92),                 # -X
+        _box(sx0, sx1, sy1 - wall, sy1, z0, z1, 0.92),                 # +Y
+        _box(sx1 - wall, sx1, sy0, wy0, z0, z1, 0.92),
+        _box(sx1 - wall, sx1, wy1, sy1, z0, z1, 0.92),
+    ]
+
+    # Mur -Y avec baie de porte (deux jambages + linteau)
+    door_w, door_h = 0.9, 2.05
+    door_cx = sx0 + width * 0.28
+    solids += [
+        _box(sx0, door_cx - door_w / 2, sy0, sy0 + wall, z0, z1, 0.92),
+        _box(door_cx + door_w / 2, sx1, sy0, sy0 + wall, z0, z1, 0.92),
+        _box(
+            door_cx - door_w / 2, door_cx + door_w / 2,
+            sy0, sy0 + wall,
+            z0 + door_h, z1, 0.92,
+        ),
+    ]
+
+    # --- Murs de l'aile ---
+    solids += [
+        _box(wx1 - wall, wx1, wy0, wy1, z0, z1, 0.9),
+        _box(sx1, wx1, wy0, wy0 + wall, z0, z1, 0.9),
+        _box(sx1, wx1, wy1 - wall, wy1, z0, z1, 0.9),
+    ]
+
+    # --- Mobilier ---
+    # Canapé le long du mur +Y
+    solids.append(_box(-1.1, 1.1, sy1 - 0.95, sy1 - 0.25, z0 + wall, z0 + wall + 0.75, 0.55))
+    # Table basse devant le canapé
+    solids.append(_box(-0.55, 0.55, sy1 - 1.55, sy1 - 1.05, z0 + wall, z0 + wall + 0.40, 0.7))
+    # Bibliothèque haute contre -X
+    solids.append(_box(sx0 + wall + 0.05, sx0 + wall + 0.40, -0.9, 0.9, z0 + wall, z0 + wall + 2.0, 0.5))
+    # Îlot / table cuisine côté aile
+    solids.append(_box(sx1 + 0.4, sx1 + 1.4, -0.45, 0.45, z0 + wall, z0 + wall + 0.90, 0.65))
+    # Colonne / pilier
+    solids.append(_box(0.85, 1.15, -0.15, 0.15, z0 + wall, z1 - wall, 0.75))
+    # Meuble bas sous fenêtre (mur +Y aile)
+    solids.append(_box(sx1 + 0.3, wx1 - wall - 0.1, wy1 - 0.55, wy1 - wall - 0.05,
+                       z0 + wall, z0 + wall + 0.55, 0.6))
+    # Carton / obstacle bas près du centre
+    solids.append(_box(-0.35, 0.15, -1.4, -1.05, z0 + wall, z0 + wall + 0.55, 0.45))
+
+    return origin, solids
+
+
+SCENES = {
+    "box": build_scene_box,
+    "apartment": build_scene_apartment,
+}
+
+
+def sample_scene(
     psi_deg: float,
     theta_deg: np.ndarray,
     *,
     origin: np.ndarray,
-    box_min: np.ndarray,
-    box_max: np.ndarray,
+    solids: list[Solid],
     rho_max_m: float = 12.0,
 ) -> tuple[np.ndarray, np.ndarray]:
     """Renvoie (rho_m, intensity) pour une colonne d'élévations à ψ fixé."""
@@ -123,24 +253,27 @@ def sample_room(
 
     for i, th_deg in enumerate(theta_deg):
         direction = direction_head_frame(math.radians(float(th_deg)), psi)
-        hit = ray_hit_box(origin, direction, box_min, box_max)
-        if hit is None or hit > rho_max_m:
+        best_t: float | None = None
+        best_albedo = 1.0
+        for solid in solids:
+            t = ray_enter_box(
+                origin, direction,
+                np.asarray(solid.box_min), np.asarray(solid.box_max),
+            )
+            if t is None or t > rho_max_m:
+                continue
+            if best_t is None or t < best_t:
+                best_t = t
+                best_albedo = solid.albedo
+
+        if best_t is None:
             rho[i] = 0.0
             inten[i] = 0
         else:
-            rho[i] = hit
-            # Intensité grossière : murs plus brillants de face.
+            rho[i] = best_t
             facing = abs(direction[np.argmax(np.abs(direction))])
-            inten[i] = int(np.clip(80 + 140 * facing, 1, 255))
+            inten[i] = int(np.clip((60 + 160 * facing) * best_albedo, 1, 255))
     return rho, inten
-
-
-def room_bounds(width: float, depth: float, height: float, sensor_z: float):
-    """Pièce centrée en XY, sol à z=-sensor_z, plafond à height-sensor_z."""
-    origin = np.array([0.0, 0.0, 0.0])
-    box_min = np.array([-width / 2, -depth / 2, -sensor_z])
-    box_max = np.array([width / 2, depth / 2, height - sensor_z])
-    return origin, box_min, box_max
 
 
 def iter_scan_packets(
@@ -154,16 +287,15 @@ def iter_scan_packets(
     height: float,
     sensor_z: float,
     realtime: bool,
+    scene: str = "apartment",
 ):
     """Générateur de datagrammes pour un balayage 0 → psi_end."""
-    origin, box_min, box_max = room_bounds(width, depth, height, sensor_z)
+    builder = SCENES.get(scene, build_scene_apartment)
+    origin, solids = builder(width, depth, height, sensor_z)
 
-    # Élévations : un tour LiDAR complet, comme le LD19 (0…360).
     thetas = np.arange(0.0, 360.0, theta_step_deg)
     n_theta = len(thetas)
 
-    # Avance en ψ entre deux paquets (ψ quasi constant dans un datagramme,
-    # comme côté firmware à 2 °/s).
     dt_packet_s = points_per_packet / 4500.0
     d_psi = psi_speed_deg_s * dt_packet_s
 
@@ -179,10 +311,7 @@ def iter_scan_packets(
         batch_theta = thetas[idx]
         theta_idx += points_per_packet
 
-        rho, inten = sample_room(
-            psi, batch_theta,
-            origin=origin, box_min=box_min, box_max=box_max,
-        )
+        rho, inten = sample_scene(psi, batch_theta, origin=origin, solids=solids)
         psi_end = min(psi + d_psi, psi_end_deg)
         flags = FLAG_SCAN_START if first else 0
         first = False
@@ -261,7 +390,7 @@ def output_path_for_loop(base: Path, loop: int, loops: int) -> Path:
 
 def main() -> None:
     ap = argparse.ArgumentParser(
-        description="Flux UDP de test (pièce synthétique) pour la station hôte"
+        description="Flux UDP de test (scène synthétique) pour la station hôte"
     )
     ap.add_argument("--host", default="127.0.0.1", help="IP de la station hôte")
     ap.add_argument("--port", type=int, default=9000)
@@ -269,10 +398,16 @@ def main() -> None:
     ap.add_argument("--speed", type=float, default=2.0, help="vitesse azimut (°/s)")
     ap.add_argument("--theta-step", type=float, default=1.0, help="pas d'élévation (°)")
     ap.add_argument("--points", type=int, default=120, help="points par datagramme")
-    ap.add_argument("--width", type=float, default=4.0, help="largeur pièce X (m)")
-    ap.add_argument("--depth", type=float, default=5.0, help="profondeur pièce Y (m)")
-    ap.add_argument("--height", type=float, default=2.5, help="hauteur pièce (m)")
+    ap.add_argument("--width", type=float, default=5.0, help="largeur salon X (m)")
+    ap.add_argument("--depth", type=float, default=4.5, help="profondeur salon Y (m)")
+    ap.add_argument("--height", type=float, default=2.6, help="hauteur sous plafond (m)")
     ap.add_argument("--sensor-z", type=float, default=1.5, help="hauteur capteur (m)")
+    ap.add_argument(
+        "--scene",
+        choices=sorted(SCENES),
+        default="apartment",
+        help="box = pavé vide ; apartment = L + mobilier (défaut)",
+    )
     ap.add_argument(
         "--fast",
         action="store_true",
@@ -283,18 +418,10 @@ def main() -> None:
         "--output",
         type=Path,
         default=Path("scans/simulate.pcd"),
-        help="fichier .pcd du nuage simulé (vide = ne pas enregistrer)",
+        help="fichier .pcd du nuage simulé",
     )
-    ap.add_argument(
-        "--no-save",
-        action="store_true",
-        help="ne pas écrire de fichier (UDP uniquement)",
-    )
-    ap.add_argument(
-        "--no-udp",
-        action="store_true",
-        help="ne pas envoyer d'UDP (enregistrement local uniquement)",
-    )
+    ap.add_argument("--no-save", action="store_true", help="UDP uniquement")
+    ap.add_argument("--no-udp", action="store_true", help="fichier uniquement")
     ap.add_argument(
         "--calibration",
         type=Path,
@@ -315,7 +442,8 @@ def main() -> None:
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
     print(
-        f"[simulate] pièce {args.width}×{args.depth}×{args.height} m  "
+        f"[simulate] scène « {args.scene} »  "
+        f"{args.width}×{args.depth}×{args.height} m  "
         f"ψ 0…{args.psi_end}° @ {args.speed}°/s"
     )
     if send_udp:
@@ -339,6 +467,7 @@ def main() -> None:
                 height=args.height,
                 sensor_z=args.sensor_z,
                 realtime=not args.fast,
+                scene=args.scene,
             ):
                 datagrams.append(datagram)
                 if sock is not None:

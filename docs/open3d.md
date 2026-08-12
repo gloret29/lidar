@@ -101,17 +101,18 @@ lidar-receive --port 9000 --output scans/sim_pos1.pcd --auto-stop
 lidar-simulate --host 127.0.0.1 --port 9000 --fast
 ```
 
-Le simulateur raytrace une pièce axis-aligned (défaut 4×5×2,5 m, capteur à
-1,5 m), encode des datagrammes **identiques au firmware** (magic `LDAR`,
-120 points, drapeaux start/end) et les envoie en UDP.
+Le simulateur raytrace une scène axis-aligned. Par défaut **`apartment`** :
+salon en L, couloir, baie de porte, canapé, table, bibliothèque, îlot,
+colonne. Alternative : `--scene box` (pavé vide).
 
 | Option | Défaut | Rôle |
 |---|---|---|
 | `--host` / `--port` | `127.0.0.1` / 9000 | Destination |
+| `--scene` | `apartment` | `apartment` (L + mobilier) ou `box` |
 | `--fast` | off | Ignore le rythme temps réel ~4,5 kpts/s |
 | `--psi-end` | 180 | Amplitude azimut |
 | `--speed` | 2 °/s | Vitesse azimut (temps réel) |
-| `--width` `--depth` `--height` | 4 / 5 / 2,5 | Dimensions de la pièce (m) |
+| `--width` `--depth` `--height` | 5 / 4,5 / 2,6 | Dimensions du salon (m) |
 | `--loops` | 1 | `0` = balayages en boucle |
 | `--output` | `scans/simulate.pcd` | Nuage XYZ enregistré en fin de scan |
 | `--no-save` | off | UDP uniquement, pas de fichier |
