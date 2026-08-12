@@ -129,7 +129,7 @@ scanner.
 | Pièces 3D | 6 pièces paramétriques, rendues et vérifiées |
 | Documentation de construction | Complète |
 | Firmware | Structure complète, **non testée sur matériel** |
-| Station hôte | Protocole, transformation et visualisation opérationnels |
+| Station hôte | Protocole, transform, Open3D, simulateur UDP, tests |
 | Calibration | Procédures écrites, à exécuter sur le prototype |
 
 ## Limites connues
