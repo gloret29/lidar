@@ -1,12 +1,17 @@
 /**
  * Scanner 3D LiDAR DIY — firmware ESP32-S3
  *
- * Tasks FreeRTOS (à implémenter progressivement) :
- *   1. lidar_task   — parsing UART LD19
- *   2. stepper_task — balayage vertical phi
- *   3. imu_task     — lecture MPU6050
- *   4. fusion_task  — conversion (X, Y, Z)
- *   5. network_task — streaming UDP
+ * Le LD19 est monté sur la tranche : son plan de balayage est vertical
+ * et contient l'axe de rotation. L'angle interne du LiDAR est donc
+ * l'ÉLÉVATION, et l'angle moteur l'AZIMUT. Voir docs/geometry.md.
+ *
+ * Les points partent en POLAIRE BRUT ; la conversion cartésienne est
+ * faite côté hôte, où la calibration reste modifiable après coup.
+ *
+ * Tâches :
+ *   lidar_task    coeur 1  UART LD19 -> file de points
+ *   network_task  coeur 0  agrégation -> datagrammes UDP
+ *   motion_task   coeur 1  profil moteur, nivellement, homing
  */
 
 #include <Arduino.h>
@@ -15,157 +20,183 @@
 #include <esp_timer.h>
 
 #include "config.h"
+#include "ld19.h"
+#include "protocol.h"
+#include "scanner.h"
 #include "wifi_setup.h"
 
-// ---------------------------------------------------------------------------
-// Types
-// ---------------------------------------------------------------------------
-
-struct LidarPoint {
-  float rho;
-  float theta;
-  uint64_t timestamp_us;
-};
-
-struct CartesianPoint {
-  float x;
-  float y;
-  float z;
-  uint32_t quality;
-};
-
-// ---------------------------------------------------------------------------
-// Globals
-// ---------------------------------------------------------------------------
+namespace {
 
 WiFiUDP udp;
-static String udp_host = UDP_HOST_DEFAULT;
+String udp_host = UDP_HOST_DEFAULT;
 
-static float pitch_offset_deg = 0.0f;
-static float elevation_deg = 0.0f;
+QueueHandle_t point_queue = nullptr;
+uint32_t packet_sequence = 0;
+volatile uint16_t lidar_speed_dhz = 0;
+volatile uint16_t pending_flags = 0;
 
-// ---------------------------------------------------------------------------
-// Coordinate transform
-// ---------------------------------------------------------------------------
+struct QueuedPoint {
+    RawPoint pt;
+    uint64_t t_us;
+    int32_t psi_mdeg;
+};
 
-CartesianPoint toCartesian(float rho, float theta_deg, float phi_deg) {
-  const float theta = theta_deg * DEG_TO_RAD;
-  const float phi = phi_deg * DEG_TO_RAD;
+// ------------------------------------------------------------
+//  Tâche LiDAR
+// ------------------------------------------------------------
+void lidarTask(void *) {
+    Ld19Parser parser;
+    parser.begin();
+    Ld19Frame frame;
 
-  CartesianPoint p{};
-  p.x = rho * cosf(phi) * cosf(theta);
-  p.y = rho * cosf(phi) * sinf(theta);
-  p.z = rho * sinf(phi);
-  p.quality = 0;
-  return p;
+    for (;;) {
+        while (Serial1.available()) {
+            if (!parser.feed(static_cast<uint8_t>(Serial1.read()), frame)) continue;
+
+            lidar_speed_dhz = static_cast<uint16_t>(frame.speed_dps / 36);
+            const uint64_t now = esp_timer_get_time();
+            const int32_t psi = scannerPsiMdeg();
+
+            for (int i = 0; i < LD19_POINTS_PER_FRAME; i++) {
+                if (frame.points[i].distance_mm == 0) continue;  // pas de retour
+
+                QueuedPoint q;
+                q.pt.rho_mm = frame.points[i].distance_mm;
+                q.pt.theta_cdeg = frame.points[i].angle_cdeg;
+                q.pt.intensity = frame.points[i].intensity;
+                q.pt.reserved = 0;
+                q.pt.dt_us = 0;
+                q.t_us = now;
+                q.psi_mdeg = psi;
+                xQueueSend(point_queue, &q, 0);  // on préfère perdre un point
+                                                 // que bloquer l'UART
+            }
+        }
+        vTaskDelay(1);
+    }
 }
 
-// ---------------------------------------------------------------------------
-// Network (stub)
-// ---------------------------------------------------------------------------
+// ------------------------------------------------------------
+//  Tâche réseau
+// ------------------------------------------------------------
+void networkTask(void *) {
+    static uint8_t buffer[sizeof(PacketHeader) + POINTS_PER_PACKET * sizeof(RawPoint)];
+    QueuedPoint q;
 
-void sendPointBatch(const CartesianPoint* points, uint16_t count) {
-  if (WiFi.status() != WL_CONNECTED || count == 0) {
-    return;
-  }
+    for (;;) {
+        uint16_t count = 0;
+        uint64_t t_start = 0;
+        int32_t psi_start = 0, psi_end = 0;
 
-  // Header: magic(4) + version(2) + count(2) + timestamp(8) = 16 bytes
-  // Point: x(4) + y(4) + z(4) + quality(4) = 16 bytes
-  const size_t header_size = 16;
-  const size_t point_size = 16;
-  const size_t buf_size = header_size + count * point_size;
+        while (count < POINTS_PER_PACKET) {
+            const TickType_t wait = (count == 0) ? pdMS_TO_TICKS(200) : 0;
+            if (xQueueReceive(point_queue, &q, wait) != pdTRUE) break;
 
-  uint8_t* buf = static_cast<uint8_t*>(malloc(buf_size));
-  if (!buf) {
-    return;
-  }
+            if (count == 0) {
+                t_start = q.t_us;
+                psi_start = q.psi_mdeg;
+            }
+            psi_end = q.psi_mdeg;
 
-  uint32_t magic = PACKET_MAGIC;
-  uint16_t version = PROTOCOL_VERSION;
-  uint64_t ts = esp_timer_get_time();
+            const uint64_t delta = q.t_us - t_start;
+            q.pt.dt_us = static_cast<uint16_t>(delta > 65535 ? 65535 : delta);
 
-  memcpy(buf + 0, &magic, 4);
-  memcpy(buf + 4, &version, 2);
-  memcpy(buf + 6, &count, 2);
-  memcpy(buf + 8, &ts, 8);
+            memcpy(buffer + sizeof(PacketHeader) + count * sizeof(RawPoint), &q.pt,
+                   sizeof(RawPoint));
+            count++;
+        }
 
-  for (uint16_t i = 0; i < count; i++) {
-    size_t off = header_size + i * point_size;
-    memcpy(buf + off + 0, &points[i].x, 4);
-    memcpy(buf + off + 4, &points[i].y, 4);
-    memcpy(buf + off + 8, &points[i].z, 4);
-    memcpy(buf + off + 12, &points[i].quality, 4);
-  }
+        if (count == 0 || WiFi.status() != WL_CONNECTED) continue;
 
-  udp.beginPacket(udp_host.c_str(), UDP_PORT);
-  udp.write(buf, buf_size);
-  udp.endPacket();
+        PacketHeader h{};
+        h.magic = PACKET_MAGIC;
+        h.version = PROTOCOL_VERSION;
+        h.flags = pending_flags;
+        h.sequence = packet_sequence++;
+        h.point_count = count;
+        h.lidar_speed_dhz = lidar_speed_dhz;
+        h.t_start_us = t_start;
+        h.psi_start_mdeg = psi_start;
+        h.psi_end_mdeg = psi_end;
+        pending_flags = 0;
+        memcpy(buffer, &h, sizeof(h));
 
-  free(buf);
+        udp.beginPacket(udp_host.c_str(), UDP_PORT);
+        udp.write(buffer, sizeof(PacketHeader) + count * sizeof(RawPoint));
+        udp.endPacket();
+    }
 }
 
-// ---------------------------------------------------------------------------
-// Stepper (stub — STEP/DIR bit-bang)
-// ---------------------------------------------------------------------------
+// ------------------------------------------------------------
+//  Tâche mouvement
+// ------------------------------------------------------------
+void motionTask(void *) {
+    delay(2000);
 
-void stepperInit() {
-  pinMode(STEP_PIN, OUTPUT);
-  pinMode(DIR_PIN, OUTPUT);
-  pinMode(EN_PIN, OUTPUT);
-  digitalWrite(EN_PIN, LOW);  // enable driver
+    pending_flags |= PKT_FLAG_SCAN_START;
+    if (!scannerHome()) {
+        Serial.println("[main] homing échoué, scan annulé");
+        vTaskDelete(nullptr);
+        return;
+    }
+
+    Serial.println("[main] montée en vitesse du LiDAR");
+    scannerSetState(ScanState::Spinup);
+    delay(3000);
+
+    scannerStartSweep();
+    while (scannerState() == ScanState::Scanning) {
+        scannerTick();
+        taskYIELD();
+    }
+
+    pending_flags |= PKT_FLAG_SCAN_END;
+    Serial.println("[main] scan terminé");
+    vTaskDelete(nullptr);
 }
 
-void stepperStep(int32_t steps, bool direction_cw) {
-  digitalWrite(DIR_PIN, direction_cw ? HIGH : LOW);
-  for (int32_t i = 0; i < steps; i++) {
-    digitalWrite(STEP_PIN, HIGH);
-    delayMicroseconds(2);
-    digitalWrite(STEP_PIN, LOW);
-    delayMicroseconds(2);
-  }
-}
-
-// ---------------------------------------------------------------------------
-// Setup / loop (skeleton)
-// ---------------------------------------------------------------------------
+}  // namespace
 
 void setup() {
-  Serial.begin(115200);
-  delay(500);
-  Serial.println("[lidar-scanner] boot");
+    Serial.begin(115200);
+    delay(500);
+    Serial.println("\n[lidar-scanner] démarrage");
 
-  stepperInit();
+    Serial1.begin(LIDAR_BAUD, SERIAL_8N1, LIDAR_RX_PIN, -1);
+    Serial1.setRxBufferSize(4096);
+    ld19SetSpeed(LIDAR_TARGET_HZ);
 
-  // LiDAR UART
-  Serial1.begin(LIDAR_BAUD, SERIAL_8N1, LIDAR_RX_PIN, LIDAR_TX_PIN);
+    scannerInit();
 
-  wifiCheckResetButton();
-  if (!wifiSetup(udp_host)) {
-    Serial.println("[wifi] redémarrage dans 3 s...");
-    delay(3000);
-    ESP.restart();
-  }
+    wifiCheckResetButton();
+    if (!wifiSetup(udp_host)) {
+        Serial.println("[wifi] redémarrage dans 3 s");
+        delay(3000);
+        ESP.restart();
+    }
+    udp.begin(UDP_PORT);
 
-  udp.begin(UDP_PORT);
-  Serial.println("[lidar-scanner] ready");
+    point_queue = xQueueCreate(2048, sizeof(QueuedPoint));
+    if (!point_queue) {
+        Serial.println("[main] création de la file impossible");
+        ESP.restart();
+    }
+
+    xTaskCreatePinnedToCore(lidarTask, "lidar", 4096, nullptr, 5, nullptr, 1);
+    xTaskCreatePinnedToCore(networkTask, "network", 4096, nullptr, 3, nullptr, 0);
+    xTaskCreatePinnedToCore(motionTask, "motion", 4096, nullptr, 4, nullptr, 1);
+
+    Serial.println("[lidar-scanner] prêt");
 }
 
 void loop() {
-  // TODO: replace with FreeRTOS tasks
-  // Demo: send a single test point every second
-  static uint32_t last = 0;
-  if (millis() - last > 1000) {
-    last = millis();
-    elevation_deg += ELEVATION_STEP_DEG;
-    if (elevation_deg > ELEVATION_MAX_DEG) {
-      elevation_deg = ELEVATION_MIN_DEG;
+    static uint32_t last = 0;
+    if (millis() - last > 2000) {
+        last = millis();
+        Serial.printf("[stat] psi=%.2f deg  file=%u  paquets=%u\n",
+                      scannerPsiMdeg() / 1000.0f,
+                      static_cast<unsigned>(uxQueueMessagesWaiting(point_queue)),
+                      static_cast<unsigned>(packet_sequence));
     }
-
-    const float phi = elevation_deg + pitch_offset_deg;
-    CartesianPoint demo = toCartesian(1.0f, 0.0f, phi);
-    sendPointBatch(&demo, 1);
-
-    Serial.printf("[demo] phi=%.1f -> (%.3f, %.3f, %.3f)\n", phi, demo.x, demo.y,
-                  demo.z);
-  }
+    vTaskDelay(pdMS_TO_TICKS(100));
 }

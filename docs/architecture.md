@@ -1,101 +1,147 @@
-# Architecture
+# Architecture logicielle
 
 ## Vue d'ensemble
 
-Le scanner combine un LiDAR 2D en rotation continue (azimut $\theta$) avec un balayage vertical discret ou continu (élévation $\phi$) pour produire un nuage de points 3D.
-
 ```
-                    ┌─────────────────┐
-                    │   Station hôte   │
-                    │  Open3D / ROS2   │
-                    └────────▲────────┘
-                             │ WiFi (UDP)
-                    ┌────────┴────────┐
-                    │   ESP32-S3      │
-                    │  ┌───────────┐  │
-                    │  │ Transform │  │
-                    │  │  (X,Y,Z)  │  │
-                    │  └─────▲─────┘  │
-                    │   ┌────┴────┐   │
-                    │   │ Queues  │   │
-                    │   └──┬───┬──┘   │
-                    └───┬──┴───┴───┬───┘
-                        │      │   │
-                   UART │  I2C │   │ STEP/DIR
-                        │      │   │
-                   ┌────┴──┐ ┌─┴───┴──┐
-                   │ LD19  │ │MPU6050 │
-                   └───────┘ └────────┘
-                              │
-                         ┌────┴────┐
-                         │ NEMA 17 │
-                         │ TMC2209 │
-                         └─────────┘
+   ┌──────────────────── Tête tournante ────────────────────┐
+   │   LD19  (plan de balayage vertical, 5 Hz, 4500 pts/s)   │
+   └────────────────────────┬───────────────────────────────┘
+                            │ UART 230400
+   ┌────────────────────────┴───────────────────────────────┐
+   │                      ESP32-S3                          │
+   │                                                        │
+   │   lidar_task  ──►  file  ──►  network_task             │
+   │   (coeur 1)                   (coeur 0)                │
+   │        ▲                                               │
+   │   motion_task ──► TMC2209 ──► NEMA 17                  │
+   │   (coeur 1)                                            │
+   └────────────────────────┬───────────────────────────────┘
+                            │ UDP, points POLAIRES BRUTS
+   ┌────────────────────────┴───────────────────────────────┐
+   │                   Station hôte                          │
+   │   protocol ──► transform (calibration) ──► Open3D      │
+   └────────────────────────────────────────────────────────┘
 ```
 
-## Firmware — tasks FreeRTOS
+## Décision structurante : transmettre en polaire brut
 
-| Task | Priorité | Période / déclenchement |
-|------|----------|-------------------------|
-| `lidar_task` | Haute | Lecture UART (DMA), push `(ρ, θ, t)` |
-| `stepper_task` | Moyenne | Profil de balayage $\phi$, push `(φ_cmd, t)` |
-| `imu_task` | Moyenne | 100–200 Hz, push `(pitch, t)` |
-| `fusion_task` | Haute | Associe ρ, θ, φ, pitch → `(X, Y, Z)` |
-| `network_task` | Moyenne | Envoi UDP par paquets |
+La conversion cartésienne se fait **sur l'hôte**, pas sur l'ESP32.
 
-### Synchronisation temporelle
+L'argument n'est pas la bande passante — 36 ko/s en polaire contre 72 ko/s en
+cartésien, les deux sont négligeables en Wi-Fi. L'argument est la
+**reprocessabilité** : le bras de levier, le zéro d'azimut et le nivellement
+sont des paramètres de calibration. Les garder côté hôte permet de corriger un
+réglage et de rejouer un scan déjà enregistré, sans reflasher ni retourner sur
+site.
 
-Chaque point LiDAR doit être associé à :
+C'est d'autant plus pertinent que la transformation est exactement l'endroit où
+une erreur de conception s'était glissée initialement (voir
+[geometry.md](geometry.md) § 3).
 
-- $\phi_{\text{cmd}}$ : angle commandé du stepper au timestamp $t$
-- $\phi_{\text{imu}}$ : pitch mesuré par MPU6050 (correction mécanique)
-- $\phi_{\text{effective}} = \phi_{\text{cmd}} + \phi_{\text{imu\_offset}}$
+## Tâches du firmware
 
-Utiliser `esp_timer_get_time()` comme horloge commune.
+| Tâche | Cœur | Priorité | Rôle |
+|---|---|---|---|
+| `lidar_task` | 1 | 5 | Lecture UART, décodage des trames LD19, mise en file |
+| `motion_task` | 1 | 4 | Nivellement, homing, profil de balayage |
+| `network_task` | 0 | 3 | Agrégation en datagrammes, émission UDP |
+| `loop()` | 0 | 1 | Télémétrie sur le port série |
 
-## Protocole réseau (UDP)
+La file entre `lidar_task` et `network_task` compte 2 048 entrées, soit environ
+450 ms de marge à 4 500 pts/s. En cas de saturation, `lidar_task` **abandonne
+le point** plutôt que de bloquer : perdre un point est sans conséquence, perdre
+la synchronisation de l'UART corromprait toute une salve de trames.
 
-Port par défaut : **9000**
+### Synchronisation des angles
 
-L'adresse IP de la station hôte est configurée via le portail **WiFiManager** au premier démarrage (persistée en flash). Voir [wifi.md](wifi.md).
+À 2 °/s, l'azimut ne varie que de **0,005°** pendant l'émission d'une trame de
+12 points (2,7 ms). C'est trois ordres de grandeur sous la résolution visée
+(0,4°). Relever $\psi$ une fois par trame suffit donc largement.
 
-### En-tête paquet (16 octets, little-endian)
+Les bornes `psi_start` et `psi_end` sont néanmoins transmises à chaque
+datagramme, et l'hôte interpole selon l'horodatage : la chaîne reste correcte
+si l'on décide un jour d'accélérer le balayage.
+
+## Protocole UDP, version 2
+
+Port par défaut : **9000**. L'adresse de l'hôte se configure via le portail
+WiFiManager ([wifi.md](wifi.md)). Tout est en little-endian.
+
+### En-tête (32 octets)
 
 | Offset | Type | Champ |
-|--------|------|-------|
-| 0 | `uint32` | Magic `0x4C444152` ("LDAR") |
-| 4 | `uint16` | Version protocole |
-| 6 | `uint16` | Nombre de points |
-| 8 | `uint64` | Timestamp scan (µs) |
+|---|---|---|
+| 0 | `uint32` | Magic `0x4C444152` (« LDAR ») |
+| 4 | `uint16` | Version du protocole (2) |
+| 6 | `uint16` | Drapeaux |
+| 8 | `uint32` | Numéro de séquence |
+| 12 | `uint16` | Nombre de points |
+| 14 | `uint16` | Vitesse du LD19, en 0,1 Hz |
+| 16 | `uint64` | Horodatage du premier point (µs) |
+| 24 | `int32` | Azimut au premier point (millidegrés) |
+| 28 | `int32` | Azimut au dernier point (millidegrés) |
 
-### Point (16 octets)
+### Point (8 octets)
 
 | Offset | Type | Champ |
-|--------|------|-------|
-| 0 | `float` | X (m) |
-| 4 | `float` | Y (m) |
-| 8 | `float` | Z (m) |
-| 12 | `uint32` | Intensité / qualité (optionnel) |
+|---|---|---|
+| 0 | `uint16` | Distance $\rho$, millimètres |
+| 2 | `uint16` | Angle LiDAR $\theta$ = **élévation**, centidegrés |
+| 4 | `uint8` | Intensité |
+| 5 | `uint8` | Réservé |
+| 6 | `uint16` | Décalage depuis l'horodatage d'en-tête (µs) |
+
+### Drapeaux
+
+| Bit | Nom | Signification |
+|---|---|---|
+| 0 | `SCAN_START` | Premier datagramme d'un scan |
+| 1 | `SCAN_END` | Balayage terminé |
+| 2 | `LEVEL_VALID` | Nivellement IMU réussi |
+| 3 | `SHOCK_DETECTED` | Le trépied a bougé : scan suspect |
+
+120 points par datagramme, soit 992 octets — sous la MTU, donc jamais de
+fragmentation IP.
+
+Le numéro de séquence permet à l'hôte de chiffrer les pertes. UDP est retenu
+sciemment : sur un nuage de plusieurs centaines de milliers de points, quelques
+pertes sont sans importance, alors que la latence de retransmission de TCP
+perturberait l'affichage temps réel.
 
 ## Station hôte
 
 ```
-host/
-└── lidar_host/
-    ├── receiver.py    # Socket UDP, parsing binaire
-    ├── point_cloud.py # Accumulation, filtrage
-    └── visualize.py   # Viewer Open3D temps réel
+host/src/lidar_host/
+├── protocol.py      décodage v2, vectorisé NumPy
+├── transform.py     polaire -> cartésien, calibration, nivellement
+├── receiver.py      socket UDP, accumulation, export
+├── visualize.py     affichage temps réel Open3D
+└── postprocess.py   filtrage, recalage ICP, maillage Poisson
 ```
 
-Pipeline hôte :
+Le décodage est vectorisé : `np.frombuffer` sur un dtype structuré, sans boucle
+Python. Un datagramme de 120 points se décode en quelques microsecondes, très
+loin des 37 datagrammes par seconde à absorber.
 
-1. Réception UDP → buffer de points
-2. Filtrage statistique (radius outlier removal)
-3. Visualisation ou enregistrement `.PCD`
-4. (Optionnel) reconstruction mesh Poisson
+## Débit
 
-## Débit estimé
+| Étage | Débit |
+|---|---|
+| LD19 en sortie UART | 4 500 pts/s, soit 17,6 ko/s de trames |
+| Points valides après filtrage | environ 4 000 pts/s |
+| Charge utile UDP | 32 ko/s |
+| Avec en-têtes UDP/IP | environ 34 ko/s |
 
-- LD19 : ~4 500 pts/s
-- 12 octets/point (XYZ float) + overhead ≈ **54–60 Ko/s**
-- WiFi 802.11n suffisant en conditions normales ; prévoir buffer PSRAM côté firmware
+Très largement dans les capacités d'un 802.11n, y compris en périphérie de
+couverture.
+
+## Tests
+
+```bash
+cd host && PYTHONPATH=src .venv/bin/python -m pytest tests/ -q
+```
+
+35 tests couvrent le décodage du protocole et la transformation géométrique,
+sans aucun matériel. Ils comprennent notamment un **garde-fou contre le retour
+à la formule sphérique naïve** : c'est l'erreur la plus coûteuse possible sur
+ce projet, car elle produit un nuage plausible mais faux.

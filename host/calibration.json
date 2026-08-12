@@ -1,0 +1,14 @@
+{
+  "_comment": "Voir docs/calibration.md. Ces valeurs sont appliquées au post-traitement : les modifier ne demande ni reflashage ni nouveau scan.",
+
+  "lever_arm_mm": { "tx": 0.0, "ty": 0.0, "tz": 0.0 },
+  "psi_offset_deg": 0.0,
+  "theta_offset_deg": 0.0,
+  "steps_per_degree": 8.889,
+  "timestamp_offset_us": 0,
+  "g_zero": [0.0, 0.0, -1.0],
+
+  "rho_min_m": 0.05,
+  "rho_max_m": 12.0,
+  "intensity_min": 0
+}

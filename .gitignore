@@ -1,9 +1,10 @@
 # Python
-host/.venv/
-host/**/__pycache__/
-host/**/*.egg-info/
+.venv/
+**/__pycache__/
+**/*.egg-info/
 host/dist/
 host/build/
+.pytest_cache/
 *.pyc
 
 # PlatformIO

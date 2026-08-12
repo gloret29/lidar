@@ -1,6 +1,6 @@
 [project]
 name = "lidar-host"
-version = "0.1.0"
+version = "0.2.0"
 description = "Station hôte pour le scanner 3D LiDAR DIY"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -9,9 +9,14 @@ dependencies = [
     "open3d>=0.17",
 ]
 
+[project.optional-dependencies]
+dev = ["pytest>=7.4"]
+
 [project.scripts]
 lidar-visualize = "lidar_host.visualize:main"
 lidar-receive = "lidar_host.receiver:main"
+lidar-register = "lidar_host.postprocess:main_register"
+lidar-mesh = "lidar_host.postprocess:main_mesh"
 
 [build-system]
 requires = ["setuptools>=68"]
