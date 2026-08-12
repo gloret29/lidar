@@ -42,7 +42,12 @@ lidar-simulate --host 127.0.0.1 --port 9000 --fast
 ```
 
 Le simulateur envoie une pièce rectangulaire synthétique (protocole UDP v2)
-**et enregistre** le nuage dans `scans/simulate.pcd` par défaut.
+**et enregistre** le nuage dans `scans/simulate.pcd` par défaut. Un exemplaire
+est versionné dans le dépôt : on peut l’ouvrir sans relancer la simulation.
+
+```bash
+python -c "import open3d as o3d; o3d.visualization.draw_geometries([o3d.io.read_point_cloud('scans/simulate.pcd')])"
+```
 
 ```bash
 # Fichier seul, sans UDP
