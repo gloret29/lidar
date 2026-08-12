@@ -28,15 +28,33 @@ La fenêtre Open3D a besoin d’un serveur graphique :
 | Environnement | Astuce |
 |---|---|
 | Windows natif | Fonctionne en général sans réglage |
-| WSL2 | WSLg (Windows 11) ou un X server ; sinon enregistrer en `.pcd` et ouvrir sous Windows |
-| SSH distant | `lidar-receive` sans fenêtre, puis ouvrir le fichier ailleurs |
-| macOS / Linux desktop | OK dès que l’écran local est disponible |
+| WSL2 + WSLg | `export DISPLAY=:0` puis `lidar-visualize` |
+| WSL2 sans GUI | `lidar-receive … --output scans/test.pcd` puis ouvrir le fichier sous Windows |
+| SSH distant | idem : recevoir en `.pcd`, visualiser ailleurs |
 
-Sans affichage, on peut quand même tout faire sauf `lidar-visualize` :
+Si la fenêtre échoue, `lidar-visualize` bascule tout seul en **réception
+sans fenêtre** et écrit un `.pcd` (défaut `scans/headless.pcd`, ou
+`--output`). Forcer ce mode : `--headless`.
 
 ```bash
-lidar-receive --port 9000 --output scans/test.pcd --auto-stop
+# Terminal A (WSL)
+lidar-receive --port 9000 --output scans/sim.pcd --auto-stop
+# ou
+lidar-visualize --port 9000 --headless --output scans/sim.pcd
+
+# Terminal B
+lidar-simulate --host 127.0.0.1 --port 9000 --fast
 ```
+
+Sous Windows (PowerShell), pour ouvrir le fichier généré dans WSL :
+
+```powershell
+python -c "import open3d as o3d; o3d.visualization.draw_geometries([o3d.io.read_point_cloud(r'\\wsl$\Ubuntu\home\loret\dev\lidar\host\scans\sim.pcd')])"
+```
+
+(Adapter le chemin distro / utilisateur.)
+
+Sans affichage, on peut quand même tout faire sauf la fenêtre live.
 
 ## 2. Chaîne complète (vue d’ensemble)
 
