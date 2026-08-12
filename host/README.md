@@ -89,7 +89,7 @@ Guide Open3D (fenêtre live, fichiers, ICP, Poisson, dépannage) :
 pytest -q
 ```
 
-37 tests, sans matériel. Ils couvrent le décodage du protocole, la
+39 tests, sans matériel. Ils couvrent le décodage du protocole, la
 transformation géométrique (garde-fou contre la formule sphérique naïve) et
 le simulateur UDP (dont l'enregistrement du nuage).
 
