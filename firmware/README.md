@@ -19,24 +19,27 @@ pio run -e ota -t upload      # par le réseau
 ```
 
 Les dépendances (`WiFiManager`, `TMCStepper`) sont téléchargées automatiquement.
-L'OTA n'en ajoute aucune : `ArduinoOTA`, `WebServer` et `Update` font partie du
-core ESP32.
+Web + OTA n'en ajoutent aucune : `ArduinoOTA`, `WebServer`, `Update` et
+`Preferences` font partie du core ESP32.
 
 ## Configuration
 
-### Wi-Fi et OTA — aucun identifiant en dur
+### Wi-Fi et panneau web — aucun identifiant en dur
 
 Au premier démarrage, l'ESP32 ouvre le point d'accès `LiDAR-Scanner-Setup`. On
 y renseigne le réseau local, l'adresse de la station hôte et le mot de passe
-OTA. Ces trois valeurs sont persistées en NVS et relues à chaque démarrage.
-Maintenir **BOOT** au démarrage remet tout à zéro.
+du panneau (OTA inclus). Ces valeurs sont persistées en NVS.
 
-Voir [docs/wifi.md](../docs/wifi.md) et [docs/ota.md](../docs/ota.md).
+Après connexion, ouvrir `http://lidar-scanner.local/` : commande de balayage,
+diagnostics, réglages StallGuard / courants / vitesse, et OTA.
 
-### Autres paramètres
+Voir [docs/wifi.md](../docs/wifi.md), [docs/web.md](../docs/web.md) et
+[docs/ota.md](../docs/ota.md).
 
-Tout est dans [`include/config.h`](include/config.h) : brochage, vitesse du
-LiDAR, profil de balayage, courants moteur, seuil StallGuard.
+### Paramètres
+
+- Défauts et brochage : [`include/config.h`](include/config.h)
+- Valeurs runtime (persistées) : panneau web → NVS namespace `scanset`
 
 > **Attention** : sur la variante N16R8, les GPIO 33 à 37 sont occupés par la
 > PSRAM octale. Les utiliser fait planter la carte au démarrage.
@@ -47,17 +50,23 @@ LiDAR, profil de balayage, courants moteur, seuil StallGuard.
 firmware/
 ├── platformio.ini
 ├── include/
-│   ├── config.h        brochage et paramètres
-│   ├── protocol.h      format des datagrammes UDP (v2)
+│   ├── config.h        brochage et défauts
+│   ├── protocol.h      datagrammes UDP (v2)
 │   ├── ld19.h          analyseur de trames LiDAR
 │   ├── scanner.h       axe de lacet
-│   ├── ota.h           mise à jour par le réseau
-│   └── wifi_setup.h    portail captif, persistance NVS
+│   ├── settings.h      réglages NVS
+│   ├── control.h       file de commandes
+│   ├── status.h        télémétrie
+│   ├── ota.h           panneau web + OTA
+│   └── wifi_setup.h
 └── src/
-    ├── main.cpp        tâches FreeRTOS, accroches OTA
-    ├── ld19.cpp        décodage 47 octets + CRC8 (polynôme 0x4D)
-    ├── scanner.cpp     TMC2209, homing StallGuard, profil
-    ├── ota.cpp         ArduinoOTA + serveur web d'upload
+    ├── main.cpp
+    ├── ld19.cpp
+    ├── scanner.cpp
+    ├── settings.cpp
+    ├── control.cpp
+    ├── status.cpp
+    ├── ota.cpp         page unique + ArduinoOTA
     └── wifi_setup.cpp
 ```
 
@@ -65,55 +74,51 @@ firmware/
 
 ```
 setup()
-  ├── UART LiDAR + consigne PWM à 5 Hz
-  ├── TMC2209 : StealthChop2, 700 mA, StallGuard armé
-  ├── WiFiManager (réglages relus depuis la NVS)
-  ├── OTA : ArduinoOTA + serveur web + mDNS
-  └── création des tâches
+  ├── réglages NVS
+  ├── UART LiDAR + PWM
+  ├── TMC2209
+  ├── WiFiManager
+  ├── panneau web + ArduinoOTA
+  └── tâches
 
-motion_task    fenêtre OTA 10 s -> homing -> montée en vitesse -> balayage 180 deg
+motion_task    attend start/stop/rehome/estop (file FreeRTOS)
 lidar_task     UART -> décodage -> file
-network_task   file -> datagrammes de 120 points -> UDP
-ota_task       ArduinoOTA.handle() + serveur web
+network_task   file -> datagrammes UDP
+web_task       HTTP + ArduinoOTA.handle()
 ```
+
+Le scanner **ne lance plus de balayage tout seul** au démarrage.
 
 ## Points d'implémentation notables
 
 **Les points partent en polaire brut.** La conversion cartésienne est faite
-côté hôte, ce qui permet de corriger la calibration et de rejouer un scan sans
-reflasher. Voir [docs/architecture.md](../docs/architecture.md).
+côté hôte. Voir [docs/architecture.md](../docs/architecture.md).
 
-**Débordement de file : on abandonne le point.** Perdre un point sur 400 000
-est sans conséquence ; bloquer la lecture de l'UART corromprait toute une salve
-de trames.
+**Débordement de file : on abandonne le point.** Perdre un point est sans
+conséquence ; bloquer l'UART corromprait toute une salve.
 
-**StealthChop2 n'est pas un confort.** Les vibrations d'un moteur en
-SpreadCycle se transmettent directement au capteur optique et dégradent la
-mesure. C'est la raison d'être de la liaison UART vers le TMC2209.
+**StealthChop2 n'est pas un confort.** Les vibrations SpreadCycle se
+transmettent au capteur optique.
 
-**L'OTA coupe le moteur avant d'écrire.** Redémarrer avec le TMC2209 encore
-alimenté laisserait l'axe en couple pendant plusieurs secondes. Une mise à jour
-relâche donc `EN` en premier, avant toute écriture en flash.
+**L'OTA coupe le moteur avant d'écrire**, et est refusé pendant un balayage.
+Comme le scanner démarre au repos, un firmware défectueux reste rattrapable
+sans fenêtre artificielle de 10 s. Détails dans [docs/ota.md](../docs/ota.md).
 
-**L'OTA est refusé pendant un balayage**, et une fenêtre de 10 s est ménagée à
-chaque démarrage. Sans elle, un firmware qui plante en cours de scan ne serait
-plus récupérable que par USB — le scanner redémarrerait en boucle sans jamais
-laisser d'occasion de le corriger. Détails dans [docs/ota.md](../docs/ota.md).
+**Les réglages exposés sont bornés dans le firmware** (courants, StallGuard,
+vitesse). La calibration géométrique reste sur l'hôte.
 
 ## État
 
 Le firmware est **structurellement complet mais n'a pas encore tourné sur du
 matériel**. À valider en priorité au premier montage :
 
-- [ ] Décodage des trames LD19 (vérifier le taux de CRC valides)
-- [ ] Réglage du rapport cyclique PWM pour obtenir réellement 5 Hz
-- [ ] Seuil `SGTHRS` du homing StallGuard
-- [ ] Nivellement IMU (le code MPU6050 reste à écrire)
-- [ ] Tenue en débit sous charge Wi-Fi réelle
+- [ ] Décodage des trames LD19 (taux de CRC via le panneau)
+- [ ] Consigne PWM → 5 Hz réellement mesurés
+- [ ] Seuil StallGuard (curseur web + lecture live)
+- [ ] Nivellement IMU (code MPU6050 à écrire)
+- [ ] Commande web start/stop/rehome sur trépied
 - [ ] OTA de bout en bout, par les deux voies
 
-Le premier téléversement se fait obligatoirement **par USB** : l'OTA suppose
-qu'un firmware sachant l'assurer tourne déjà.
+Le premier téléversement se fait obligatoirement **par USB**.
 
-La géométrie et le protocole, eux, sont couverts par les 35 tests de
-`host/tests/`, exécutables sans matériel.
+La géométrie et le protocole sont couverts par les tests de `host/tests/`.

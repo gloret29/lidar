@@ -10,12 +10,17 @@ namespace {
 HardwareSerial tmc_serial(2);
 TMC2209Stepper driver(&tmc_serial, 0.11f, TMC_ADDRESS);
 
-volatile int32_t position_steps = 0;   // 0 = butée mécanique
+volatile int32_t position_steps = 0;
 volatile ScanState state = ScanState::Idle;
+volatile bool stop_requested = false;
 
 int32_t target_steps = 0;
 uint32_t step_interval_us = 0;
 uint64_t next_step_us = 0;
+
+uint16_t i_scan_ma = CURRENT_SCAN_MA;
+uint16_t i_home_ma = CURRENT_HOMING_MA;
+uint16_t sg_threshold = STALLGUARD_THRESHOLD;
 
 inline void pulse() {
     digitalWrite(STEP_PIN, HIGH);
@@ -35,68 +40,94 @@ void scannerInit() {
     pinMode(DIR_PIN, OUTPUT);
     pinMode(EN_PIN, OUTPUT);
     pinMode(TMC_DIAG_PIN, INPUT);
-    digitalWrite(EN_PIN, HIGH);  // driver désactivé au démarrage
+    digitalWrite(EN_PIN, HIGH);
 
     tmc_serial.begin(115200, SERIAL_8N1, TMC_RX_PIN, TMC_TX_PIN);
     driver.begin();
     driver.toff(4);
     driver.blank_time(24);
-    driver.rms_current(CURRENT_SCAN_MA);
+    driver.rms_current(i_scan_ma);
     driver.microsteps(MICROSTEPS);
-    driver.en_spreadCycle(false);  // StealthChop2 : indispensable, un
-                                   // balayage vibrant ruine la mesure optique
+    driver.en_spreadCycle(false);
     driver.pwm_autoscale(true);
     driver.TCOOLTHRS(0xFFFFF);
-    driver.SGTHRS(STALLGUARD_THRESHOLD);
+    driver.SGTHRS(sg_threshold);
 
     digitalWrite(EN_PIN, LOW);
+    state = ScanState::Idle;
     Serial.printf("[scanner] TMC2209 version 0x%02X\n", driver.version());
 }
 
+void scannerApplySettings(const ScanSettings& s) {
+    i_scan_ma = s.current_scan_ma;
+    i_home_ma = s.current_homing_ma;
+    sg_threshold = s.stallguard;
+    driver.rms_current(i_scan_ma);
+    driver.SGTHRS(sg_threshold);
+}
+
+void scannerEnable() {
+    digitalWrite(EN_PIN, LOW);
+    if (state == ScanState::Fault) state = ScanState::Idle;
+}
+
 bool scannerHome() {
+    stop_requested = false;
     state = ScanState::Homing;
-    driver.rms_current(CURRENT_HOMING_MA);
+    digitalWrite(EN_PIN, LOW);
+    driver.rms_current(i_home_ma);
+    driver.SGTHRS(sg_threshold);
 
     digitalWrite(DIR_PIN, LOW);
     const uint32_t interval = intervalFor(HOMING_SPEED_DEG_S);
     const int32_t max_steps = STEPS_PER_REV + STEPS_PER_REV / 4;
-
-    // StallGuard exige une vitesse établie : on ignore les premiers pas.
     const int32_t settle = static_cast<int32_t>(STEPS_PER_DEGREE * 5);
 
     for (int32_t i = 0; i < max_steps; i++) {
+        if (stop_requested) {
+            state = ScanState::Idle;
+            driver.rms_current(i_scan_ma);
+            Serial.println("[scanner] homing interrompu");
+            return false;
+        }
         pulse();
         delayMicroseconds(interval);
         if (i > settle && digitalRead(TMC_DIAG_PIN) == HIGH) {
             delay(50);
-            // On recule légèrement pour libérer la butée.
             digitalWrite(DIR_PIN, HIGH);
             for (int32_t k = 0; k < static_cast<int32_t>(STEPS_PER_DEGREE * 2); k++) {
                 pulse();
                 delayMicroseconds(interval);
             }
             position_steps = 0;
-            driver.rms_current(CURRENT_SCAN_MA);
+            driver.rms_current(i_scan_ma);
+            state = ScanState::Idle;
             Serial.printf("[scanner] butée trouvée après %d pas\n", i);
             return true;
         }
     }
 
-    driver.rms_current(CURRENT_SCAN_MA);
+    driver.rms_current(i_scan_ma);
     state = ScanState::Fault;
     Serial.println("[scanner] ÉCHEC du homing : aucun contact détecté");
     return false;
 }
 
 void scannerStartSweep() {
-    target_steps = static_cast<int32_t>(SCAN_END_DEG * STEPS_PER_DEGREE);
-    step_interval_us = intervalFor(SCAN_SPEED_DEG_S);
+    const ScanSettings& s = settings();
+    stop_requested = false;
+    target_steps = static_cast<int32_t>(s.scan_end_deg * STEPS_PER_DEGREE);
+    step_interval_us = intervalFor(s.scan_speed_deg_s);
     next_step_us = esp_timer_get_time();
+    digitalWrite(EN_PIN, LOW);
     digitalWrite(DIR_PIN, HIGH);
+    driver.rms_current(i_scan_ma);
     state = ScanState::Scanning;
-    Serial.printf("[scanner] balayage : %d pas, %.1f deg/s\n", target_steps,
-                  SCAN_SPEED_DEG_S);
+    Serial.printf("[scanner] balayage : %d pas, %.1f deg/s jusqu'à %.0f deg\n",
+                  target_steps, s.scan_speed_deg_s, s.scan_end_deg);
 }
+
+void scannerRequestStop() { stop_requested = true; }
 
 void scannerTick() {
     if (state != ScanState::Scanning) return;
@@ -104,9 +135,10 @@ void scannerTick() {
     const uint64_t now = esp_timer_get_time();
     if (now < next_step_us) return;
 
-    if (position_steps >= target_steps) {
+    if (stop_requested || position_steps >= target_steps) {
         state = ScanState::Done;
-        Serial.println("[scanner] balayage terminé");
+        Serial.println(stop_requested ? "[scanner] balayage arrêté"
+                                      : "[scanner] balayage terminé");
         return;
     }
 
@@ -114,21 +146,28 @@ void scannerTick() {
     position_steps++;
     next_step_us += step_interval_us;
 
-    // Rattrapage si l'ordonnanceur nous a mis en retard.
     if (now > next_step_us + step_interval_us) next_step_us = now + step_interval_us;
 }
 
 void scannerEmergencyStop() {
-    digitalWrite(EN_PIN, HIGH);  // driver désactivé, moteur non alimenté
+    stop_requested = true;
+    digitalWrite(EN_PIN, HIGH);
     if (state == ScanState::Scanning || state == ScanState::Homing ||
         state == ScanState::Spinup)
         state = ScanState::Fault;
     Serial.println("[scanner] arrêt d'urgence : moteur désactivé");
 }
 
+int16_t scannerSgResult() {
+    // SG_RESULT est un registre 10 bits ; une valeur aberrante signale
+    // souvent une UART muette plutôt qu'une charge réelle.
+    const uint32_t raw = driver.SG_RESULT();
+    if (raw > 1023) return -1;
+    return static_cast<int16_t>(raw);
+}
+
 int32_t scannerPsiMdeg() {
-    const int32_t steps = position_steps;
-    return static_cast<int32_t>(steps * 1000.0f / STEPS_PER_DEGREE);
+    return static_cast<int32_t>(position_steps * 1000.0f / STEPS_PER_DEGREE);
 }
 
 ScanState scannerState() { return state; }

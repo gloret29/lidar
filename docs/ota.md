@@ -75,9 +75,9 @@ que pour le téléversement.
 Ouvrir `http://lidar-scanner.local/` — ou l'adresse IP — et s'authentifier avec
 `admin` et le mot de passe OTA.
 
-La page affiche la version, la partition active, la mémoire libre et l'état du
-scanner, puis propose de déposer un fichier `firmware.bin`. Une barre de
-progression suit l'écriture, et le scanner redémarre tout seul.
+La section **Mise à jour OTA** de la page (voir aussi [web.md](web.md)) propose
+de déposer un fichier `firmware.bin`. Une barre de progression suit l'écriture,
+et le scanner redémarre tout seul.
 
 Le binaire à téléverser est produit par la compilation :
 
@@ -122,24 +122,16 @@ mécanique dans un état indéterminé. Tant que l'état est `Homing`, `Spinup` 
 Un balayage dure au plus 180 s. Pour passer outre, mettre
 `OTA_ALLOW_DURING_SCAN` à 1 dans `config.h` — en connaissance de cause.
 
-### La fenêtre OTA au démarrage
+### Le scanner démarre au repos
 
-C'est le filet de sécurité contre le scénario classique : téléverser un
-firmware qui plante pendant le scan, et se retrouver avec un appareil qui
-redémarre en boucle sans jamais laisser d'occasion de le corriger.
+Plus de balayage automatique au boot : `motion_task` attend une commande
+(`start` depuis le panneau web). L'OTA est donc joignable immédiatement après
+la connexion Wi‑Fi, sans fenêtre artificielle de 10 s. Un firmware qui planterait
+*pendant* un scan reste rattrapable au redémarrage suivant, puisque le prochain
+boot ne relance rien tout seul.
 
-À chaque démarrage, `motion_task` attend **10 secondes** avant de lancer le
-homing. Pendant ce délai le scanner est au repos, donc joignable en OTA.
-
-```
-[main] fenêtre OTA de 10 s avant le balayage
-```
-
-Si une mise à jour démarre pendant la fenêtre, le balayage est annulé au profit
-de la mise à jour.
-
-Durée réglable par `OTA_BOOT_WINDOW_S` dans `config.h`. La réduire raccourcit
-d'autant le filet de sécurité.
+La constante `OTA_BOOT_WINDOW_S` dans `config.h` est conservée pour une
+éventuelle réactivation d'un démarrage automatique, mais n'est plus utilisée.
 
 ## 6. Comportement en cas d'échec
 
@@ -178,7 +170,7 @@ le mot de passe OTA, et rouvre le portail captif.
 | Symptôme | Cause probable | Correction |
 |---|---|---|
 | `lidar-scanner.local` introuvable | mDNS non résolu | Utiliser l'adresse IP |
-| espota expire | Balayage en cours | Attendre la fin, ou utiliser la fenêtre de démarrage |
+| espota expire | Balayage en cours | Attendre la fin, ou redémarrer (boot au repos) |
 | `Authentication Failed` | Mot de passe divergent | Aligner `--auth=` sur la valeur du portail |
 | La page demande sans cesse le mot de passe | Identifiant oublié | L'identifiant est `admin` |
 | `Not Enough Space` | Schéma sans OTA | Rétablir `default_16MB.csv` |

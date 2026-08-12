@@ -87,19 +87,26 @@ entre les scans.
 1. Déployer le trépied, hauteur environ 1,50 m.
 2. Visser le scanner sur l'embase 1/4"-20.
 3. Mettre de niveau grossièrement à la bulle.
-4. Mettre sous tension. La LED d'état indique la connexion Wi-Fi.
-5. Vérifier la réception sur la station hôte.
+4. Mettre sous tension et attendre la connexion Wi‑Fi.
+5. Ouvrir `http://lidar-scanner.local/` (ou l'IP du scanner).
+6. Lancer la réception sur la station hôte, puis cliquer **Lancer le scan**.
 
-### Séquence automatique
+Voir [web.md](web.md) pour la commande, les diagnostics et les réglages.
+
+### Séquence d'un balayage
 
 ```
-  1. Nivellement IMU        10 s   moyennage de la gravité
+  1. Nivellement IMU        10 s   moyennage de la gravité (à venir)
   2. Homing StallGuard       5 s   zéro d'azimut absolu
-  3. Stabilisation LD19      3 s   montée en vitesse à 5 Hz
-  4. Balayage 0 → 180°   45-180 s  selon le pas choisi
-  5. Contrôle de choc        2 s   relecture de l'IMU
+  3. Stabilisation LD19      3 s   montée en vitesse
+  4. Balayage 0 → fin °  45-180 s  selon vitesse / amplitude
+  5. Contrôle de choc        2 s   relecture de l'IMU (à venir)
   6. Vidange des tampons     2 s
 ```
+
+Le scanner ne démarre **pas** tout seul : chaque prise se lance depuis le
+panneau (ou `POST /api/command?cmd=start`). Arrêt propre ou d'urgence depuis
+la même page.
 
 Ne pas toucher au trépied pendant le balayage — pas même pour le stabiliser.
 

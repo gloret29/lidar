@@ -48,7 +48,7 @@ une erreur de conception s'était glissée initialement (voir
 | `lidar_task` | 1 | 5 | Lecture UART, décodage des trames LD19, mise en file |
 | `motion_task` | 1 | 4 | Nivellement, homing, profil de balayage |
 | `network_task` | 0 | 3 | Agrégation en datagrammes, émission UDP |
-| `ota_task` | 0 | 2 | Mise à jour par le réseau ([ota.md](ota.md)) |
+| `ota_task` / `web_task` | 0 | 2 | Panneau web + OTA ([web.md](web.md), [ota.md](ota.md)) |
 | `loop()` | 0 | 1 | Télémétrie sur le port série |
 
 La file entre `lidar_task` et `network_task` compte 2 048 entrées, soit environ
@@ -79,10 +79,9 @@ Le port 3232 n'est pas servi pendant un balayage, et le port 80 renvoie alors
 laisserait la mécanique dans un état indéterminé.
 
 Une mise à jour relâche `EN` du TMC2209 **avant** la première écriture en
-flash, puis suspend `lidar_task` et `network_task`. Et parce qu'un firmware
-défectueux qui plante en cours de scan ne serait plus joignable, `motion_task`
-ménage une fenêtre de 10 s au démarrage pendant laquelle le scanner reste au
-repos. Détails dans [ota.md](ota.md).
+flash, puis suspend `lidar_task` et `network_task`. Le scanner démarre au
+repos (plus de balayage automatique) : l'OTA et le panneau de commande sont
+joignables immédiatement. Détails dans [web.md](web.md) et [ota.md](ota.md).
 
 ## Protocole UDP, version 2
 

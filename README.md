@@ -30,6 +30,7 @@ scan, à ±5 cm, en 45 à 180 secondes.
 | [docs/assembly.md](docs/assembly.md) | Montage pas à pas |
 | [docs/wiring.md](docs/wiring.md) | Brochage, alimentation, réglage du TMC2209 |
 | [docs/wifi.md](docs/wifi.md) | Configuration réseau par portail captif |
+| [docs/web.md](docs/web.md) | Panneau web : commande, diagnostics, réglages |
 | [docs/ota.md](docs/ota.md) | Mise à jour du firmware par le réseau |
 
 ### Utiliser
@@ -100,8 +101,12 @@ pio device monitor
 Au premier démarrage, se connecter au point d'accès `LiDAR-Scanner-Setup` pour
 configurer le Wi-Fi, l'adresse de la station hôte et le mot de passe OTA.
 
-Les mises à jour suivantes passent par le réseau, sans rebrancher l'USB — soit
-depuis PlatformIO, soit en déposant le `.bin` sur `http://lidar-scanner.local/` :
+Le scanner **reste au repos** après connexion. Ouvrir
+`http://lidar-scanner.local/` pour lancer un balayage, suivre la télémétrie et
+ajuster StallGuard / courants / vitesse. Voir [docs/web.md](docs/web.md).
+
+Les mises à jour passent par le réseau, sans rebrancher l'USB — soit depuis
+PlatformIO, soit en déposant le `.bin` sur la même page :
 
 ```bash
 pio run -e ota -t upload

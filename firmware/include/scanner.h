@@ -2,6 +2,8 @@
 
 #include <Arduino.h>
 
+#include "settings.h"
+
 // ============================================================
 //  Axe de lacet : pilotage du NEMA 17 via TMC2209
 // ============================================================
@@ -18,22 +20,30 @@ enum class ScanState : uint8_t {
 
 void scannerInit();
 
+/// Applique courants et seuil StallGuard depuis les réglages.
+void scannerApplySettings(const ScanSettings& s);
+
+/// Réactive le driver après un arrêt d'urgence.
+void scannerEnable();
+
 /// Prise de référence par StallGuard contre la butée mécanique.
-/// Renvoie false si aucun contact n'est détecté dans le tour imparti.
 bool scannerHome();
 
-/// Démarre un balayage continu de SCAN_START_DEG à SCAN_END_DEG.
+/// Démarre un balayage continu selon les réglages courants.
 void scannerStartSweep();
+
+/// Demande l'arrêt en fin de pas courant (balayage uniquement).
+void scannerRequestStop();
 
 /// À appeler périodiquement : avance le moteur selon le profil.
 void scannerTick();
 
 /// Coupe l'alimentation du moteur et abandonne le mouvement en cours.
-/// Le driver est désactivé : la tête devient libre en rotation.
 void scannerEmergencyStop();
 
-/// Azimut courant en millidegrés, sûr en lecture concurrente.
-int32_t scannerPsiMdeg();
+/// Lecture StallGuard (0..511 typique). -1 si le driver ne répond pas.
+int16_t scannerSgResult();
 
+int32_t scannerPsiMdeg();
 ScanState scannerState();
 void scannerSetState(ScanState s);
