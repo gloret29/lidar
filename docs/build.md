@@ -296,11 +296,10 @@ Fiches : [wifi.md](wifi.md), [web.md](web.md).
 
 Sur le panneau, sans lancer de long scan :
 
-- [ ] Diagnostics : état `idle`, heap raisonnable, RSSI visible  
-- [ ] Réglages : valeurs par défaut présentes  
-- [ ] Bouton **Rehomer** : la tête trouve la butée (ajuster StallGuard si
-      besoin)  
-- [ ] **Arrêt d’urgence** : moteur se coupe  
+- [ ] Diagnostics : état `idle`, heap raisonnable, RSSI visible
+- [ ] Réglages : valeurs par défaut présentes
+- [ ] Bouton **Rehomer** : la tête trouve la butée (ajuster StallGuard si besoin)
+- [ ] **Arrêt d'urgence** : moteur se coupe
 
 **Contrôle.** Homing fiable ; page web stable ; l’IP hôte dans le portail est
 bien celle du PC qui écoutera le port UDP 9000.
