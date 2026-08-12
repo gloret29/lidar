@@ -215,7 +215,11 @@ Suivre **strictement** l’ordre du guide de montage. Résumé :
 
 ## Étape 5 — Câblage et alimentation
 
-Fiche : [wiring.md](wiring.md).
+Fiche et **plans SVG** : [wiring.md](wiring.md)
+([ensemble](wiring/01_ensemble.svg),
+[alimentation](wiring/02_alimentation.svg),
+[signaux](wiring/03_signaux.svg),
+[brochage](wiring/04_brochage.svg)).
 
 ### 5.1 Alimentation (hors ESP32 d’abord)
 

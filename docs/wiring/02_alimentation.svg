@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="880" height="430" viewBox="0 0 880 430">
+  <title>Alimentation scanner LiDAR</title>
+  <rect width="880" height="430" fill="#f7f7f5"/>
+  <style>
+    .box { fill:#fff; stroke:#222; stroke-width:1.5; }
+    .box-pwr { fill:#fff8f0; stroke:#8b4513; stroke-width:1.5; }
+    .box-mcu { fill:#eef4ff; stroke:#1a3a6b; stroke-width:1.5; }
+    .box-sen { fill:#eefaf0; stroke:#1b5e20; stroke-width:1.5; }
+    .box-mot { fill:#faf0ff; stroke:#4a148c; stroke-width:1.5; }
+    .title { font:700 16px "Segoe UI",system-ui,sans-serif; fill:#111; }
+    .label { font:600 12px "Segoe UI",system-ui,sans-serif; fill:#111; }
+    .small { font:11px "Segoe UI",system-ui,sans-serif; fill:#333; }
+    .note { font:11px "Segoe UI",system-ui,sans-serif; fill:#555; }
+    .v12 { stroke:#c62828; stroke-width:2.5; fill:none; }
+    .v5 { stroke:#ef6c00; stroke-width:2.2; fill:none; }
+    .v33 { stroke:#1565c0; stroke-width:2; fill:none; }
+    .gnd { stroke:#212121; stroke-width:2.5; fill:none; }
+    .sig { stroke:#2e7d32; stroke-width:1.8; fill:none; }
+    .sig2 { stroke:#6a1b9a; stroke-width:1.8; fill:none; }
+    .leg { font:11px "Segoe UI",system-ui,sans-serif; fill:#222; }
+  </style>
+  <text x="24" y="28" class="title">Plan d’alimentation — Scanner 3D LiDAR</text>
+<rect x="40" y="50" width="160" height="56" rx="6" class="box-pwr"/>
+<text x="120.0" y="68" text-anchor="middle" class="label">Power bank</text>
+<text x="120.0" y="83" text-anchor="middle" class="small">USB-C PD 100 W</text>
+<rect x="260" y="50" width="160" height="56" rx="6" class="box-pwr"/>
+<text x="340.0" y="68" text-anchor="middle" class="label">Trigger PD</text>
+<text x="340.0" y="83" text-anchor="middle" class="small">→ 12 V DC</text>
+<rect x="480" y="50" width="150" height="56" rx="6" class="box-mot"/>
+<text x="555.0" y="68" text-anchor="middle" class="label">TMC2209</text>
+<text x="555.0" y="83" text-anchor="middle" class="small">VM = 12 V</text>
+<rect x="260" y="160" width="160" height="56" rx="6" class="box-pwr"/>
+<text x="340.0" y="178" text-anchor="middle" class="label">Buck</text>
+<text x="340.0" y="193" text-anchor="middle" class="small">12 V → 5 V / 3 A</text>
+<rect x="480" y="140" width="150" height="50" rx="6" class="box-sen"/>
+<text x="555.0" y="158" text-anchor="middle" class="label">LD19</text>
+<text x="555.0" y="173" text-anchor="middle" class="small">VCC 5 V</text>
+<rect x="480" y="210" width="150" height="50" rx="6" class="box-mcu"/>
+<text x="555.0" y="228" text-anchor="middle" class="label">ESP32-S3</text>
+<text x="555.0" y="243" text-anchor="middle" class="small">5V / VIN</text>
+<rect x="700" y="210" width="140" height="50" rx="6" class="box-sen"/>
+<text x="770.0" y="228" text-anchor="middle" class="label">MPU6050</text>
+<text x="770.0" y="243" text-anchor="middle" class="small">3,3 V</text>
+<rect x="700" y="140" width="140" height="50" rx="6" class="box-mot"/>
+<text x="770.0" y="158" text-anchor="middle" class="label">TMC2209</text>
+<text x="770.0" y="173" text-anchor="middle" class="small">VIO 3,3 V</text>
+<path d="M200,78 L260,78" class="v12"/>
+<text x="230" y="70" text-anchor="middle" class="note">USB-C</text>
+<path d="M420,78 L480,78" class="v12"/>
+<text x="450" y="70" text-anchor="middle" class="note">12 V</text>
+<path d="M340,106 L340,160" class="v12"/>
+<path d="M420,188 L480,165" class="v5"/>
+<text x="445" y="168" text-anchor="middle" class="note">5 V</text>
+<path d="M420,188 L480,235" class="v5"/>
+<path d="M630,235 L700,235" class="v33"/>
+<text x="665" y="228" text-anchor="middle" class="note">3,3 V</text>
+<path d="M555,210 L555,120 L700,120 L700,165" class="v33"/>
+<text x="640" y="112" text-anchor="middle" class="note">3,3 V</text>
+<path d="M40,300 L840,300" class="gnd"/>
+<text x="40" y="318" class="label">Masse commune (GND) — obligatoire entre tous les modules</text>
+<path d="M120,300 L120,280" class="gnd"/>
+<path d="M340,300 L340,280" class="gnd"/>
+<path d="M555,300 L555,280" class="gnd"/>
+<path d="M555,300 L555,280" class="gnd"/>
+<path d="M770,300 L770,280" class="gnd"/>
+<path d="M770,300 L770,280" class="gnd"/>
+<path d="M120,106 L120,300" class="gnd"/>
+<path d="M340,216 L340,300" class="gnd"/>
+<path d="M555,260 L555,300" class="gnd"/>
+<path d="M555,190 L620,190 L620,300" class="gnd"/>
+<path d="M770,190 L770,300" class="gnd"/>
+<path d="M770,260 L770,300" class="gnd"/>
+<path d="M40,350 L80,350" class="v12"/><text x="90" y="354" class="leg">12 V (trigger PD → TMC VM + buck)</text>
+<path d="M360,350 L400,350" class="v5"/><text x="410" y="354" class="leg">5 V (buck → LD19 + ESP32)</text>
+<path d="M40,378 L80,378" class="v33"/><text x="90" y="382" class="leg">3,3 V (ESP32 → MPU6050 + TMC VIO)</text>
+<path d="M360,378 L400,378" class="gnd"/><text x="410" y="382" class="leg">GND commun</text>
+<text x="40" y="410" class="note">Mesurer 12 V et 5 V à vide avant de connecter les charges. Consommation typique : 8–12 W en balayage.</text>
+
+</svg>

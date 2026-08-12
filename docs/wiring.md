@@ -1,6 +1,40 @@
 # Câblage et pinout
 
+Plans de câblage du scanner 3D LiDAR (ESP32-S3 N16R8).  
+Figures vectorielles dans [`wiring/`](wiring/) — régénérables via
+[`generate_wiring_svgs.py`](generate_wiring_svgs.py).
+
+## Plans (aperçu)
+
+| Plan | Fichier | Contenu |
+|---|---|---|
+| Ensemble | [wiring/01_ensemble.svg](wiring/01_ensemble.svg) | Tête / boîtier / énergie / hôte |
+| Alimentation | [wiring/02_alimentation.svg](wiring/02_alimentation.svg) | 12 V, 5 V, 3,3 V, masse |
+| Signaux | [wiring/03_signaux.svg](wiring/03_signaux.svg) | UART, I2C, STEP/DIR/EN, DIAG |
+| Brochage | [wiring/04_brochage.svg](wiring/04_brochage.svg) | Table GPIO fil par fil |
+
+![Ensemble](wiring/01_ensemble.svg)
+
+![Alimentation](wiring/02_alimentation.svg)
+
+![Signaux](wiring/03_signaux.svg)
+
+![Brochage](wiring/04_brochage.svg)
+
+---
+
 ## 1. Architecture d'alimentation
+
+```mermaid
+flowchart LR
+  PB["Power bank<br/>USB-C PD 100 W"] --> TR["Trigger PD<br/>12 V"]
+  TR --> TMCV["TMC2209 VM"]
+  TR --> BUCK["Buck<br/>12 V → 5 V 3 A"]
+  BUCK --> LD["LD19 VCC 5 V"]
+  BUCK --> ESP["ESP32-S3 5V/VIN"]
+  ESP --> MPU["MPU6050 3,3 V"]
+  ESP --> VIO["TMC2209 VIO 3,3 V"]
+```
 
 ```
   Power bank USB-C PD 100 W
@@ -23,28 +57,61 @@ et de comportements erratiques.
 
 Consommation totale : environ 8 à 12 W en balayage.
 
+---
+
 ## 2. Brochage de l'ESP32-S3 DevKitC-1 (N16R8)
 
-| Fonction | GPIO | Sens | Remarques |
-|---|---|---|---|
-| LiDAR UART RX | 18 | Entrée | Reçoit le TX du LD19 |
-| LiDAR PWM (vitesse) | 17 | Sortie | 30 kHz, pilote la vitesse de rotation |
-| I2C SDA (MPU6050) | 8 | E/S | |
-| I2C SCL (MPU6050) | 9 | Sortie | |
-| TMC2209 STEP | 4 | Sortie | |
-| TMC2209 DIR | 5 | Sortie | |
-| TMC2209 EN | 6 | Sortie | Actif à l'état bas |
-| TMC2209 UART TX | 7 | Sortie | Via résistance 1 kΩ vers PDN_UART |
-| TMC2209 UART RX | 15 | Entrée | Directement sur PDN_UART |
-| TMC2209 DIAG (StallGuard) | 16 | Entrée | Détection de butée |
-| Bouton BOOT | 0 | Entrée | Réinitialisation Wi-Fi, maintenu au démarrage |
-| LED RGB embarquée | 48 | Sortie | GPIO 38 sur certaines révisions |
+| Fonction | GPIO | Sens | Fil conseillé | Remarques |
+|---|---|---|---|---|
+| LiDAR UART RX | 18 | Entrée | Jaune | Reçoit le TX du LD19 |
+| LiDAR PWM | 17 | Sortie | Blanc | 30 kHz, vitesse de rotation |
+| I2C SDA | 8 | E/S | Bleu | MPU6050 |
+| I2C SCL | 9 | Sortie | Vert | MPU6050 |
+| TMC STEP | 4 | Sortie | Orange | |
+| TMC DIR | 5 | Sortie | Violet | |
+| TMC EN | 6 | Sortie | Gris | Actif à l'état bas |
+| TMC UART TX | 7 | Sortie | Brun | Via résistance **1 kΩ** → PDN_UART |
+| TMC UART RX | 15 | Entrée | Brun | Directement sur PDN_UART |
+| TMC DIAG | 16 | Entrée | Rose | StallGuard |
+| BOOT | 0 | Entrée | — | Reset Wi‑Fi si maintenu au démarrage |
+| GND | — | — | Noir | Masse commune |
+| 3V3 | — | Sortie | Rouge clair | MPU + TMC VIO |
+| 5V / VIN | — | Entrée | Rouge | Depuis le buck |
 
 ### Broches à ne pas utiliser
 
 Sur la variante **N16R8**, la PSRAM octale occupe les **GPIO 33 à 37** : les
 utiliser fait planter la carte au démarrage. Éviter également les GPIO 26 à 32
 (flash SPI) et 19/20 (USB natif).
+
+```mermaid
+flowchart TB
+  subgraph ESP["ESP32-S3"]
+    G18[GPIO18 RX]
+    G17[GPIO17 PWM]
+    G8[GPIO8 SDA]
+    G9[GPIO9 SCL]
+    G4[GPIO4 STEP]
+    G5[GPIO5 DIR]
+    G6[GPIO6 EN]
+    G7[GPIO7 TX]
+    G15[GPIO15 RX]
+    G16[GPIO16 DIAG]
+  end
+  LD19["LD19"] --> G18
+  G17 --> LD19
+  G8 <--> MPU["MPU6050"]
+  G9 --> MPU
+  G4 --> TMC["TMC2209"]
+  G5 --> TMC
+  G6 --> TMC
+  G7 -->|1 kΩ| TMC
+  G15 --- TMC
+  TMC --> G16
+  TMC --> MOT["NEMA 17"]
+```
+
+---
 
 ## 3. LiDAR LD19
 
@@ -77,6 +144,8 @@ débattement, une simple boucle de mou suffit : ni bague tournante, ni contact
 glissant. Laisser environ 120 mm de mou en hélice lâche le long de la colonne
 et fixer les deux extrémités par collier rilsan, jamais en tension.
 
+---
+
 ## 4. MPU6050
 
 **Monté sur la base fixe**, pas sur la tête tournante — il ne sert qu'à mesurer
@@ -97,6 +166,8 @@ Le coller à plat dans le boîtier électronique, faces bien parallèles au plat
 de base. Son orientation exacte n'a pas besoin d'être parfaite : la calibration
 mesure l'écart une fois pour toutes.
 
+---
+
 ## 5. TMC2209 et NEMA 17
 
 | TMC2209 | Connexion |
@@ -109,12 +180,10 @@ mesure l'écart une fois pour toutes.
 | EN | GPIO 6 |
 | PDN_UART | GPIO 15, et GPIO 7 via 1 kΩ |
 | DIAG | GPIO 16 |
-| MS1 / MS2 | Voir adressage ci-dessous |
+| MS1 / MS2 | GND / GND (adresse 0) |
 | A+ A− B+ B− | Moteur NEMA 17 |
 
 ### Liaison UART à un fil
-
-Le TMC2209 dialogue sur une seule broche, PDN_UART. Montage usuel :
 
 ```
    ESP32 TX (GPIO 7) ──[ 1 kΩ ]──┬── PDN_UART (TMC2209)
@@ -125,75 +194,44 @@ Le TMC2209 dialogue sur une seule broche, PDN_UART. Montage usuel :
 La résistance évite le conflit lorsque le driver répond. Sans cette liaison, il
 faudrait régler le courant au potentiomètre et renoncer à StallGuard.
 
-L'UART apporte trois choses qui changent tout :
+L'UART apporte :
 
-1. **Réglage logiciel du courant**, bien plus précis et reproductible qu'un
-   potentiomètre.
-2. **StealthChop2** correctement configuré, donc un balayage silencieux et sans
-   vibration parasite — critique quand on porte un capteur optique.
-3. **StallGuard4**, qui permet la prise de référence sans capteur.
-
-### Adressage MS1/MS2
-
-En mode UART, MS1 et MS2 définissent l'adresse du driver, pas le micro-pas
-(réglé par registre). Un seul driver : MS1 = MS2 = GND, adresse 0.
+1. **Réglage logiciel du courant**
+2. **StealthChop2** (balayage silencieux, sans vibration parasite)
+3. **StallGuard** (homing sans capteur)
 
 ### Courant moteur
 
-Le 17HS4401 est donné pour 1,5 A par phase. La charge se limite au frottement
-des roulements et à 110 g de tête : **inutile d'y aller fort**.
+Réglage recommandé : **700 mA RMS** par UART. En repli, multimètre :
 
-Réglage recommandé : **700 mA RMS**, par UART (`setRMSCurrent(700)`).
+$$V_{\text{ref}} \approx 1{,}25 \times I_{\text{RMS}} \approx 0{,}88\ \text{V}$$
 
-En repli, sans UART, régler le potentiomètre au multimètre. Avec
-$R_{\text{sense}} = 0{,}11\ \Omega$ :
+(avec $R_{\text{sense}} = 0{,}11\ \Omega$ — vérifier sur la carte).
 
-$$V_{\text{ref}} \approx 1{,}25 \times I_{\text{RMS}}$$
-
-soit environ **0,88 V** pour 700 mA. Vérifier la valeur de $R_{\text{sense}}$
-de la carte : elle varie selon les fabricants.
-
-Un courant excessif chauffe pour rien, augmente les vibrations et dégrade la
-qualité optique du scan.
-
-### Prise de référence par StallGuard
-
-La colonne porte un contrefort fixe et le berceau un secteur de 26°. À la mise
-sous tension, le moteur tourne lentement jusqu'au contact ; la détection de
-blocage donne le **zéro d'azimut absolu**, sans aucun capteur.
-
-Paramètres de départ :
+### StallGuard — paramètres de départ
 
 | Registre | Valeur | Rôle |
 |---|---|---|
-| `TCOOLTHRS` | 0xFFFFF | Active StallGuard sur toute la plage utile |
-| `SGTHRS` | 60 à 100 | Seuil de détection, à affiner |
-| Courant de homing | 300 mA | Réduit pour un contact doux |
-| Vitesse de homing | 10 °/s | StallGuard exige une vitesse minimale |
+| `TCOOLTHRS` | 0xFFFFF | StallGuard sur toute la plage |
+| `SGTHRS` | 60 à 100 | Seuil (partir de 80) |
+| Courant homing | 300 mA | Contact doux |
+| Vitesse homing | 10 °/s | Minimum pour StallGuard |
 
-`SGTHRS` se règle empiriquement : trop bas, aucune détection ; trop haut,
-déclenchements intempestifs. Partir de 80 et ajuster par pas de 10.
+---
 
-## 6. Schéma d'ensemble
+## 6. Ordre de câblage recommandé
 
-```
-                       ┌──────────────────────┐
-                       │      ESP32-S3        │
-                       │      DevKitC-1       │
-                       └──┬────┬────┬────┬────┘
-             GPIO 18/17 ──┘    │    │    └── GPIO 4/5/6/7/15/16
-                  UART+PWM     │    │              STEP/DIR/EN/UART/DIAG
-                     │      GPIO 8/9│                    │
-                     │        I2C   │                    │
-              ┌──────┴─────┐  ┌─────┴────┐        ┌──────┴─────┐
-              │   LD19     │  │ MPU6050  │        │  TMC2209   │
-              │ (tournant) │  │  (fixe)  │        │            │
-              └────────────┘  └──────────┘        └──────┬─────┘
-                                                         │
-                                                   ┌─────┴─────┐
-                                                   │  NEMA 17  │
-                                                   └───────────┘
-```
+1. **Masses** : relier tous les GND (trigger, buck, ESP, TMC, LD19).  
+2. **Mesurer** 12 V (trigger) et 5 V (buck) à vide.  
+3. Brancher **5 V** sur ESP32 VIN et LD19 VCC.  
+4. Brancher **3,3 V** sur MPU6050 et TMC VIO.  
+5. Signaux LD19 (TX→18, PWM←17).  
+6. I2C MPU (8/9).  
+7. TMC STEP/DIR/EN/DIAG + UART avec 1 kΩ.  
+8. **12 V** sur TMC VM.  
+9. Phases moteur en dernier (ou après un premier boot sans moteur).
+
+---
 
 ## 7. Contrôle avant première mise sous tension
 
@@ -209,3 +247,5 @@ déclenchements intempestifs. Partir de 80 et ajuster par pas de 10.
 
 Premier démarrage : brancher **sans le moteur**, vérifier que le LD19 émet et
 que le Wi-Fi monte, puis seulement connecter le moteur.
+
+Voir aussi [build.md](build.md) étape 5 et [assembly.md](assembly.md).
