@@ -43,10 +43,12 @@ lidar-simulate --host 127.0.0.1 --port 9000 --fast
 
 Le simulateur envoie une scène synthétique (protocole UDP v2) — par défaut
 un **appartement en L avec mobilier** (`--scene apartment`) — **et enregistre**
-le nuage dans `scans/simulate.pcd`. Un exemplaire est versionné dans le dépôt.
+le nuage dans `scans/simulate.pcd`. Un exemplaire est versionné dans le dépôt,
+ainsi que le maillage `scans/simulate.ply`.
 
 ```bash
 python -c "import open3d as o3d; o3d.visualization.draw_geometries([o3d.io.read_point_cloud('scans/simulate.pcd')])"
+python -c "import open3d as o3d; m=o3d.io.read_triangle_mesh('scans/simulate.ply'); m.compute_vertex_normals(); o3d.visualization.draw_geometries([m])"
 ```
 
 ```bash

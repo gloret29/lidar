@@ -31,8 +31,9 @@ firmware/.vscode/ipch
 *.ply
 *.bag
 captures/
-# Exemple de scan synthétique versionné pour valider Open3D sans matériel
+# Exemples synthétiques versionnés pour valider Open3D sans matériel
 !host/scans/simulate.pcd
+!host/scans/simulate.ply
 
 # Secrets
 .env
