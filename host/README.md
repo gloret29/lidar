@@ -78,7 +78,9 @@ lidar-receive --port 9000 --output scans/salon_pos1.pcd --auto-stop
 
 ```bash
 lidar-register scans/salon_*.pcd --output salon.pcd
-lidar-mesh salon.pcd --output salon.ply --depth 8
+lidar-mesh salon.pcd --output salon.ply --depth 8 --smooth taubin
+# ou relisser un .ply existant :
+lidar-mesh scans/simulate.ply --output scans/simulate_smooth.ply --smooth-iter 20
 ```
 
 ## Calibration

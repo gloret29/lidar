@@ -265,11 +265,26 @@ lidar-mesh scans/salon_complet.pcd --output scans/salon.ply --depth 8 --voxel 0.
 4. Élagage des zones de faible densité  
 5. Export `.ply` (maillage triangulaire)
 
-| `--depth` | Effet typique |
+| `--depth` | 8 | Niveau octree Poisson |
+| `--voxel` | 0,01 | Sous-échantillonnage avant Poisson (m) |
+| `--smooth` | `taubin` | `none` / `taubin` / `laplacian` / `simple` |
+| `--smooth-iter` | 10 | Itérations de lissage |
+
+**Lisser un `.ply` déjà produit** (sans refaire Poisson) :
+
+```bash
+lidar-mesh scans/simulate.ply --output scans/simulate_smooth.ply --smooth taubin --smooth-iter 20
+```
+
+| Méthode | Effet |
 |---|---|
-| 7 | Rapide, lisse, détails perdus |
-| **8** | Réglage standard intérieur |
-| 9–10 | Plus de détail, plus de triangles, plus de bruit amplifié |
+| `taubin` | Lisse en préservant mieux le volume — **recommandé** |
+| `laplacian` | Plus agressif, peut « fondre » les arêtes |
+| `simple` | Moyenne locale rapide |
+| `none` | Pas de lissage |
+
+Trop d’itérations efface les détails (plinthes, arêtes de meubles). Partir de
+10–20 pour un intérieur.
 
 Le `.ply` s’ouvre dans Open3D, Blender, MeshLab, CloudCompare, etc. :
 
