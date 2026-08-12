@@ -126,7 +126,7 @@ cd host
 python -m venv .venv
 source .venv/bin/activate          # Windows : .venv\Scripts\activate
 pip install -e ".[dev]"
-pytest -q                          # 37 tests attendus
+pytest -q                          # 39 tests attendus
 ```
 
 Sous WSL2, pour Open3D :
