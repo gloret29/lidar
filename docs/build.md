@@ -58,13 +58,49 @@ le PC fait le XYZ.*
 
 ### 1.1 Inventaire
 
-Ouvrir [bom.md](bom.md) et cocher :
+Ouvrir [bom.md](bom.md) et cocher, section par section :
 
-- [ ] Section **A** — déjà commandé (LD19, ESP32-S3 N16R8, TMC2209, NEMA 17,
-      MPU6050, 608ZZ, insert 1/4"-20, trigger PD, buck 5 V, power bank)
-- [ ] Section **B** — à acquérir (tige Ø8, accouplement 5→8, visserie, fil,
-      rilsan)
-- [ ] Section **D** — outillage (imprimante, fer à souder, multimètre, Allen…)
+**A — Déjà commandé**
+
+- [ ] A1 LD19 (FHL-LD19 / P)
+- [ ] A2 ESP32-S3 DevKitC-1 **N16R8**
+- [ ] A3 Driver TMC2209
+- [ ] A4 Moteur NEMA 17
+- [ ] A5 MPU6050
+- [ ] A6 Roulements 608ZZ (×2 min.)
+- [ ] A7 Insert laiton 1/4"-20 UNC
+- [ ] A8 Trigger USB-C PD
+- [ ] A9 Buck 12 V → 5 V 3 A
+- [ ] A10 Power bank USB-C PD
+
+**B — À acquérir**
+
+- [ ] B1 Tige Ø8 (≥ 120 mm, à recouper à 115 mm)
+- [ ] B2 Accouplement flexible 5 → 8 mm
+- [ ] B3–B7 Visserie M3 / M2,5 (voir [bom.md](bom.md))
+- [ ] B8 Colliers rilsan
+- [ ] B9 Fil silicone AWG24–26
+- [ ] B10 Niveau à bulle (optionnel)
+
+**C — Pièces imprimées** (réalisées à l’[étape 3](#étape-3--impression-3d), pas à acheter)
+
+- [ ] C0 `test_fits` (coupon — en premier)
+- [ ] C1 `base_plate`
+- [ ] C2 `bearing_tower`
+- [ ] C3 `lidar_cradle`
+- [ ] C4 `electronics_box`
+- [ ] C5 `electronics_lid`
+
+**D — Outillage**
+
+- [ ] Imprimante 3D (volume ≥ 130 × 130 × 140 mm)
+- [ ] Fer à souder (pose insert)
+- [ ] Pied à coulisse
+- [ ] Multimètre
+- [ ] Clés Allen 1,5 / 2 / 2,5 mm
+- [ ] Scie à métaux ou Dremel (recoupe tige)
+
+**E — Vigilance achat** : relire [bom.md](bom.md) § E (variante LD19, N16R8, accouplement flexible).
 
 ### 1.2 Points critiques à l’achat
 
@@ -75,8 +111,9 @@ Ouvrir [bom.md](bom.md) et cocher :
 | Tige | Acier rectifié Ø8, à recouper à **115 mm** |
 | LD19 | FHL-LD19 (ou P) ; noter le filetage des trous (souvent M2,5) |
 
-**Contrôle.** Toute la section B est chez toi avant de commencer le montage
-final. On peut imprimer en attendant.
+**Contrôle.** Toute la section **B** est chez toi avant le montage final.
+La section **C** se coche au fur et à mesure des impressions. On peut
+imprimer en attendant la fin des livraisons A/B.
 
 ---
 
