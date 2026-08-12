@@ -21,9 +21,23 @@ Python ≥ 3.10. Dépendances : NumPy et Open3D.
 lidar-visualize --port 9000
 ```
 
-Le nuage se construit à l'écran, colorié selon l'altitude. Surveiller que les
-murs apparaissent **plans** et les angles **droits** : des murs courbes
-signalent un bras de levier mal calibré.
+### Flux de test sans matériel
+
+Dans un terminal :
+
+```bash
+lidar-visualize --port 9000
+```
+
+Dans un autre :
+
+```bash
+lidar-simulate --host 127.0.0.1 --port 9000 --fast
+```
+
+Le simulateur envoie une pièce rectangulaire synthétique (protocole UDP v2).
+Options : `--width`, `--depth`, `--height`, `--speed`, `--psi-end`, `--loops 0`
+(infini). Détails dans [docs/open3d.md](../docs/open3d.md#flux-de-test-sans-matériel).
 
 ### Enregistrement
 
@@ -49,6 +63,9 @@ ni reflashage ni nouvelle acquisition.
 
 Procédures détaillées dans [docs/calibration.md](../docs/calibration.md).
 
+Guide Open3D (fenêtre live, fichiers, ICP, Poisson, dépannage) :
+[docs/open3d.md](../docs/open3d.md).
+
 ## Tests
 
 ```bash
@@ -68,6 +85,7 @@ host/
 │   ├── transform.py    polaire -> cartésien, calibration, nivellement
 │   ├── receiver.py     socket, accumulation, export
 │   ├── visualize.py    affichage temps réel Open3D
+│   ├── simulate.py     flux UDP de test (pièce synthétique)
 │   └── postprocess.py  filtrage, ICP, Poisson
 ├── tests/
 └── calibration.json

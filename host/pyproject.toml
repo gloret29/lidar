@@ -17,6 +17,7 @@ lidar-visualize = "lidar_host.visualize:main"
 lidar-receive = "lidar_host.receiver:main"
 lidar-register = "lidar_host.postprocess:main_register"
 lidar-mesh = "lidar_host.postprocess:main_mesh"
+lidar-simulate = "lidar_host.simulate:main"
 
 [build-system]
 requires = ["setuptools>=68"]
