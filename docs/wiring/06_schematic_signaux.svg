@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="860" height="510" viewBox="0 0 860 510">
+  <title>Signaux — schéma classique</title>
+  <rect width="860" height="510" fill="#fff"/>
+  <style>
+  .wire { fill:none; stroke:#111; stroke-width:1.6; }
+  .wire-thin { fill:none; stroke:#111; stroke-width:1.2; }
+  .sym { fill:none; stroke:#111; stroke-width:1.6; }
+  .sym-fill { fill:#fff; stroke:#111; stroke-width:1.6; }
+  .title { font:700 18px "Segoe UI",system-ui,sans-serif; fill:#111; }
+  .label { font:600 12px "Segoe UI",system-ui,sans-serif; fill:#111; }
+  .small { font:11px "Segoe UI",system-ui,sans-serif; fill:#111; }
+  .pin { font:10px "Consolas","Courier New",monospace; fill:#111; }
+  .note { font:10px "Segoe UI",system-ui,sans-serif; fill:#444; }
+  .ref { font:700 11px "Segoe UI",system-ui,sans-serif; fill:#111; }
+</style>
+  <text x="24" y="28" text-anchor="start" class="title">Schéma des signaux — ESP32-S3 ↔ périphériques</text>
+<rect x="300" y="50" width="120" height="420" class="sym-fill"/>
+<text x="360.0" y="66" text-anchor="middle" class="ref">U1</text>
+<text x="360.0" y="82" text-anchor="middle" class="label">ESP32-S3 DevKitC-1</text>
+<path d="M276,98.0 L300,98.0" class="wire"/>
+<text x="272" y="102.0" text-anchor="end" class="pin">3V3</text>
+<path d="M276,135.0 L300,135.0" class="wire"/>
+<text x="272" y="139.0" text-anchor="end" class="pin">GND</text>
+<path d="M276,172.0 L300,172.0" class="wire"/>
+<text x="272" y="176.0" text-anchor="end" class="pin">5V/VIN</text>
+<path d="M276,209.0 L300,209.0" class="wire"/>
+<text x="272" y="213.0" text-anchor="end" class="pin">GPIO0 BOOT</text>
+<path d="M276,246.0 L300,246.0" class="wire"/>
+<text x="272" y="250.0" text-anchor="end" class="pin">GPIO4 STEP</text>
+<path d="M276,283.0 L300,283.0" class="wire"/>
+<text x="272" y="287.0" text-anchor="end" class="pin">GPIO5 DIR</text>
+<path d="M276,320.0 L300,320.0" class="wire"/>
+<text x="272" y="324.0" text-anchor="end" class="pin">GPIO6 EN</text>
+<path d="M276,357.0 L300,357.0" class="wire"/>
+<text x="272" y="361.0" text-anchor="end" class="pin">GPIO7 TMC TX</text>
+<path d="M276,394.0 L300,394.0" class="wire"/>
+<text x="272" y="398.0" text-anchor="end" class="pin">GPIO8 SDA</text>
+<path d="M276,431.0 L300,431.0" class="wire"/>
+<text x="272" y="435.0" text-anchor="end" class="pin">GPIO9 SCL</text>
+<path d="M420,98.0 L444,98.0" class="wire"/>
+<text x="448" y="102.0" text-anchor="start" class="pin">GPIO15 TMC RX</text>
+<path d="M420,135.0 L444,135.0" class="wire"/>
+<text x="448" y="139.0" text-anchor="start" class="pin">GPIO16 DIAG</text>
+<path d="M420,172.0 L444,172.0" class="wire"/>
+<text x="448" y="176.0" text-anchor="start" class="pin">GPIO17 PWM</text>
+<path d="M420,209.0 L444,209.0" class="wire"/>
+<text x="448" y="213.0" text-anchor="start" class="pin">GPIO18 RX</text>
+<path d="M420,246.0 L444,246.0" class="wire"/>
+<text x="448" y="250.0" text-anchor="start" class="pin">GND</text>
+<path d="M420,283.0 L444,283.0" class="wire"/>
+<text x="448" y="287.0" text-anchor="start" class="pin">3V3</text>
+<path d="M420,320.0 L444,320.0" class="wire"/>
+<text x="448" y="324.0" text-anchor="start" class="pin">5V/VIN</text>
+<path d="M420,357.0 L444,357.0" class="wire"/>
+<text x="448" y="361.0" text-anchor="start" class="pin">NC</text>
+<path d="M420,394.0 L444,394.0" class="wire"/>
+<text x="448" y="398.0" text-anchor="start" class="pin">NC</text>
+<path d="M420,431.0 L444,431.0" class="wire"/>
+<text x="448" y="435.0" text-anchor="start" class="pin">NC</text>
+<text x="360.0" y="452" text-anchor="middle" class="note">N16R8</text>
+<rect x="40" y="40" width="90" height="90" class="sym-fill"/>
+<text x="85.0" y="56" text-anchor="middle" class="ref">LD1</text>
+<text x="85.0" y="72" text-anchor="middle" class="label">LD19 LiDAR</text>
+<path d="M16,88.0 L40,88.0" class="wire"/>
+<text x="12" y="92.0" text-anchor="end" class="pin">TX</text>
+<path d="M16,98.0 L40,98.0" class="wire"/>
+<text x="12" y="102.0" text-anchor="end" class="pin">PWM in</text>
+<path d="M16,108.0 L40,108.0" class="wire"/>
+<text x="12" y="112.0" text-anchor="end" class="pin">VCC</text>
+<path d="M16,118.0 L40,118.0" class="wire"/>
+<text x="12" y="122.0" text-anchor="end" class="pin">GND</text>
+<text x="85" y="150" text-anchor="middle" class="note">tête tournante</text>
+<path d="M130,62 L220,62" class="wire"/>
+<path d="M220,62 L220,221.33333333333334" class="wire"/>
+<path d="M220,221.33333333333334 L444,221.33333333333334" class="wire"/>
+<text x="170" y="54" text-anchor="middle" class="small">TX → RX</text>
+<path d="M130,82 L210,82" class="wire"/>
+<path d="M210,82 L210,180.22222222222223" class="wire"/>
+<path d="M210,180.22222222222223 L444,180.22222222222223" class="wire"/>
+<text x="165" y="74" text-anchor="middle" class="small">PWM ←</text>
+<rect x="40" y="260" width="90" height="80" class="sym-fill"/>
+<text x="85.0" y="276" text-anchor="middle" class="ref">U5</text>
+<text x="85.0" y="292" text-anchor="middle" class="label">MPU6050</text>
+<path d="M16,308.0 L40,308.0" class="wire"/>
+<text x="12" y="312.0" text-anchor="end" class="pin">SDA</text>
+<path d="M16,314.0 L40,314.0" class="wire"/>
+<text x="12" y="318.0" text-anchor="end" class="pin">SCL</text>
+<path d="M16,320.0 L40,320.0" class="wire"/>
+<text x="12" y="324.0" text-anchor="end" class="pin">AD0</text>
+<path d="M16,326.0 L40,326.0" class="wire"/>
+<text x="12" y="330.0" text-anchor="end" class="pin">VCC</text>
+<path d="M16,332.0 L40,332.0" class="wire"/>
+<text x="12" y="336.0" text-anchor="end" class="pin">GND</text>
+<path d="M130,286 L250,286" class="wire"/>
+<path d="M250,286 L250,426.8888888888889" class="wire"/>
+<path d="M250,426.8888888888889 L276,426.8888888888889" class="wire"/>
+<text x="185" y="278" text-anchor="middle" class="small">SDA GPIO8</text>
+<path d="M130,306 L240,306" class="wire"/>
+<path d="M240,306 L240,463.8888888888889" class="wire"/>
+<path d="M240,463.8888888888889 L276,463.8888888888889" class="wire"/>
+<text x="175" y="298" text-anchor="middle" class="small">SCL GPIO9</text>
+<path d="M130,326 L230,326" class="wire"/>
+<path d="M230,326 L230,336" class="wire"/>
+<path d="M220,336 L240,336" class="wire"/>
+<path d="M224,340 L236,340" class="wire"/>
+<path d="M227,344 L233,344" class="wire"/>
+<text x="150" y="318" text-anchor="start" class="note">AD0→GND (0x68)</text>
+<rect x="620" y="80" width="120" height="200" class="sym-fill"/>
+<text x="680.0" y="96" text-anchor="middle" class="ref">U3</text>
+<text x="680.0" y="112" text-anchor="middle" class="label">TMC2209</text>
+<path d="M740,128.0 L764,128.0" class="wire"/>
+<text x="768" y="132.0" text-anchor="start" class="pin">STEP</text>
+<path d="M740,143.0 L764,143.0" class="wire"/>
+<text x="768" y="147.0" text-anchor="start" class="pin">DIR</text>
+<path d="M740,158.0 L764,158.0" class="wire"/>
+<text x="768" y="162.0" text-anchor="start" class="pin">EN</text>
+<path d="M740,173.0 L764,173.0" class="wire"/>
+<text x="768" y="177.0" text-anchor="start" class="pin">PDN_UART</text>
+<path d="M740,188.0 L764,188.0" class="wire"/>
+<text x="768" y="192.0" text-anchor="start" class="pin">DIAG</text>
+<path d="M740,203.0 L764,203.0" class="wire"/>
+<text x="768" y="207.0" text-anchor="start" class="pin">MS1</text>
+<path d="M740,218.0 L764,218.0" class="wire"/>
+<text x="768" y="222.0" text-anchor="start" class="pin">MS2</text>
+<path d="M740,233.0 L764,233.0" class="wire"/>
+<text x="768" y="237.0" text-anchor="start" class="pin">VM</text>
+<path d="M740,248.0 L764,248.0" class="wire"/>
+<text x="768" y="252.0" text-anchor="start" class="pin">VIO</text>
+<path d="M740,263.0 L764,263.0" class="wire"/>
+<text x="768" y="267.0" text-anchor="start" class="pin">GND</text>
+<path d="M444,262.44444444444446 L620,108" class="wire"/>
+<text x="520" y="256.44444444444446" text-anchor="middle" class="small">GPIO4</text>
+<path d="M444,303.55555555555554 L620,128" class="wire"/>
+<text x="520" y="297.55555555555554" text-anchor="middle" class="small">GPIO5</text>
+<path d="M444,344.6666666666667 L620,148" class="wire"/>
+<text x="520" y="338.6666666666667" text-anchor="middle" class="small">GPIO6</text>
+<path d="M444,385.7777777777778 L560,385.7777777777778" class="wire"/>
+<path d="M444,98.0 L620,98.0" class="wire"/>
+<path d="M620,98.0 L620,385.7777777777778" class="wire"/>
+<circle cx="620" cy="385.7777777777778" r="2.8" fill="#111"/>
+<path d="M620,385.7777777777778 L620,168" class="wire"/>
+<path d="M560,384.7777777777778 L568,384.7777777777778 L574,379.7777777777778 L582,389.7777777777778 L590,379.7777777777778 L598,389.7777777777778 L606,384.7777777777778 L606,384.7777777777778" class="wire"/>
+<text x="568" y="374.7777777777778" text-anchor="start" class="ref">R1</text>
+<text x="568" y="402.7777777777778" text-anchor="start" class="small">1 kΩ</text>
+<text x="545" y="407.7777777777778" text-anchor="middle" class="small">GPIO7 TX</text>
+<text x="545" y="90.0" text-anchor="middle" class="small">GPIO15 RX</text>
+<path d="M444,139.11111111111111 L620,188" class="wire"/>
+<text x="520" y="133.11111111111111" text-anchor="middle" class="small">GPIO16</text>
+<path d="M620,208 L590,208" class="wire"/>
+<path d="M590,208 L590,240" class="wire"/>
+<path d="M590,240 L590,250" class="wire"/>
+<path d="M580,250 L600,250" class="wire"/>
+<path d="M584,254 L596,254" class="wire"/>
+<path d="M587,258 L593,258" class="wire"/>
+<path d="M620,228 L575,228" class="wire"/>
+<path d="M575,228 L575,240" class="wire"/>
+<text x="555" y="252" text-anchor="middle" class="note">MS1=MS2=GND</text>
+<circle cx="760" cy="360" r="22" class="sym-fill"/>
+<text x="760" y="365" text-anchor="middle" class="label">M</text>
+<text x="732" y="332" text-anchor="start" class="ref">M1</text>
+<text x="760" y="398" text-anchor="middle" class="small">NEMA 17</text>
+<path d="M740,168 L760,338" class="wire"/>
+<path d="M740,188 L748,338" class="wire"/>
+<text x="700" y="250" text-anchor="middle" class="small">A+/A−</text>
+<text x="700" y="270" text-anchor="middle" class="small">B+/B−</text>
+<path d="M620,260 L620,400" class="wire"/>
+<path d="M620,400 L80,400" class="wire"/>
+<path d="M80,400 L80,410" class="wire"/>
+<path d="M70,410 L90,410" class="wire"/>
+<path d="M74,414 L86,414" class="wire"/>
+<path d="M77,418 L83,418" class="wire"/>
+<text x="350" y="392" text-anchor="middle" class="label">Masse commune (GND)</text>
+<text x="40" y="470" text-anchor="start" class="note">LD19 : UART 230 400 bauds 8N1, 3,3 V compatibles. PWM 30 kHz → 5 Hz (firmware).</text>
+<text x="40" y="488" text-anchor="start" class="note">GPIO 33–37 interdits (PSRAM N16R8). EN TMC actif à l’état bas.</text>
+
+</svg>

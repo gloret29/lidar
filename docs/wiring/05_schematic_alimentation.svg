@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="820" height="500" viewBox="0 0 820 500">
+  <title>Alimentation — schéma classique</title>
+  <rect width="820" height="500" fill="#fff"/>
+  <style>
+  .wire { fill:none; stroke:#111; stroke-width:1.6; }
+  .wire-thin { fill:none; stroke:#111; stroke-width:1.2; }
+  .sym { fill:none; stroke:#111; stroke-width:1.6; }
+  .sym-fill { fill:#fff; stroke:#111; stroke-width:1.6; }
+  .title { font:700 18px "Segoe UI",system-ui,sans-serif; fill:#111; }
+  .label { font:600 12px "Segoe UI",system-ui,sans-serif; fill:#111; }
+  .small { font:11px "Segoe UI",system-ui,sans-serif; fill:#111; }
+  .pin { font:10px "Consolas","Courier New",monospace; fill:#111; }
+  .note { font:10px "Segoe UI",system-ui,sans-serif; fill:#444; }
+  .ref { font:700 11px "Segoe UI",system-ui,sans-serif; fill:#111; }
+</style>
+  <text x="24" y="28" text-anchor="start" class="title">Schéma d’alimentation — Scanner 3D LiDAR</text>
+<path d="M80,70 L80,88" class="wire"/>
+<path d="M72,88 L72,104" class="sym"/>
+<path d="M88,92 L88,100" class="sym"/>
+<path d="M72,96 L88,96" class="sym"/>
+<text x="58" y="82" text-anchor="start" class="ref">BAT1</text>
+<text x="46" y="118" text-anchor="middle" class="small">Power bank</text>
+<text x="80" y="130" text-anchor="middle" class="small">USB-C PD 100 W</text>
+<rect x="180" y="60" width="110" height="70" class="sym-fill"/>
+<text x="235.0" y="76" text-anchor="middle" class="ref">U2</text>
+<text x="235.0" y="92" text-anchor="middle" class="label">Trigger PD</text>
+<path d="M156,108.0 L180,108.0" class="wire"/>
+<text x="152" y="112.0" text-anchor="end" class="pin">USB-C in</text>
+<path d="M290,108.0 L314,108.0" class="wire"/>
+<text x="318" y="112.0" text-anchor="start" class="pin">+12 V</text>
+<path d="M290,118.0 L314,118.0" class="wire"/>
+<text x="318" y="122.0" text-anchor="start" class="pin">GND</text>
+<path d="M80,96 L156,96" class="wire"/>
+<circle cx="80" cy="96" r="2.8" fill="#111"/>
+<path d="M314,96 L720,96" class="wire"/>
+<text x="520" y="88" text-anchor="middle" class="label">+12 V</text>
+<rect x="620" y="40" width="100" height="50" class="sym-fill"/>
+<text x="670.0" y="56" text-anchor="middle" class="ref">U3</text>
+<text x="670.0" y="72" text-anchor="middle" class="label">TMC2209</text>
+<path d="M596,88.0 L620,88.0" class="wire"/>
+<text x="592" y="92.0" text-anchor="end" class="pin">VM</text>
+<path d="M720,88.0 L744,88.0" class="wire"/>
+<text x="748" y="92.0" text-anchor="start" class="pin">GND</text>
+<path d="M670,90 L670,96" class="wire"/>
+<circle cx="670" cy="96" r="2.8" fill="#111"/>
+<rect x="180" y="190" width="110" height="70" class="sym-fill"/>
+<text x="235.0" y="206" text-anchor="middle" class="ref">U4</text>
+<text x="235.0" y="222" text-anchor="middle" class="label">Buck 12→5 V</text>
+<path d="M156,238.0 L180,238.0" class="wire"/>
+<text x="152" y="242.0" text-anchor="end" class="pin">+12 V in</text>
+<path d="M156,248.0 L180,248.0" class="wire"/>
+<text x="152" y="252.0" text-anchor="end" class="pin">GND</text>
+<path d="M290,238.0 L314,238.0" class="wire"/>
+<text x="318" y="242.0" text-anchor="start" class="pin">+5 V</text>
+<path d="M290,248.0 L314,248.0" class="wire"/>
+<text x="318" y="252.0" text-anchor="start" class="pin">GND</text>
+<path d="M235,96 L235,238" class="wire"/>
+<circle cx="235" cy="96" r="2.8" fill="#111"/>
+<path d="M314,220 L720,220" class="wire"/>
+<text x="520" y="212" text-anchor="middle" class="label">+5 V / 3 A</text>
+<path d="M235,238 L235,220" class="wire"/>
+<circle cx="235" cy="220" r="2.8" fill="#111"/>
+<rect x="560" y="170" width="90" height="50" class="sym-fill"/>
+<text x="605.0" y="186" text-anchor="middle" class="ref">LD1</text>
+<text x="605.0" y="202" text-anchor="middle" class="label">LD19</text>
+<path d="M536,218.0 L560,218.0" class="wire"/>
+<text x="532" y="222.0" text-anchor="end" class="pin">VCC 5 V</text>
+<path d="M650,218.0 L674,218.0" class="wire"/>
+<text x="678" y="222.0" text-anchor="start" class="pin">GND</text>
+<path d="M536,218 L560,218" class="wire"/>
+<path d="M536,218 L536,220" class="wire"/>
+<circle cx="536" cy="220" r="2.8" fill="#111"/>
+<rect x="700" y="170" width="90" height="50" class="sym-fill"/>
+<text x="745.0" y="186" text-anchor="middle" class="ref">U1</text>
+<text x="745.0" y="202" text-anchor="middle" class="label">ESP32-S3</text>
+<path d="M676,218.0 L700,218.0" class="wire"/>
+<text x="672" y="222.0" text-anchor="end" class="pin">5V/VIN</text>
+<path d="M790,218.0 L814,218.0" class="wire"/>
+<text x="818" y="222.0" text-anchor="start" class="pin">GND</text>
+<path d="M676,218 L676,220" class="wire"/>
+<circle cx="676" cy="220" r="2.8" fill="#111"/>
+<path d="M745,260 L745,300" class="wire"/>
+<text x="760" y="292" text-anchor="start" class="label">+3,3 V</text>
+<rect x="700" y="300" width="90" height="50" class="sym-fill"/>
+<text x="745.0" y="316" text-anchor="middle" class="ref">U5</text>
+<text x="745.0" y="332" text-anchor="middle" class="label">MPU6050</text>
+<path d="M676,348.0 L700,348.0" class="wire"/>
+<text x="672" y="352.0" text-anchor="end" class="pin">VCC 3,3 V</text>
+<path d="M790,348.0 L814,348.0" class="wire"/>
+<text x="818" y="352.0" text-anchor="start" class="pin">GND</text>
+<rect x="560" y="300" width="90" height="50" class="sym-fill"/>
+<text x="605.0" y="316" text-anchor="middle" class="ref">U3b</text>
+<text x="605.0" y="332" text-anchor="middle" class="label">TMC2209</text>
+<path d="M536,348.0 L560,348.0" class="wire"/>
+<text x="532" y="352.0" text-anchor="end" class="pin">VIO 3,3 V</text>
+<path d="M650,348.0 L674,348.0" class="wire"/>
+<text x="678" y="352.0" text-anchor="start" class="pin">GND</text>
+<path d="M420,170 L420,180" class="wire"/>
+<path d="M412,180 L428,180" class="sym"/>
+<path d="M412,186 L428,186" class="sym"/>
+<path d="M420,186 L420,196" class="wire"/>
+<text x="432" y="178" text-anchor="start" class="ref">C1</text>
+<text x="432" y="192" text-anchor="start" class="small">100 nF</text>
+<path d="M420,96 L420,170" class="wire"/>
+<circle cx="420" cy="96" r="2.8" fill="#111"/>
+<path d="M420,196 L420,206" class="wire"/>
+<path d="M410,206 L430,206" class="wire"/>
+<path d="M414,210 L426,210" class="wire"/>
+<path d="M417,214 L423,214" class="wire"/>
+<path d="M480,190 L480,200" class="wire"/>
+<path d="M472,200 L488,200" class="sym"/>
+<path d="M472,206 L488,206" class="sym"/>
+<path d="M480,206 L480,216" class="wire"/>
+<text x="492" y="198" text-anchor="start" class="ref">C2</text>
+<text x="492" y="212" text-anchor="start" class="small">100 nF</text>
+<path d="M480,220 L480,190" class="wire"/>
+<circle cx="480" cy="220" r="2.8" fill="#111"/>
+<path d="M480,216 L480,226" class="wire"/>
+<path d="M470,226 L490,226" class="wire"/>
+<path d="M474,230 L486,230" class="wire"/>
+<path d="M477,234 L483,234" class="wire"/>
+<path d="M60,420 L780,420" class="wire"/>
+<text x="40" y="424" text-anchor="start" class="label">GND</text>
+<path d="M235,248 L235,420" class="wire"/>
+<path d="M314,118 L314,420" class="wire"/>
+<path d="M605,218 L605,420" class="wire"/>
+<path d="M676,218 L676,420" class="wire"/>
+<path d="M745,218 L745,420" class="wire"/>
+<path d="M605,348 L605,420" class="wire"/>
+<path d="M745,348 L745,420" class="wire"/>
+<path d="M670,90 L670,420" class="wire"/>
+<path d="M80,420 L80,430" class="wire"/>
+<path d="M70,430 L90,430" class="wire"/>
+<path d="M74,434 L86,434" class="wire"/>
+<path d="M77,438 L83,438" class="wire"/>
+<path d="M235,420 L235,430" class="wire"/>
+<path d="M225,430 L245,430" class="wire"/>
+<path d="M229,434 L241,434" class="wire"/>
+<path d="M232,438 L238,438" class="wire"/>
+<path d="M314,420 L314,430" class="wire"/>
+<path d="M304,430 L324,430" class="wire"/>
+<path d="M308,434 L320,434" class="wire"/>
+<path d="M311,438 L317,438" class="wire"/>
+<path d="M536,420 L536,430" class="wire"/>
+<path d="M526,430 L546,430" class="wire"/>
+<path d="M530,434 L542,434" class="wire"/>
+<path d="M533,438 L539,438" class="wire"/>
+<path d="M605,420 L605,430" class="wire"/>
+<path d="M595,430 L615,430" class="wire"/>
+<path d="M599,434 L611,434" class="wire"/>
+<path d="M602,438 L608,438" class="wire"/>
+<path d="M670,420 L670,430" class="wire"/>
+<path d="M660,430 L680,430" class="wire"/>
+<path d="M664,434 L676,434" class="wire"/>
+<path d="M667,438 L673,438" class="wire"/>
+<path d="M676,420 L676,430" class="wire"/>
+<path d="M666,430 L686,430" class="wire"/>
+<path d="M670,434 L682,434" class="wire"/>
+<path d="M673,438 L679,438" class="wire"/>
+<path d="M745,420 L745,430" class="wire"/>
+<path d="M735,430 L755,430" class="wire"/>
+<path d="M739,434 L751,434" class="wire"/>
+<path d="M742,438 L748,438" class="wire"/>
+<text x="40" y="460" text-anchor="start" class="note">Masse commune obligatoire entre trigger, buck, ESP32, TMC2209, LD19 et moteur.</text>
+<text x="40" y="478" text-anchor="start" class="note">Mesurer +12 V et +5 V à vide avant de connecter les charges. Consommation typique : 8–12 W.</text>
+
+</svg>

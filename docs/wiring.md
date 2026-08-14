@@ -1,10 +1,26 @@
 # Câblage et pinout
 
 Plans de câblage du scanner 3D LiDAR (ESP32-S3 N16R8).  
-Figures vectorielles dans [`wiring/`](wiring/) — régénérables via
-[`generate_wiring_svgs.py`](generate_wiring_svgs.py).
+Figures vectorielles dans [`wiring/`](wiring/) :
 
-## Plans (aperçu)
+- plans bloc — [`generate_wiring_svgs.py`](generate_wiring_svgs.py)
+- **schémas électriques classiques** — [`generate_schematic_svgs.py`](generate_schematic_svgs.py)
+
+## Schémas électriques (style circuit)
+
+| Schéma | Fichier | Contenu |
+|---|---|---|
+| Alimentation | [wiring/05_schematic_alimentation.svg](wiring/05_schematic_alimentation.svg) | BAT1, trigger, buck, rails 12 V / 5 V / 3,3 V |
+| Signaux | [wiring/06_schematic_signaux.svg](wiring/06_schematic_signaux.svg) | ESP32-S3, LD19, MPU6050, TMC2209, R1 1 kΩ |
+| Ensemble | [wiring/07_schematic_ensemble.svg](wiring/07_schematic_ensemble.svg) | Vue d’ensemble compacte |
+
+![Alimentation — schéma classique](wiring/05_schematic_alimentation.svg)
+
+![Signaux — schéma classique](wiring/06_schematic_signaux.svg)
+
+![Ensemble — schéma classique](wiring/07_schematic_ensemble.svg)
+
+## Plans bloc (aperçu)
 
 | Plan | Fichier | Contenu |
 |---|---|---|
