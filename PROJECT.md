@@ -91,7 +91,7 @@ Cinq pièces imprimées en PETG, paramétriques (OpenSCAD), avec insert laiton
 | `lidar_task` | Décodage des trames LD19 (47 octets, CRC8 polynôme 0x4D) |
 | `motion_task` | Nivellement, homing StallGuard, profil de balayage |
 | `network_task` | Agrégation et émission UDP |
-| `ota_task` / panneau web | Commande, diagnostics, réglages NVS, OTA |
+| `ota_task` / panneau web | Commande, diagnostics, réglages NVS, OTA firmware + LittleFS |
 
 Les points sont transmis en **polaire brut** $(\rho, \theta)$, avec l'azimut en
 en-tête de datagramme. La conversion cartésienne est faite côté hôte, ce qui
@@ -99,8 +99,10 @@ permet de corriger la calibration et de rejouer un scan **sans reflasher ni
 rescanner**.
 
 Le scanner démarre au repos. Les balayages se lancent depuis
-`http://lidar-scanner.local/` (ou l'API). Les mises à jour se font par le
-réseau ; le moteur est coupé avant toute écriture en flash.
+`http://lidar-scanner.local/` (ou l'API). Le premier flash USB installe une
+**amorce OTA** (Wi-Fi + mises à jour firmware/filesystem) ; le firmware
+scanner arrive ensuite par le réseau. Le moteur est coupé avant toute
+écriture en flash.
 
 ### Station hôte (Python)
 
@@ -128,7 +130,7 @@ scanner.
 | Géométrie et mathématiques | Validées, 35 tests automatisés |
 | Pièces 3D | 6 pièces paramétriques, rendues et vérifiées |
 | Documentation de construction | Complète |
-| Firmware | Structure complète, **non testée sur matériel** |
+| Firmware | Amorce OTA compilée ; scanner compilé, **non testé sur matériel** |
 | Station hôte | Protocole, transform, Open3D, simulateur UDP, tests |
 | Calibration | Procédures écrites, à exécuter sur le prototype |
 

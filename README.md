@@ -65,8 +65,10 @@ dans [docs/geometry.md](docs/geometry.md).
 ```
 lidar/
 ├── firmware/            ESP32-S3 (PlatformIO / Arduino / FreeRTOS)
+│   ├── boards/          DevKitC-1 N16R8 (16 Mo + PSRAM)
+│   ├── data/            image LittleFS
 │   ├── include/         config, protocole, pilotes
-│   └── src/             tâches, parseur LD19, axe de lacet
+│   └── src/             amorce OTA, tâches, parseur LD19, axe de lacet
 ├── host/                Station hôte Python
 │   ├── src/lidar_host/  protocole, transformation, visualisation, simulateur
 │   ├── tests/           tests protocole / géométrie / simulateur (sans matériel)
@@ -99,7 +101,7 @@ valeurs dans `params.scad`, puis relancer `make`. Détails dans
 
 ```bash
 cd firmware
-pio run -e usb -t upload
+pio run -e seed -t upload     # amorce OTA, une fois en USB
 pio device monitor
 ```
 
@@ -114,7 +116,8 @@ Les mises à jour passent par le réseau, sans rebrancher l'USB — soit depuis
 PlatformIO, soit en déposant le `.bin` sur la même page :
 
 ```bash
-pio run -e ota -t upload
+pio run -e ota -t upload      # firmware scanner
+pio run -e ota -t uploadfs    # filesystem LittleFS
 ```
 
 Voir [docs/ota.md](docs/ota.md).

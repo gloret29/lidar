@@ -1,0 +1,3 @@
+lidar-scanner LittleFS
+Image de filesystem de test. Si ce fichier apparaît sur la page d'amorce
+après `pio run -e seed-ota -t uploadfs`, l'OTA filesystem fonctionne.

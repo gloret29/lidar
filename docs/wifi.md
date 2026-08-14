@@ -4,7 +4,8 @@ Le firmware utilise [WiFiManager](https://github.com/tzapu/WiFiManager) : pas de
 
 ## Premier démarrage
 
-1. Flasher le firmware et alimenter l'ESP32-S3.
+1. Flasher l'**amorce** en USB (`pio run -e seed -t upload`) et alimenter
+   l'ESP32-S3.
 2. L'ESP32 tente de se connecter au WiFi sauvegardé ; s'il n'y en a pas (ou échec), il ouvre un **point d'accès** :
    - SSID AP : `LiDAR-Scanner-Setup`
    - Mot de passe : aucun (AP ouvert par défaut)
@@ -47,7 +48,8 @@ Maintenir le bouton **BOOT** (GPIO 0) enfoncé **pendant la mise sous tension** 
 ## Serial monitor
 
 ```
-[wifi] connexion ou portail AP « LiDAR-Scanner-Setup »...
-[wifi] connecté — IP: 192.168.1.42
-[wifi] UDP host: 192.168.1.100:9000
+[lidar-scanner] amorce OTA 0.1.0-seed
+[wifi] connexion, sinon portail AP « LiDAR-Scanner-Setup »
+[wifi] connecté — IP 192.168.1.42
+[seed] http://lidar-scanner.local/ ou http://192.168.1.42/
 ```

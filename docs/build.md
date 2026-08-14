@@ -262,28 +262,31 @@ brûlé au premier essai moteur.
 
 Fiche : [firmware/README.md](../firmware/README.md).
 
-### 6.1 Premier flash **obligatoirement en USB**
+### 6.1 Premier flash **obligatoirement en USB** — amorce OTA
+
+On flashe d'abord l'amorce : Wi-Fi + OTA firmware + OTA LittleFS, rien
+d'autre. Une fois le réseau configuré, le câble USB n'est plus nécessaire.
 
 ```bash
 cd firmware
-pio run -e usb -t upload
+pio run -e seed -t upload
 pio device monitor
 ```
 
 Attendu sur le moniteur :
 
 ```
-[lidar-scanner] démarrage — firmware 0.4.x
+[lidar-scanner] amorce OTA 0.1.0-seed
 [wifi] …
-[web] http://lidar-scanner.local/ …
-[main] en attente de commande
+[seed] http://lidar-scanner.local/ …
 ```
 
-Les mises à jour suivantes : [ota.md](ota.md) (`pio run -e ota -t upload` ou
-page web).
+Configurer le Wi-Fi via `LiDAR-Scanner-Setup`, puis ouvrir
+`http://lidar-scanner.local/`. Les mises à jour suivantes : [ota.md](ota.md)
+(`pio run -e ota -t upload` / `-t uploadfs`, ou la page web).
 
-**Contrôle.** Flash OK, pas de reboot en boucle, message « en attente de
-commande ».
+**Contrôle.** Flash OK, pas de reboot en boucle, page d'amorce joignable
+en HTTP, OTA firmware et filesystem acceptés.
 
 ---
 
@@ -390,7 +393,7 @@ Réglages fins (StallGuard, courants, vitesse) : [web.md](web.md).
 - [ ] Coupon `test_fits` validé, pièces imprimées  
 - [ ] Mécanique montée, rotation libre jusqu’à butée  
 - [ ] 12 V / 5 V mesurés, Vref TMC réglé  
-- [ ] Firmware flashé USB, panneau web joignable  
+- [ ] Amorce `seed` flashée USB, page OTA joignable  
 - [ ] Homing StallGuard fiable  
 - [ ] Au moins un `.pcd` réel enregistré  
 - [ ] `calibration.json` renseigné (même approximatif)  

@@ -4,12 +4,17 @@ Le scanner se met à jour par Wi-Fi, sans câble USB. C'est particulièrement
 utile une fois l'appareil sanglé sur son trépied, port USB tourné vers
 l'intérieur du boîtier.
 
-Deux voies coexistent :
+Le **premier** flash se fait en USB avec l'amorce (`pio run -e seed -t upload`).
+Elle n'initialise ni le LiDAR ni le moteur : uniquement le Wi-Fi, ArduinoOTA
+et la page web. Les mises à jour suivantes — firmware **et** filesystem
+LittleFS — passent par le réseau.
+
+Deux voies coexistent ensuite :
 
 | Voie | Port | Usage |
 |---|---|---|
-| **espota** | 3232 | Développement : `pio run -e ota -t upload` |
-| **Page web** | 80 | Terrain : téléverser un `.bin` depuis un navigateur |
+| **espota** | 3232 | Développement : `pio run -e ota -t upload` / `-t uploadfs` |
+| **Page web** | 80 | Terrain : déposer `firmware.bin` ou `littlefs.bin` |
 
 ## 1. Prérequis : schéma de partitions
 
@@ -17,7 +22,8 @@ L'OTA écrit le nouveau firmware dans une **seconde partition applicative**,
 puis bascule le pointeur de démarrage. Il faut donc un schéma de partitions qui
 en comporte deux.
 
-`default_16MB.csv`, déjà configuré, fournit `app0` et `app1` de 6,5 Mo chacune.
+`default_16MB.csv`, déjà configuré, fournit `app0` et `app1` de 6,5 Mo chacune,
+plus une partition `data` utilisée comme LittleFS.
 
 Le firmware le vérifie au démarrage et le signale sur le port série :
 
@@ -52,8 +58,11 @@ authentification HTTP basic avec l'identifiant **`admin`**.
 
 ```bash
 cd firmware
-pio run -e ota -t upload
+pio run -e ota -t upload      # firmware scanner
+pio run -e ota -t uploadfs    # image LittleFS (contenu de data/)
 ```
+
+L'amorce elle-même se met à jour avec `-e seed-ota` à la place de `-e ota`.
 
 L'environnement `ota` de `platformio.ini` vise `lidar-scanner.local`. Si mDNS
 ne résout pas sur votre réseau — c'est fréquent sous Windows et sur certains
@@ -76,17 +85,18 @@ Ouvrir `http://lidar-scanner.local/` — ou l'adresse IP — et s'authentifier a
 `admin` et le mot de passe OTA.
 
 La section **Mise à jour OTA** de la page (voir aussi [web.md](web.md)) propose
-de déposer un fichier `firmware.bin`. Une barre de progression suit l'écriture,
-et le scanner redémarre tout seul.
+deux dépôts : `firmware.bin` (partition applicative) et `littlefs.bin`
+(partition data). Une barre de progression suit l'écriture, puis redémarrage.
 
-Le binaire à téléverser est produit par la compilation :
+Binaires produits par la compilation :
 
 ```
 firmware/.pio/build/usb/firmware.bin
+firmware/.pio/build/usb/littlefs.bin
 ```
 
-C'est bien `firmware.bin` qu'il faut, **pas** `firmware.elf` ni
-`firmware.factory.bin`.
+C'est bien `firmware.bin` / `littlefs.bin` qu'il faut, **pas** `firmware.elf`
+ni `firmware.factory.bin`.
 
 ### Points d'accès
 
@@ -94,7 +104,8 @@ C'est bien `firmware.bin` qu'il faut, **pas** `firmware.elf` ni
 |---|---|---|
 | `/` | GET | Page de mise à jour |
 | `/info` | GET | État en JSON : version, partitions, mémoire, occupation |
-| `/update` | POST | Téléversement multipart du `.bin` |
+| `/update` | POST | Téléversement multipart du firmware |
+| `/updatefs` | POST | Téléversement multipart du filesystem LittleFS |
 
 ## 5. Sécurité mécanique
 
@@ -154,11 +165,14 @@ mieux qu'un état indéterminé.
 ## 7. Récupération
 
 Si l'OTA devient inaccessible — mauvaise configuration Wi-Fi, plantage
-précoce — il reste toujours l'USB :
+précoce — il reste toujours l'USB. On reflashe l'amorce (page OTA seule)
+ou directement le firmware scanner :
 
 ```bash
 cd firmware
-pio run -e usb -t upload
+pio run -e seed -t upload     # amorce OTA
+# ou
+pio run -e usb -t upload      # firmware scanner
 ```
 
 Et pour repartir d'une configuration réseau vierge : maintenir **BOOT** au

@@ -4,23 +4,39 @@ Firmware PlatformIO du scanner 3D LiDAR.
 
 ## Prérequis
 
-- [PlatformIO](https://platformio.org/) (CLI ou extension VS Code / Cursor)
+- [PlatformIO](https://platformio.org/) (CLI ou extension VS Code / Cursor).
+  Sans `pio` dans le PATH : `firmware/.pio-venv/bin/pio`.
 - ESP32-S3 DevKitC-1 **N16R8** (16 Mo Flash / 8 Mo PSRAM octale)
 
 ## Compilation
 
+Premier flash, **obligatoirement en USB** : l'amorce OTA. Elle ne pilote
+ni le LiDAR ni le moteur. Elle ouvre le portail Wi-Fi, puis accepte les
+mises à jour du firmware **et** du filesystem LittleFS. Ensuite, plus
+besoin de câble.
+
 ```bash
-pio run -e usb -t upload      # par câble
+pio run -e seed -t upload
 pio device monitor
 ```
 
+Au premier démarrage, se connecter à `LiDAR-Scanner-Setup` pour le Wi-Fi
+et le mot de passe OTA. Puis ouvrir `http://lidar-scanner.local/`.
+
+Les mises à jour suivantes, sans USB :
+
 ```bash
-pio run -e ota -t upload      # par le réseau
+pio run -e ota -t upload      # firmware scanner
+pio run -e ota -t uploadfs    # image LittleFS (data/)
 ```
 
+Pour itérer sur l'amorce elle-même : `pio run -e seed-ota -t upload`.
+Le firmware scanner se compile encore avec `-e usb` si un câble est
+branché.
+
 Les dépendances (`WiFiManager`, `TMCStepper`) sont téléchargées automatiquement.
-Web + OTA n'en ajoutent aucune : `ArduinoOTA`, `WebServer`, `Update` et
-`Preferences` font partie du core ESP32.
+Web + OTA n'en ajoutent aucune : `ArduinoOTA`, `WebServer`, `Update`,
+`LittleFS` et `Preferences` font partie du core ESP32.
 
 ## Configuration
 
@@ -49,6 +65,8 @@ Voir [docs/wifi.md](../docs/wifi.md), [docs/web.md](../docs/web.md) et
 ```
 firmware/
 ├── platformio.ini
+├── boards/              ESP32-S3 DevKitC-1 N16R8 (16 Mo + PSRAM)
+├── data/                image LittleFS (`pio run -t uploadfs`)
 ├── include/
 │   ├── config.h        brochage et défauts
 │   ├── protocol.h      datagrammes UDP (v2)
@@ -60,13 +78,14 @@ firmware/
 │   ├── ota.h           panneau web + OTA
 │   └── wifi_setup.h
 └── src/
+    ├── seed/main.cpp   amorce OTA (premier flash USB)
     ├── main.cpp
     ├── ld19.cpp
     ├── scanner.cpp
     ├── settings.cpp
     ├── control.cpp
     ├── status.cpp
-    ├── ota.cpp         page unique + ArduinoOTA
+    ├── ota.cpp         page unique + ArduinoOTA (firmware + LittleFS)
     └── wifi_setup.cpp
 ```
 
@@ -117,8 +136,10 @@ matériel**. À valider en priorité au premier montage :
 - [ ] Seuil StallGuard (curseur web + lecture live)
 - [ ] Nivellement IMU (code MPU6050 à écrire)
 - [ ] Commande web start/stop/rehome sur trépied
-- [ ] OTA de bout en bout, par les deux voies
+- [ ] OTA firmware **et** LittleFS, par espota et par la page web
 
-Le premier téléversement se fait obligatoirement **par USB**.
+Le premier téléversement se fait obligatoirement **par USB**, avec
+l'environnement `seed`. Les suivants passent par le réseau
+(`-e ota -t upload` / `uploadfs`).
 
 La géométrie et le protocole sont couverts par les tests de `host/tests/`.

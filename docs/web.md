@@ -18,7 +18,7 @@ Quatre blocs, un seul écran :
 | **Commande** | Lancer, arrêter, rehomer, arrêt d'urgence |
 | **Diagnostics** | État, ψ, fréquence LiDAR, CRC, file, StallGuard, RSSI |
 | **Réglages** | Les 6 paramètres de mise au point, persistés en NVS |
-| **OTA** | Téléversement d'un `firmware.bin` |
+| **OTA** | Téléversement d'un `firmware.bin` ou d'un `littlefs.bin` |
 
 Le balayage **ne démarre plus tout seul** au boot. Après connexion Wi‑Fi, le
 scanner reste au repos jusqu'à un clic sur « Lancer le scan » — ou jusqu'à
@@ -36,7 +36,8 @@ Toutes les routes exigent l'authentification HTTP basic.
 | `/api/settings` | GET | — | Réglages courants |
 | `/api/settings` | POST | formulaire urlencoded | Enregistre + applique |
 | `/api/settings?defaults=1` | POST | — | Restaure les valeurs d'usine |
-| `/update` | POST | multipart `.bin` | OTA web |
+| `/update` | POST | multipart `.bin` | OTA firmware |
+| `/updatefs` | POST | multipart `.bin` | OTA LittleFS |
 | `/info` | GET | — | Alias de `/api/status` (compat OTA) |
 
 Exemple :

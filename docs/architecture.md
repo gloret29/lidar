@@ -48,7 +48,7 @@ une erreur de conception s'était glissée initialement (voir
 | `lidar_task` | 1 | 5 | Lecture UART, décodage des trames LD19, mise en file |
 | `motion_task` | 1 | 4 | Nivellement, homing, profil de balayage |
 | `network_task` | 0 | 3 | Agrégation en datagrammes, émission UDP |
-| `ota_task` / `web_task` | 0 | 2 | Panneau web + OTA ([web.md](web.md), [ota.md](ota.md)) |
+| `ota_task` / `web_task` | 0 | 2 | Panneau web + OTA firmware **et** LittleFS ([web.md](web.md), [ota.md](ota.md)) |
 | `loop()` | 0 | 1 | Télémétrie sur le port série |
 
 La file entre `lidar_task` et `network_task` compte 2 048 entrées, soit environ
@@ -72,11 +72,11 @@ si l'on décide un jour d'accélérer le balayage.
 |---|---|---|
 | 9000 | UDP, sortant | Flux de points vers la station hôte |
 | 3232 | TCP | Mise à jour ArduinoOTA / espota |
-| 80 | TCP | Page de mise à jour et point d'accès `/info` |
+| 80 | TCP | Page de commande, `/info`, OTA web (`/update`, `/updatefs`) |
 
 Le port 3232 n'est pas servi pendant un balayage, et le port 80 renvoie alors
-503 sur `/update` : une mise à jour en pleine acquisition perdrait le scan et
-laisserait la mécanique dans un état indéterminé.
+503 sur `/update` et `/updatefs` : une mise à jour en pleine acquisition
+perdrait le scan et laisserait la mécanique dans un état indéterminé.
 
 Une mise à jour relâche `EN` du TMC2209 **avant** la première écriture en
 flash, puis suspend `lidar_task` et `network_task`. Le scanner démarre au
@@ -155,6 +155,13 @@ loin des 37 datagrammes par seconde à absorber.
 
 Très largement dans les capacités d'un 802.11n, y compris en périphérie de
 couverture.
+
+## Amorce OTA
+
+Le premier flash USB installe un firmware minimal (`src/seed/`) : Wi-Fi,
+ArduinoOTA et page web, sans LiDAR ni moteur. Les mises à jour suivantes —
+firmware scanner **et** image LittleFS — passent par le réseau. Voir
+[ota.md](ota.md).
 
 ## Tests
 

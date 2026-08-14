@@ -9,6 +9,7 @@ host/build/
 
 # PlatformIO
 firmware/.pio/
+firmware/.pio-venv/
 firmware/.vscode/.browse.c_cpp.db*
 firmware/.vscode/c_cpp_properties.json
 firmware/.vscode/launch.json

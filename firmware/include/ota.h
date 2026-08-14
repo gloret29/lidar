@@ -9,9 +9,10 @@
 //    - commande de balayage (start / stop / rehome / arrêt)
 //    - télémétrie live
 //    - paramètres de réglage (NVS)
-//    - téléversement du firmware
+//    - téléversement du firmware et du filesystem LittleFS
 //
-//  ArduinoOTA (port 3232) reste disponible en parallèle.
+//  ArduinoOTA (port 3232) reste disponible en parallèle
+//  (firmware et LittleFS). L'amorce USB est dans src/seed/.
 //  Voir docs/web.md et docs/ota.md.
 // ============================================================
 

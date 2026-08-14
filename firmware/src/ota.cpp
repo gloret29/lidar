@@ -2,6 +2,7 @@
 
 #include <ArduinoOTA.h>
 #include <ESPmDNS.h>
+#include <LittleFS.h>
 #include <Update.h>
 #include <WebServer.h>
 #include <WiFi.h>
@@ -21,6 +22,7 @@ String web_password;
 volatile bool in_progress = false;
 bool upload_authorized = false;
 bool upload_refused = false;
+int upload_command = U_FLASH;
 
 // ------------------------------------------------------------
 //  Page unique
@@ -115,15 +117,23 @@ label.field input{width:110px;padding:7px 8px;border-radius:7px;border:1px solid
 </section>
 <section>
   <h2>Mise à jour OTA</h2>
-  <p class="hint">Fichier <code>firmware.bin</code> — indisponible pendant un balayage.</p>
+  <p class="hint">Indisponible pendant un balayage. Firmware : <code>firmware.bin</code>. Filesystem : <code>littlefs.bin</code>.</p>
   <label class="drop" id="drop">
     <input type="file" id="file" accept=".bin">
-    Déposer le binaire ou cliquer
+    Firmware — déposer ou cliquer
     <div class="name" id="fname"></div>
   </label>
-  <button id="flash" disabled style="width:100%;margin-top:12px">Téléverser</button>
+  <button id="flash" disabled style="width:100%;margin-top:12px">Téléverser le firmware</button>
   <div class="bar" id="bar"><i id="fill"></i></div>
   <div class="msg" id="otamsg"></div>
+  <label class="drop" id="dropfs" style="margin-top:16px">
+    <input type="file" id="filefs" accept=".bin">
+    Filesystem LittleFS — déposer ou cliquer
+    <div class="name" id="fnamefs"></div>
+  </label>
+  <button id="flashfs" disabled style="width:100%;margin-top:12px">Téléverser le filesystem</button>
+  <div class="bar" id="barfs"><i id="fillfs"></i></div>
+  <div class="msg" id="otamsgfs"></div>
 </section>
 </main>
 <script>
@@ -160,7 +170,8 @@ async function refresh(){
     $('start').disabled=busy;
     $('rehome').disabled=busy;
     $('flash').disabled=busy||!$('file').files[0];
-    if(d.ota_busy) setMsg('otamsg','Écriture en flash…','warn');
+    $('flashfs').disabled=busy||!$('filefs').files[0];
+    if(d.ota_busy){setMsg('otamsg','Écriture en flash…','warn');setMsg('otamsgfs','Écriture en flash…','warn')}
   }catch(e){}
 }
 async function cmd(c){
@@ -202,32 +213,40 @@ $('defaults').onclick=async()=>{
   }catch(e){setMsg('setmsg',e.message,'err')}
 };
 
-const drop=$('drop');
-['dragover','dragleave','drop'].forEach(e=>drop.addEventListener(e,ev=>{
-  ev.preventDefault(); drop.classList.toggle('over',e==='dragover');
-  if(e==='drop'&&ev.dataTransfer.files.length){$('file').files=ev.dataTransfer.files;pick()}
-}));
-$('file').onchange=pick;
-function pick(){
-  const f=$('file').files[0]; if(!f)return;
-  $('fname').textContent=f.name+' ('+(f.size/1024).toFixed(0)+' ko)';
-  $('flash').disabled=false;
+function bindDrop(dropId,fileId,nameId,btnId){
+  const drop=$(dropId);
+  ['dragover','dragleave','drop'].forEach(e=>drop.addEventListener(e,ev=>{
+    ev.preventDefault(); drop.classList.toggle('over',e==='dragover');
+    if(e==='drop'&&ev.dataTransfer.files.length){$(fileId).files=ev.dataTransfer.files;pick()}
+  }));
+  $(fileId).onchange=pick;
+  function pick(){
+    const f=$(fileId).files[0]; if(!f)return;
+    $(nameId).textContent=f.name+' ('+(f.size/1024).toFixed(0)+' ko)';
+    $(btnId).disabled=false;
+  }
 }
-$('flash').onclick=()=>{
-  const f=$('file').files[0]; if(!f)return;
-  const fd=new FormData(); fd.append('firmware',f,f.name);
-  const xhr=new XMLHttpRequest();
-  $('flash').disabled=true; $('bar').style.display='block';
-  setMsg('otamsg','Écriture en flash…','warn');
-  xhr.upload.onprogress=e=>{if(e.lengthComputable)$('fill').style.width=(e.loaded/e.total*100).toFixed(1)+'%'};
-  xhr.onload=()=>{
-    const ok=xhr.status===200;
-    setMsg('otamsg',ok?'Réussi — redémarrage.':('Échec : '+xhr.responseText),ok?'ok':'err');
-    if(!ok)$('flash').disabled=false;
+function bindFlash(fileId,btnId,barId,fillId,msgId,url){
+  $(btnId).onclick=()=>{
+    const f=$(fileId).files[0]; if(!f)return;
+    const fd=new FormData(); fd.append('image',f,f.name);
+    const xhr=new XMLHttpRequest();
+    $(btnId).disabled=true; $(barId).style.display='block';
+    setMsg(msgId,'Écriture en flash…','warn');
+    xhr.upload.onprogress=e=>{if(e.lengthComputable)$(fillId).style.width=(e.loaded/e.total*100).toFixed(1)+'%'};
+    xhr.onload=()=>{
+      const ok=xhr.status===200;
+      setMsg(msgId,ok?'Réussi — redémarrage.':('Échec : '+xhr.responseText),ok?'ok':'err');
+      if(!ok)$(btnId).disabled=false;
+    };
+    xhr.onerror=()=>{setMsg(msgId,'Connexion interrompue.','err');$(btnId).disabled=false};
+    xhr.open('POST',url); xhr.send(fd);
   };
-  xhr.onerror=()=>{setMsg('otamsg','Connexion interrompue.','err');$('flash').disabled=false};
-  xhr.open('POST','/update'); xhr.send(fd);
-};
+}
+bindDrop('drop','file','fname','flash');
+bindDrop('dropfs','filefs','fnamefs','flashfs');
+bindFlash('file','flash','bar','fill','otamsg','/update');
+bindFlash('filefs','flashfs','barfs','fillfs','otamsgfs','/updatefs');
 
 loadSettings().catch(()=>{});
 refresh(); setInterval(refresh,1000);
@@ -360,11 +379,15 @@ void handleUpload() {
                 return;
             }
 
-            Serial.printf("[ota] téléversement web de « %s »\n", up.filename.c_str());
+            Serial.printf("[ota] téléversement web %s « %s »\n",
+                          upload_command == U_SPIFFS ? "filesystem" : "firmware",
+                          up.filename.c_str());
             if (hooks.on_begin) hooks.on_begin();
             in_progress = true;
 
-            if (!Update.begin(UPDATE_SIZE_UNKNOWN)) {
+            if (upload_command == U_SPIFFS) LittleFS.end();
+
+            if (!Update.begin(UPDATE_SIZE_UNKNOWN, upload_command)) {
                 Update.printError(Serial);
                 in_progress = false;
             }
@@ -442,7 +465,9 @@ bool otaInit(const String& hostname, const String& password, const OtaHooks& h) 
     if (!web_password.isEmpty()) ArduinoOTA.setPassword(web_password.c_str());
 
     ArduinoOTA.onStart([]() {
-        Serial.println("[ota] début (espota)");
+        const bool fs = ArduinoOTA.getCommand() == U_SPIFFS;
+        Serial.printf("[ota] début espota (%s)\n", fs ? "filesystem" : "firmware");
+        if (fs) LittleFS.end();
         if (hooks.on_begin) hooks.on_begin();
         in_progress = true;
     });
@@ -480,7 +505,16 @@ bool otaInit(const String& hostname, const String& password, const OtaHooks& h) 
     server.on("/api/settings", HTTP_GET, handleSettingsGet);
     server.on("/api/settings", HTTP_POST, handleSettingsPost);
     server.on("/info", HTTP_GET, handleInfo);
-    server.on("/update", HTTP_POST, handleUpdateResult, handleUpload);
+    server.on(
+        "/update", HTTP_POST, handleUpdateResult, []() {
+            upload_command = U_FLASH;
+            handleUpload();
+        });
+    server.on(
+        "/updatefs", HTTP_POST, handleUpdateResult, []() {
+            upload_command = U_SPIFFS;
+            handleUpload();
+        });
     server.onNotFound([]() { server.send(404, "text/plain", "introuvable"); });
     server.begin();
 
