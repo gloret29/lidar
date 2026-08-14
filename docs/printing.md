@@ -18,7 +18,7 @@ déforme dès 50 °C — proscrit dans une voiture en été.
 
 | Pièce | Périmètres | Remplissage | Orientation | Supports |
 |---|---|---|---|---|
-| `test_fits` | 3 | 20 % | Telle quelle | Non |
+| `test_fits` | **2** | **10 %** | Telle quelle | Non |
 | `base_plate` | 4 | 30 % | **Retournée**, bossage vers le haut | Non |
 | `bearing_tower` | **5** | **40 %** | Bride sur le plateau | Non |
 | `lidar_cradle` | 4 | 35 % | **Couchée**, platine à plat | Sous le moyeu |
@@ -26,6 +26,20 @@ déforme dès 50 °C — proscrit dans une voiture en été.
 | `electronics_lid` | 3 | 20 % | À plat | Non |
 
 Durée totale : environ 9 h, pour 220 g de filament.
+
+### `test_fits` — coupon rapide
+
+Pièce **compacte** (~118 × 46 × 6 mm, logements roulement sur 4 mm seulement).
+Viser **15 à 25 min** de plateau :
+
+| Paramètre | Valeur | Motif |
+|---|---|---|
+| Hauteur de couche | **0,28 mm** | Précision suffisante pour juger un Ø22 |
+| Périmètres | **2** | Les perçages définissent l'ajustement, pas les parois |
+| Remplissage | **10 %** | Plaque pleine, peu de contrainte mécanique |
+| Vitesse | Profil « draft » du slicer | OK pour un coupon jetable |
+
+Ne pas appliquer ces réglages agressifs à `bearing_tower` ni au berceau.
 
 ### `bearing_tower` — la pièce critique
 
@@ -63,9 +77,13 @@ paire est repérée par un nombre d'encoches gravées entre les deux rangées.
 
 | Index | 1 | 2 | 3 | 4 | 5 |
 |---|---|---|---|---|---|
-| `delta` | −0,20 | −0,15 | −0,10 | −0,05 | 0,00 |
-| Logement 608ZZ | 21,80 | 21,85 | 21,90 | 21,95 | 22,00 |
-| Alésage tige Ø8 | 8,15 | 8,20 | 8,25 | 8,30 | 8,35 |
+| `delta` | −0,05 | 0,00 | +0,05 | +0,10 | +0,15 |
+| Logement 608ZZ | 21,95 | 22,00 | 22,05 | 22,10 | 22,15 |
+| Alésage tige Ø8 | 8,30 | 8,35 | 8,40 | 8,45 | 8,50 |
+
+La plage est volontairement décalée vers le **large** : beaucoup d'imprimantes
+rétrécissent les perçages. Si l'encoche 5 d'un ancien coupon (delta 0,00) était
+encore serrée, repartir sur cette version avant d'imprimer la colonne.
 
 Critères :
 
@@ -79,12 +97,12 @@ Reporter ensuite dans
 [`params.scad`](../mechanical/openscad/params.scad) :
 
 ```
-fit_press = -0.10;   // delta de l'index retenu pour le roulement
-fit_slide =  0.25;   // delta + 0.35 pour l'index retenu pour la tige
+fit_press =  0.10;   // delta de l'index retenu pour le roulement
+fit_slide =  0.45;   // delta + 0.35 pour l'index retenu pour la tige
 ```
 
-puis régénérer les STL avec `make`. Cinq minutes d'impression évitent de rater
-la colonne, qui demande près de 4 h.
+puis régénérer les STL avec `make`. Une vingtaine de minutes de plateau
+(compact + couche 0,28 mm) évitent de rater la colonne, qui demande près de 4 h.
 
 ## Pose de l'insert 1/4"-20
 

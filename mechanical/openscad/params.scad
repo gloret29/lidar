@@ -16,9 +16,11 @@ $fs = 0.6;
 //  À recalibrer sur votre imprimante avec mechanical/openscad/
 //  test_fits.scad avant d'imprimer les pièces définitives.
 // ------------------------------------------------------------
-fit_press = -0.10;  // serré   : roulement dans son logement
-fit_slide = 0.25;   // glissant: tige, vis traversantes
+fit_press = 0.10;   // serré   : roulement dans son logement
+fit_slide = 0.45;   // glissant: tige, vis traversantes
 fit_free = 0.50;    // libre   : dégagements
+// Calibré après coupon test_fits : encoche 5 (delta 0,00) encore serrée
+// sur l'ancienne plage — imprimante qui rétrécit les perçages.
 
 // ------------------------------------------------------------
 //  Roulement 608ZZ
