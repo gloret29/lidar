@@ -22,7 +22,7 @@
 #include "config.h"
 #include "wifi_setup.h"
 
-#define SEED_VERSION "0.1.0-seed"
+#define SEED_VERSION "0.1.1-seed"
 
 namespace {
 
@@ -33,6 +33,21 @@ volatile bool in_progress = false;
 bool upload_authorized = false;
 bool upload_refused = false;
 int upload_command = U_FLASH;
+bool fs_mounted = false;
+
+bool mountLittleFS() {
+    if (LittleFS.begin(false)) {
+        fs_mounted = true;
+        return true;
+    }
+    Serial.println("[seed] LittleFS illisible — formatage");
+    if (LittleFS.format() && LittleFS.begin(true)) {
+        fs_mounted = true;
+        return true;
+    }
+    fs_mounted = false;
+    return false;
+}
 
 const char kIndexHtml[] PROGMEM = R"HTML(<!DOCTYPE html>
 <html lang="fr">
@@ -224,7 +239,7 @@ void handleStatus() {
     body += next ? next->label : "?";
     body += "\",\"next_size_kb\":";
     body += String(next ? next->size / 1024 : 0);
-    const bool fs_ok = LittleFS.totalBytes() > 0;
+    const bool fs_ok = fs_mounted && LittleFS.totalBytes() > 0;
     body += ",\"fs_mounted\":";
     body += fs_ok ? "true" : "false";
 
@@ -274,7 +289,7 @@ void handleUpload() {
                           upload_command == U_SPIFFS ? "filesystem" : "firmware",
                           up.filename.c_str());
 
-            if (upload_command == U_SPIFFS) LittleFS.end();
+            if (upload_command == U_SPIFFS && fs_mounted) LittleFS.end();
 
             in_progress = true;
             if (!Update.begin(UPDATE_SIZE_UNKNOWN, upload_command)) {
@@ -340,18 +355,19 @@ void setup() {
     Serial.println("[seed] pas de LiDAR, pas de moteur — USB plus nécessaire après le Wi-Fi");
 
     wifiCheckResetButton();
+
+    if (mountLittleFS())
+        Serial.printf("[seed] LittleFS %u / %u octets\n",
+                      static_cast<unsigned>(LittleFS.usedBytes()),
+                      static_cast<unsigned>(LittleFS.totalBytes()));
+    else
+        Serial.println("[seed] LittleFS indisponible — OTA firmware OK, pas de listing FS");
+
     if (!wifiSetup(net_settings)) {
         Serial.println("[wifi] redémarrage dans 3 s");
         delay(3000);
         ESP.restart();
     }
-
-    if (!LittleFS.begin(true))
-        Serial.println("[seed] LittleFS : montage impossible");
-    else
-        Serial.printf("[seed] LittleFS %u / %u octets\n",
-                      static_cast<unsigned>(LittleFS.usedBytes()),
-                      static_cast<unsigned>(LittleFS.totalBytes()));
 
     const esp_partition_t* running = esp_ota_get_running_partition();
     const esp_partition_t* next = esp_ota_get_next_update_partition(nullptr);
@@ -371,7 +387,10 @@ void setup() {
     ArduinoOTA.onStart([]() {
         const bool fs = ArduinoOTA.getCommand() == U_SPIFFS;
         Serial.printf("[seed] début espota (%s)\n", fs ? "filesystem" : "firmware");
-        if (fs) LittleFS.end();
+        if (fs) {
+            if (fs_mounted) LittleFS.end();
+            fs_mounted = false;
+        }
         in_progress = true;
     });
     ArduinoOTA.onProgress([](unsigned int done, unsigned int total) {
@@ -428,11 +447,15 @@ void loop() {
     static uint32_t last = 0;
     if (millis() - last > 2000) {
         last = millis();
-        Serial.printf("[seed] %s  rssi=%d  heap=%u  fs=%u/%u%s\n",
+        char fsbuf[32] = "  fs=n/a";
+        if (fs_mounted) {
+            snprintf(fsbuf, sizeof(fsbuf), "  fs=%u/%u",
+                     static_cast<unsigned>(LittleFS.usedBytes()),
+                     static_cast<unsigned>(LittleFS.totalBytes()));
+        }
+        Serial.printf("[seed] %s  rssi=%d  heap=%u%s%s\n",
                       WiFi.localIP().toString().c_str(), WiFi.RSSI(),
-                      static_cast<unsigned>(ESP.getFreeHeap()),
-                      static_cast<unsigned>(LittleFS.usedBytes()),
-                      static_cast<unsigned>(LittleFS.totalBytes()),
+                      static_cast<unsigned>(ESP.getFreeHeap()), fsbuf,
                       in_progress ? "  [OTA]" : "");
     }
     vTaskDelay(pdMS_TO_TICKS(100));

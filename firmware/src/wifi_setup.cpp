@@ -23,6 +23,7 @@ bool params_submitted = false;
 void onParamsSaved() { params_submitted = true; }
 
 String loadOr(const char* key, const char* fallback) {
+    if (!prefs.isKey(key)) return String(fallback);
     const String value = prefs.getString(key, "");
     return value.length() ? value : String(fallback);
 }
