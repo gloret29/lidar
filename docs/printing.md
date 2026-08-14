@@ -97,7 +97,7 @@ Reporter ensuite dans
 [`params.scad`](../mechanical/openscad/params.scad) :
 
 ```
-fit_press =  0.10;   // delta de l'index retenu pour le roulement
+fit_press =  0.15;   // delta de l'index retenu pour le roulement
 fit_slide =  0.45;   // delta + 0.35 pour l'index retenu pour la tige
 ```
 
