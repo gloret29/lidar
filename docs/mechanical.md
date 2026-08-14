@@ -118,9 +118,9 @@ semelle de trépied.
 | Hauteur totale | 133 |
 | Cavité moteur | Ø62 jusqu'à z 42 |
 | Gorge d'accouplement | Ø26 |
-| Logement roulement bas | Ø21,9 × 7 à z 82 |
+| Logement roulement bas | Ø22,15 × 7 à z 82 |
 | Dégagement intermédiaire | Ø23,5 |
-| Logement roulement haut | Ø21,9 × 7 à z 122 |
+| Logement roulement haut | Ø22,15 × 7 à z 122 |
 
 Les trois fenêtres hexagonales à z 64 donnent accès **aux vis de
 l'accouplement**, inaccessibles une fois la colonne posée. Elles ne sont pas
@@ -135,7 +135,7 @@ d'azimut par StallGuard, sans capteur.
 
 | Cote | Valeur |
 |---|---|
-| Moyeu | Ø18, serrage sur 40 mm de tige, rétreint à Ø12 en tête |
+| Moyeu | Ø18, serrage sur 40 mm de tige, alésage Ø8,45, rétreint à Ø12 en tête |
 | Fente de serrage | 1,8 mm + vis M3×25 |
 | Platine | 5 mm d'épaisseur, à x = −22 (= décalage optique) |
 | Fixation LD19 | 4 lumières oblongues de 8 mm, carré 24,9 |
@@ -172,23 +172,77 @@ ont été validées par rendu.
 **La tige ne doit pas dépasser 115 mm** : au-delà elle pénètre dans le corps
 du LD19.
 
-## 6. Matériau et rigidité
+## 6. Impression 3D
+
+Guide détaillé (coupon, insert trépied, contrôles) :
+[printing.md](printing.md).
+
+### Réglages généraux
+
+| Paramètre | Valeur | Remarque |
+|---|---|---|
+| Matériau | **PETG** | Recommandé — stable en chaleur, rigide |
+| Buse | 0,4 mm | |
+| Hauteur de couche | **0,2 mm** | Sauf `test_fits` : 0,28 mm |
+| Températures | 240 °C / 80 °C | Ajuster au filament |
+| Refroidissement | ~40 % | Trop froid fragilise le PETG |
+| Rétraction | Profil PETG du slicer | Le PETG file facilement |
+| Adhérence plateau | PEI + colle barbie / laque | Bride de colonne : surface plane critique |
+
+Le PLA convient pour un essai, mais se déforme dès 50 °C — à éviter en
+extérieur ou en voiture.
+
+### Réglages par pièce
+
+| Pièce | Périmètres | Remplissage | Orientation | Supports | Durée indic. |
+|---|---|---|---|---|---|
+| `test_fits` | 2 | 10 % | Telle quelle | Non | 20–30 min |
+| `base_plate` | 4 | 30 % | **Retournée**, bossage trépied vers le haut | Non | ~1 h 30 |
+| `bearing_tower` | **5** | **40 %** | Bride sur le plateau | Non | ~4 h |
+| `lidar_cradle` | 4 | 35 % | **Couchée**, platine à plat (`rotate -90° Y`) | Sous le moyeu | ~1 h |
+| `electronics_box` | 3 | 20 % | Ouverture vers le haut | Non | ~1 h |
+| `electronics_lid` | 3 | 20 % | À plat | Non | ~15 min |
+
+**Total** : environ 9 h et 220 g de filament.
+
+Points d'attention :
+
+- **`bearing_tower`** — pièce la plus critique : ne pas réduire les 5
+  périmètres ni les 40 % de remplissage. Toute souplesse ici se traduit en
+  erreur angulaire dans le nuage.
+- **`base_plate` retournée** — face supérieure sur le plateau : pas de
+  surplomb, face moteur plane.
+- **`lidar_cradle` couchée** — couches perpendiculaires au porte-à-faux du
+  LiDAR ; imprimée debout, la pièce casse au voile.
+
+### Ajustements dimensionnels (calibrés)
+
+Imprimer le coupon **`test_fits` en premier**. Reporter les valeurs retenues
+dans [`params.scad`](../mechanical/openscad/params.scad) :
+
+| Paramètre | Valeur calibrée | Effet |
+|---|---|---|
+| `fit_press` | **0,15** | Logement 608ZZ → **Ø22,15** (encoche 5) |
+| `fit_slide` | **0,45** | Alésage tige → **Ø8,45** (encoche 4) |
+
+Puis regénérer les STL : `cd mechanical/openscad && make`.
+
+## 7. Matériau et rigidité
 
 Le **PETG** est recommandé : il est plus rigide et bien plus stable
 dimensionnellement que le PLA dans une voiture ou un local chaud, et moins
-capricieux que l'ABS. Le PLA reste acceptable pour un premier prototype à
-condition de ne jamais laisser le scanner au soleil.
+capricieux que l'ABS.
 
 Points de rigidité structurants :
 
-- La **colonne** détermine la précision angulaire : 5 périmètres et 40 % de
-  remplissage, sans exception.
+- La **colonne** détermine la précision angulaire : respecter **5 périmètres**
+  et **40 %** de remplissage (voir § 6).
 - L'entraxe des deux roulements (40 mm) fixe la rigidité en basculement. Le
   réduire dégraderait directement la précision.
 - Le **moyeu du berceau** serre sur 40 mm de tige, ce qui suffit largement pour
   110 g en porte-à-faux de 40 mm.
 
-## 7. Génération des pièces
+## 8. Génération des pièces
 
 ```bash
 cd mechanical/openscad
