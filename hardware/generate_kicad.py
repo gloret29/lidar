@@ -15,15 +15,15 @@ def uid() -> str:
     return str(uuid.uuid4())
 
 
-def fmt_effects(justify: str = "left") -> str:
-    return f"(effects (font (size 1.27 1.27)) (justify {justify}))"
+def fmt_effects(justify: str = "left", hide: bool = False) -> str:
+    hide_s = " hide" if hide else ""
+    return f"(effects (font (size 1.27 1.27)) (justify {justify}){hide_s})"
 
 
 def sym_prop(name: str, value: str, x: float, y: float, hide: bool = False) -> str:
-    hide_s = " hide" if hide else ""
     return (
         f'    (property "{name}" "{value}" (at {x} {y} 0)\n'
-        f"      {fmt_effects()}{hide_s})\n"
+        f"      {fmt_effects(hide=hide)})\n"
     )
 
 
@@ -300,11 +300,11 @@ def placed_symbol(lib_id: str, ref: str, value: str, x: float, y: float, rot: in
   (property "Value" "{value}" (at {x + 5} {y + 5} 0)
     {fmt_effects()})
   (property "Footprint" "" (at {x} {y} 0)
-    {fmt_effects()} hide)
+    {fmt_effects(hide=True)})
   (property "Datasheet" "~" (at {x} {y} 0)
-    {fmt_effects()} hide)
+    {fmt_effects(hide=True)})
   (property "Description" "{desc}" (at {x} {y} 0)
-    {fmt_effects()} hide)
+    {fmt_effects(hide=True)})
 {pins}  (instances
     (project "{PROJECT}"
       (path "/{root_uuid}" (reference "{ref}") (unit 1))
@@ -327,13 +327,13 @@ def power_flag(value: str, x: float, y: float, root_uuid: str, ref_num: int) -> 
   (dnp no)
   (uuid "{su}")
   (property "Reference" "#PWR{ref_num:02d}" (at {x} {y - 3} 0)
-    {fmt_effects()} hide)
+    {fmt_effects(hide=True)})
   (property "Value" "{value}" (at {x} {y + 3} 0)
     {fmt_effects()})
   (property "Footprint" "" (at {x} {y} 0)
-    {fmt_effects()} hide)
+    {fmt_effects(hide=True)})
   (property "Datasheet" "" (at {x} {y} 0)
-    {fmt_effects()} hide)
+    {fmt_effects(hide=True)})
   (pin "1" (uuid "{uid()}"))
   (instances
     (project "{PROJECT}"
@@ -371,7 +371,7 @@ def global_label(name: str, x: float, y: float, rot: int = 0, shape: str = "inpu
   {fmt_effects()}
   (uuid "{uid()}")
   (property "Intersheetrefs" "${{INTERSHEET_REFS}}" (at {x} {y} 0)
-    {fmt_effects()} hide)
+    {fmt_effects(hide=True)})
 )
 """
 
@@ -498,8 +498,8 @@ def schematic(root_uuid: str) -> str:
   (property "Reference" "R1" (at 158 133 0) {fmt_effects()})
   (property "Value" "1k" (at 158 137 0) {fmt_effects()})
   (property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal" (at 155 135.32 0)
-    {fmt_effects()} hide)
-  (property "Datasheet" "~" (at 155 135.32 0) {fmt_effects()} hide)
+    {fmt_effects(hide=True)})
+  (property "Datasheet" "~" (at 155 135.32 0) {fmt_effects(hide=True)})
   (pin "1" (uuid "{uid()}"))
   (pin "2" (uuid "{uid()}"))
   (instances
@@ -542,8 +542,8 @@ def schematic(root_uuid: str) -> str:
   (uuid "{su}")
   (property "Reference" "{ref}" (at {x + 3} {y - 2} 0) {fmt_effects()})
   (property "Value" "{val}" (at {x + 3} {y + 2} 0) {fmt_effects()})
-  (property "Footprint" "" (at {x} {y} 0) {fmt_effects()} hide)
-  (property "Datasheet" "~" (at {x} {y} 0) {fmt_effects()} hide)
+  (property "Footprint" "" (at {x} {y} 0) {fmt_effects(hide=True)})
+  (property "Datasheet" "~" (at {x} {y} 0) {fmt_effects(hide=True)})
   (pin "1" (uuid "{uid()}"))
   (pin "2" (uuid "{uid()}"))
   (instances

@@ -8,19 +8,19 @@
     (in_bom yes)
     (on_board yes)
     (property "Reference" "BAT" (at 0 5.08 0)
-      (effects (font (size 1.27 1.27)) (justify left)) hide)
+      (effects (font (size 1.27 1.27)) (justify left) hide))
 
     (property "Value" "PowerBank" (at 0 -5.08 0)
-      (effects (font (size 1.27 1.27)) (justify left)) hide)
+      (effects (font (size 1.27 1.27)) (justify left) hide))
 
     (property "Footprint" "" (at 0 0 0)
-      (effects (font (size 1.27 1.27)) (justify left)) hide)
+      (effects (font (size 1.27 1.27)) (justify left) hide))
 
     (property "Datasheet" "~" (at 0 0 0)
-      (effects (font (size 1.27 1.27)) (justify left)) hide)
+      (effects (font (size 1.27 1.27)) (justify left) hide))
 
     (property "Description" "Power bank USB-C PD 100 W" (at 0 0 0)
-      (effects (font (size 1.27 1.27)) (justify left)) hide)
+      (effects (font (size 1.27 1.27)) (justify left) hide))
 
     (symbol "PowerBank_0_1"
       (rectangle (start -5.08 -2.540) (end 5.08 2.540)
@@ -48,19 +48,19 @@
     (in_bom yes)
     (on_board yes)
     (property "Reference" "U" (at 0 7.62 0)
-      (effects (font (size 1.27 1.27)) (justify left)) hide)
+      (effects (font (size 1.27 1.27)) (justify left) hide))
 
     (property "Value" "TriggerPD" (at 0 -7.62 0)
-      (effects (font (size 1.27 1.27)) (justify left)) hide)
+      (effects (font (size 1.27 1.27)) (justify left) hide))
 
     (property "Footprint" "" (at 0 0 0)
-      (effects (font (size 1.27 1.27)) (justify left)) hide)
+      (effects (font (size 1.27 1.27)) (justify left) hide))
 
     (property "Datasheet" "~" (at 0 0 0)
-      (effects (font (size 1.27 1.27)) (justify left)) hide)
+      (effects (font (size 1.27 1.27)) (justify left) hide))
 
     (property "Description" "Module trigger USB-C PD → 12 V" (at 0 0 0)
-      (effects (font (size 1.27 1.27)) (justify left)) hide)
+      (effects (font (size 1.27 1.27)) (justify left) hide))
 
     (symbol "TriggerPD_0_1"
       (rectangle (start -5.08 -5.080) (end 5.08 5.080)
@@ -93,19 +93,19 @@
     (in_bom yes)
     (on_board yes)
     (property "Reference" "U" (at 0 7.62 0)
-      (effects (font (size 1.27 1.27)) (justify left)) hide)
+      (effects (font (size 1.27 1.27)) (justify left) hide))
 
     (property "Value" "Buck12-5" (at 0 -7.62 0)
-      (effects (font (size 1.27 1.27)) (justify left)) hide)
+      (effects (font (size 1.27 1.27)) (justify left) hide))
 
     (property "Footprint" "" (at 0 0 0)
-      (effects (font (size 1.27 1.27)) (justify left)) hide)
+      (effects (font (size 1.27 1.27)) (justify left) hide))
 
     (property "Datasheet" "~" (at 0 0 0)
-      (effects (font (size 1.27 1.27)) (justify left)) hide)
+      (effects (font (size 1.27 1.27)) (justify left) hide))
 
     (property "Description" "Convertisseur buck 12 V → 5 V 3 A" (at 0 0 0)
-      (effects (font (size 1.27 1.27)) (justify left)) hide)
+      (effects (font (size 1.27 1.27)) (justify left) hide))
 
     (symbol "Buck12-5_0_1"
       (rectangle (start -5.08 -5.080) (end 5.08 5.080)
@@ -143,19 +143,19 @@
     (in_bom yes)
     (on_board yes)
     (property "Reference" "U" (at 0 27.939999999999998 0)
-      (effects (font (size 1.27 1.27)) (justify left)) hide)
+      (effects (font (size 1.27 1.27)) (justify left) hide))
 
     (property "Value" "ESP32-S3" (at 0 -27.939999999999998 0)
-      (effects (font (size 1.27 1.27)) (justify left)) hide)
+      (effects (font (size 1.27 1.27)) (justify left) hide))
 
     (property "Footprint" "" (at 0 0 0)
-      (effects (font (size 1.27 1.27)) (justify left)) hide)
+      (effects (font (size 1.27 1.27)) (justify left) hide))
 
     (property "Datasheet" "~" (at 0 0 0)
-      (effects (font (size 1.27 1.27)) (justify left)) hide)
+      (effects (font (size 1.27 1.27)) (justify left) hide))
 
     (property "Description" "ESP32-S3 DevKitC-1 N16R8" (at 0 0 0)
-      (effects (font (size 1.27 1.27)) (justify left)) hide)
+      (effects (font (size 1.27 1.27)) (justify left) hide))
 
     (symbol "ESP32-S3_0_1"
       (rectangle (start -5.08 -25.400) (end 5.08 25.400)
@@ -253,19 +253,19 @@
     (in_bom yes)
     (on_board yes)
     (property "Reference" "LD" (at 0 7.62 0)
-      (effects (font (size 1.27 1.27)) (justify left)) hide)
+      (effects (font (size 1.27 1.27)) (justify left) hide))
 
     (property "Value" "LD19" (at 0 -7.62 0)
-      (effects (font (size 1.27 1.27)) (justify left)) hide)
+      (effects (font (size 1.27 1.27)) (justify left) hide))
 
     (property "Footprint" "" (at 0 0 0)
-      (effects (font (size 1.27 1.27)) (justify left)) hide)
+      (effects (font (size 1.27 1.27)) (justify left) hide))
 
     (property "Datasheet" "~" (at 0 0 0)
-      (effects (font (size 1.27 1.27)) (justify left)) hide)
+      (effects (font (size 1.27 1.27)) (justify left) hide))
 
     (property "Description" "LiDAR LD19 (JST 4p, tête tournante)" (at 0 0 0)
-      (effects (font (size 1.27 1.27)) (justify left)) hide)
+      (effects (font (size 1.27 1.27)) (justify left) hide))
 
     (symbol "LD19_0_1"
       (rectangle (start -5.08 -5.080) (end 5.08 5.080)
@@ -303,19 +303,19 @@
     (in_bom yes)
     (on_board yes)
     (property "Reference" "U" (at 0 12.7 0)
-      (effects (font (size 1.27 1.27)) (justify left)) hide)
+      (effects (font (size 1.27 1.27)) (justify left) hide))
 
     (property "Value" "MPU6050" (at 0 -12.7 0)
-      (effects (font (size 1.27 1.27)) (justify left)) hide)
+      (effects (font (size 1.27 1.27)) (justify left) hide))
 
     (property "Footprint" "" (at 0 0 0)
-      (effects (font (size 1.27 1.27)) (justify left)) hide)
+      (effects (font (size 1.27 1.27)) (justify left) hide))
 
     (property "Datasheet" "~" (at 0 0 0)
-      (effects (font (size 1.27 1.27)) (justify left)) hide)
+      (effects (font (size 1.27 1.27)) (justify left) hide))
 
     (property "Description" "MPU6050 GY-521 (base fixe)" (at 0 0 0)
-      (effects (font (size 1.27 1.27)) (justify left)) hide)
+      (effects (font (size 1.27 1.27)) (justify left) hide))
 
     (symbol "MPU6050_0_1"
       (rectangle (start -5.08 -10.160) (end 5.08 10.160)
@@ -358,19 +358,19 @@
     (in_bom yes)
     (on_board yes)
     (property "Reference" "U" (at 0 25.4 0)
-      (effects (font (size 1.27 1.27)) (justify left)) hide)
+      (effects (font (size 1.27 1.27)) (justify left) hide))
 
     (property "Value" "TMC2209" (at 0 -25.4 0)
-      (effects (font (size 1.27 1.27)) (justify left)) hide)
+      (effects (font (size 1.27 1.27)) (justify left) hide))
 
     (property "Footprint" "" (at 0 0 0)
-      (effects (font (size 1.27 1.27)) (justify left)) hide)
+      (effects (font (size 1.27 1.27)) (justify left) hide))
 
     (property "Datasheet" "~" (at 0 0 0)
-      (effects (font (size 1.27 1.27)) (justify left)) hide)
+      (effects (font (size 1.27 1.27)) (justify left) hide))
 
     (property "Description" "Driver TMC2209 v2.0" (at 0 0 0)
-      (effects (font (size 1.27 1.27)) (justify left)) hide)
+      (effects (font (size 1.27 1.27)) (justify left) hide))
 
     (symbol "TMC2209_0_1"
       (rectangle (start -5.08 -22.860) (end 5.08 22.860)
