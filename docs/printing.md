@@ -29,8 +29,8 @@ Durée totale : environ 9 h, pour 220 g de filament.
 
 ### `test_fits` — coupon rapide
 
-Pièce **compacte** (~118 × 46 × 6 mm, logements roulement sur 4 mm seulement).
-Viser **15 à 25 min** de plateau :
+Pièce **compacte** (~132 × 44 × 8 mm, logements roulement sur 5 mm).
+Viser **20 à 30 min** de plateau :
 
 | Paramètre | Valeur | Motif |
 |---|---|---|

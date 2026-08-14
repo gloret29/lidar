@@ -2,7 +2,8 @@
 //  00 — Coupon de calibration des ajustements
 //
 //  À IMPRIMER EN PREMIER, avant toute autre pièce.
-//  Géométrie compacte : ~65 % de matière en moins que la v1.
+//  Géométrie compacte (~132 × 44 × 8 mm) avec marges calculées :
+//  les perçages ne débordent plus du plateau (bug v2 : coupon_x = 118).
 //
 //  Cinq paires d'essais, repérées par 1 à 5 encoches gravées :
 //
@@ -10,7 +11,7 @@
 //    ----------------------------------------------
 //    delta  | -0.05   0.00  +0.05  +0.10  +0.15
 //    ----------------------------------------------
-//    logement 608ZZ (borgne 4 mm — suffisant pour juger la presse)
+//    logement 608ZZ (borgne 5 mm — suffisant pour juger la presse)
 //           | 21.95  22.00  22.05  22.10  22.15
 //    ----------------------------------------------
 //    alésage tige Ø8 (traversant)
@@ -19,7 +20,7 @@
 //  Impression rapide (voir docs/printing.md) :
 //    couche 0,28 mm · 2 périmètres · 10 % remplissage · pas de support.
 //
-//  Roulement : presse à main ferme sur 4 mm de profondeur, sans jeu.
+//  Roulement : presse à main ferme sur 5 mm de profondeur, sans jeu.
 //  Reporter delta -> params.scad fit_press.
 //
 //  Tige : coulisse sans point dur. Reporter (delta + 0.35) -> fit_slide.
@@ -29,18 +30,18 @@ include <lib.scad>
 
 deltas = [-0.05, 0.00, 0.05, 0.10, 0.15];
 
-// Enveloppe minimale : 5 colonnes espacées de 24 mm (parois ~2 mm).
-coupon_x = 118;
-coupon_y = 46;
-coupon_z = 6;
+edge_margin = 3;          // marge mini entre un perçage et le bord
+col_pitch = 26;           // pas serré mais sans empiètement (26 - 22,15 ≈ 3,9 mm)
+col_x0 = edge_margin + bearing_od / 2 + 0.15;   // pire cas : delta +0,15
 
-bearing_test_depth = 4;   // 4 mm suffisent pour juger l'ajustement OD
-bearing_row_y = 33;
-shaft_row_y = 9;
-index_row_y = 17;
+coupon_x = col_x0 + col_pitch * 4 + bearing_od / 2 + 0.15 + edge_margin;
+coupon_y = 44;
+coupon_z = 8;
 
-col_pitch = 24;
-col_x0 = 13;
+bearing_test_depth = 5;   // 5 mm : compromis vitesse / profondeur utile
+bearing_row_y = coupon_y - edge_margin - bearing_od / 2 - 0.15;
+shaft_row_y = edge_margin + shaft_d / 2 + 0.35 + 0.15;
+index_row_y = (bearing_row_y + shaft_row_y) / 2;
 
 module test_fits() {
     difference() {
@@ -49,7 +50,7 @@ module test_fits() {
         for (i = [0:4]) {
             cx = col_x0 + col_pitch * i;
 
-            // Logement roulement : borgne, ouvert vers le HAUT (4 mm seulement).
+            // Logement roulement : borgne, ouvert vers le HAUT (5 mm).
             translate([cx, bearing_row_y, coupon_z - bearing_test_depth])
                 cylinder(d = bearing_od + deltas[i], h = bearing_test_depth + 0.1,
                          $fn = 48);
