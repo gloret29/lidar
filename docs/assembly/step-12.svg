@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="820" height="420" viewBox="0 0 820 420">
+  <title>Étape 12 — premières mises sous tension</title>
+  <rect width="820" height="420" fill="#f7f8fa"/>
+  <style>
+    .title { font:700 15px "Segoe UI",system-ui,sans-serif; fill:#111; }
+    .box { fill:#fff; stroke:#333; stroke-width:1.4; }
+    .label { font:600 12px "Segoe UI",system-ui,sans-serif; fill:#111; }
+    .small { font:11px "Segoe UI",system-ui,sans-serif; fill:#333; }
+    .arrow { fill:none; stroke:#1565c0; stroke-width:1.6; marker-end:url(#arr); }
+  </style>
+  <defs>
+    <marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L6,3 L0,6 Z" fill="#1565c0"/>
+    </marker>
+  </defs>
+<text x="24" y="28" class="title">Étape 12 — premières mises sous tension</text>
+<rect x="30" y="50" width="175" height="320" rx="8" class="box"/>
+<text x="42" y="78" class="label">12a — Sans moteur</text>
+<text x="42" y="98" class="small">LD19 + Wi-Fi</text>
+<text x="42" y="130" class="small">Moniteur série : trames LD19</text>
+<text x="42" y="148" class="small">Portail LiDAR-Scanner-Setup</text>
+<path d="M205,190 L225,190" class="arrow"/>
+<rect x="225" y="50" width="175" height="320" rx="8" class="box"/>
+<text x="237" y="78" class="label">12b — 300 mA</text>
+<text x="237" y="98" class="small">Rotation ±10°</text>
+<text x="237" y="130" class="small">StealthChop quasi silencieux</text>
+<text x="237" y="148" class="small">Pas de vibration</text>
+<path d="M400,190 L420,190" class="arrow"/>
+<rect x="420" y="50" width="175" height="320" rx="8" class="box"/>
+<text x="432" y="78" class="label">12c — Homing</text>
+<text x="432" y="98" class="small">StallGuard</text>
+<text x="432" y="130" class="small">Ajuster SGTHRS (~80)</text>
+<text x="432" y="148" class="small">10 essais répétables</text>
+<path d="M595,190 L615,190" class="arrow"/>
+<rect x="615" y="50" width="175" height="320" rx="8" class="box"/>
+<text x="627" y="78" class="label">12d — 700 mA</text>
+<text x="627" y="98" class="small">Scan 180°</text>
+<text x="627" y="130" class="small">Balayage complet</text>
+<text x="627" y="148" class="small">Vérifier nuage UDP</text>
+</svg>

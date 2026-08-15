@@ -6,12 +6,21 @@ opérations deviennent impossibles une fois l'étape suivante réalisée.
 Prérequis : [`printing.md`](printing.md) terminé, ajustements calibrés,
 nomenclature [`bom.md`](bom.md) complète.
 
+Illustrations dans [`assembly/`](assembly/) — régénérables via
+[`generate_assembly_images.py`](generate_assembly_images.py).
+
+> Les pièces **imprimées** sont en couleur (bleu, vert, orange, violet) ; les
+> volumes **gris, rouge ou ambre** représentent les composants achetés (moteur,
+> roulements, tige, accouplement, LiDAR, câble).
+
 Pour l’ordre global du projet (logiciel, câblage, premier scan), voir
 [`build.md`](build.md).
 
 ---
 
 ## Étape 1 — Préparation de la tige
+
+![Étape 1 — tige Ø8 recoupée à 115 mm](assembly/step-01.png)
 
 1. Recouper la tige Ø8 à **115 mm exactement**.
 2. Ébavurer et chanfreiner légèrement les deux extrémités à la lime.
@@ -23,6 +32,8 @@ Pour l’ordre global du projet (logiciel, câblage, premier scan), voir
 
 ## Étape 2 — Insert de trépied
 
+![Étape 2 — bossage insert 1/4"-20](assembly/step-02.png)
+
 Voir [`printing.md`](printing.md) § « Pose de l'insert ». À faire maintenant :
 le bossage est encore accessible de partout.
 
@@ -30,6 +41,8 @@ Contrôle : visser une vis 1/4"-20 à la main, elle doit entrer d'équerre et sa
 point dur.
 
 ## Étape 3 — Moteur sur le plateau
+
+![Étape 3 — NEMA 17 vissé sous le plateau](assembly/step-03.png)
 
 1. Poser le plateau **à l'envers** sur l'établi.
 2. Présenter le NEMA 17, arbre vers le haut, bossage de centrage engagé dans
@@ -43,6 +56,8 @@ Contrôle : l'arbre doit tourner librement, sans point dur, et le moteur ne doit
 pas basculer.
 
 ## Étape 4 — Roulements dans la colonne
+
+![Étape 4 — deux 608ZZ dans la colonne](assembly/step-04.png)
 
 Les deux roulements s'insèrent **par le haut**.
 
@@ -64,11 +79,15 @@ c'est le test décisif de la coaxialité.
 
 ## Étape 5 — Accouplement
 
+![Étape 5 — accouplement sur l'arbre moteur](assembly/step-05.png)
+
 1. Glisser l'accouplement sur l'arbre du moteur, engagé sur **12 mm**.
 2. Ne pas encore serrer les vis.
 3. Positionner le haut de l'accouplement à z 77.
 
 ## Étape 6 — Colonne sur le plateau
+
+![Étape 6 — colonne fixée sur le plateau](assembly/step-06.png)
 
 1. Faire descendre la colonne sur le moteur, en la présentant bien droite.
 2. Faire passer le câble moteur par l'encoche de bride et la lumière du
@@ -80,6 +99,8 @@ c'est le test décisif de la coaxialité.
 Contrôle : la bride doit reposer à plat, sans jeu de basculement.
 
 ## Étape 7 — Tige et accouplement
+
+![Étape 7 — tige traversant les roulements](assembly/step-07.png)
 
 1. Introduire la tige par le haut, à travers les deux roulements.
 2. La descendre jusqu'à l'engager de 12 mm dans l'accouplement (elle affleure
@@ -97,6 +118,8 @@ résistance de détente : c'est normal.
 
 ## Étape 8 — LD19 sur le berceau
 
+![Étape 8 — LD19 dans le berceau](assembly/step-08.png)
+
 1. **Relever au pied à coulisse la hauteur du plan optique** du LD19 par
    rapport à sa face de fixation. Valeur supposée : 22 mm. Voir
    [`calibration.md`](calibration.md) § 1.
@@ -109,6 +132,8 @@ résistance de détente : c'est normal.
 
 ## Étape 9 — Berceau sur la tige
 
+![Étape 9 — tête tournante sur la tige](assembly/step-09.png)
+
 1. Enfiler le moyeu du berceau sur la tige, jusqu'à ce qu'il porte sur la bague
    intérieure du roulement supérieur.
 2. Orienter le secteur de butée en regard du contrefort de la colonne.
@@ -118,6 +143,8 @@ Contrôle : la tête complète doit tourner d'un bloc, sans jeu entre le berceau
 et la tige. En butée, le secteur doit rencontrer franchement le contrefort.
 
 ## Étape 10 — Électronique
+
+![Étape 10 — boîtier électronique](assembly/step-10.png)
 
 Câbler **hors tension**, en suivant [`wiring.md`](wiring.md).
 
@@ -133,6 +160,8 @@ Câbler **hors tension**, en suivant [`wiring.md`](wiring.md).
 
 ## Étape 11 — Câble du LiDAR
 
+![Étape 11 — câble LiDAR en hélice lâche](assembly/step-11.png)
+
 1. Descendre le câble le long de la colonne, en hélice lâche.
 2. Laisser **120 mm de mou**.
 3. Fixer par rilsan sur le berceau et en bas de la colonne, jamais en tension.
@@ -140,6 +169,8 @@ Câbler **hors tension**, en suivant [`wiring.md`](wiring.md).
    sans jamais tirer ni frotter sur une arête.
 
 ## Étape 12 — Premières mises sous tension
+
+![Étape 12 — séquence de mise sous tension](assembly/step-12.svg)
 
 Dans cet ordre, sans jamais brûler d'étape.
 
