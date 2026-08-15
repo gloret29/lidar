@@ -5,7 +5,6 @@ Figures vectorielles dans [`wiring/`](wiring/) :
 
 - plans bloc — [`generate_wiring_svgs.py`](generate_wiring_svgs.py)
 - **schémas électriques classiques** — [`generate_schematic_svgs.py`](generate_schematic_svgs.py)
-- **projet KiCad** — [`../hardware/`](../hardware/) (`lidar.kicad_pro`)
 
 ## Schémas électriques (style circuit)
 
@@ -20,12 +19,6 @@ Figures vectorielles dans [`wiring/`](wiring/) :
 ![Signaux — schéma classique](wiring/06_schematic_signaux.svg)
 
 ![Ensemble — schéma classique](wiring/07_schematic_ensemble.svg)
-
-## Projet KiCad
-
-Schéma éditable dans KiCad 8/9 : ouvrir [`hardware/lidar.kicad_pro`](../hardware/lidar.kicad_pro).
-
-Régénération : `python3 hardware/generate_kicad.py`
 
 ## Plans bloc (aperçu)
 

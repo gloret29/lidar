@@ -129,7 +129,7 @@ cd host
 python -m venv .venv
 source .venv/bin/activate          # Windows : .venv\Scripts\activate
 pip install -e ".[dev]"
-pytest -q                          # 39 tests attendus
+pytest -q                          # 38 tests attendus
 ```
 
 Sous WSL2, pour Open3D :
@@ -291,6 +291,27 @@ Configurer le Wi-Fi via `LiDAR-Scanner-Setup`, puis ouvrir
 **Contrôle.** Flash OK, pas de reboot en boucle, page d'amorce joignable
 en HTTP, OTA firmware et filesystem acceptés.
 
+### 6.2 Firmware scanner (OTA)
+
+Une fois le Wi‑Fi configuré via le portail, téléverser le firmware complet
+(scanner + panneau de commande) :
+
+```bash
+cd firmware
+pio run -e ota -t upload
+# si mDNS échoue :
+pio run -e ota -t upload --upload-port 192.168.x.x
+```
+
+Attendu sur le moniteur (USB optionnel) ou dans `/api/status` :
+
+```
+[lidar-scanner] firmware 0.4.x
+```
+
+**Contrôle.** Page web avec sections Commande, Matériel, Diagnostics, Réglages
+et OTA ; `/api/status` répond en JSON.
+
 ---
 
 ## Étape 7 — Wi‑Fi et panneau web
@@ -306,10 +327,12 @@ Fiches : [wifi.md](wifi.md), [web.md](web.md).
 
 Sur le panneau, sans lancer de long scan :
 
+- [ ] **Matériel** : Wi‑Fi OK ; LiDAR / entraînement / IMU cohérents avec le câblage réel
 - [ ] Diagnostics : état `idle`, heap raisonnable, RSSI visible
 - [ ] Réglages : valeurs par défaut présentes
-- [ ] Bouton **Rehomer** : la tête trouve la butée (ajuster StallGuard si besoin)
-- [ ] **Arrêt d'urgence** : moteur se coupe
+- [ ] Bouton **Rehomer** : pastille Entraînement → OK (ajuster StallGuard si échec)
+- [ ] **Arrêt d'urgence** : moteur coupé, Entraînement → Ko (EN relâché)
+- [ ] **Redémarrer** : l'ESP revient en ~10 s, page joignable
 
 **Contrôle.** Homing fiable ; page web stable ; l’IP hôte dans le portail est
 bien celle du PC qui écoutera le port UDP 9000.
@@ -364,8 +387,9 @@ Mesures à faire **une fois** (puis itérer) :
 1. Bras de levier (pied à coulisse) → `lever_arm_mm`  
 2. Offset azimut ψ  
 3. Offset élévation θ  
-4. Nivellement (`g_zero` — IMU quand le code sera branché, sinon bulle +
-   approximation)  
+4. Nivellement (`g_zero`) — relever `imu_gx/gy/gz` sur le panneau web avec le
+   plateau de niveau à la bulle, reporter dans `calibration.json` (voir
+   [calibration.md](calibration.md) § 4)
 5. Filtres `rho_min` / intensité  
 
 Rescanner une position de contrôle après chaque correction majeure.
@@ -396,7 +420,8 @@ Réglages fins (StallGuard, courants, vitesse) : [web.md](web.md).
 - [ ] Coupon `test_fits` validé, pièces imprimées  
 - [ ] Mécanique montée, rotation libre jusqu’à butée  
 - [ ] 12 V / 5 V mesurés, Vref TMC réglé  
-- [ ] Amorce `seed` flashée USB, page OTA joignable  
+- [ ] Firmware scanner **0.4.x** flashé (OTA ou USB)
+- [ ] Section **Matériel** du web : tous les composants câblés en **OK**
 - [ ] Homing StallGuard fiable  
 - [ ] Au moins un `.pcd` réel enregistré  
 - [ ] `calibration.json` renseigné (même approximatif)  

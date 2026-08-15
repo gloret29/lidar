@@ -11,7 +11,7 @@ Ou l'adresse IP affichée au démarrage série.
 
 ## Ce que fait la page
 
-Quatre blocs, un seul écran :
+Cinq sections, un seul écran :
 
 | Section | Rôle |
 |---|---|
@@ -48,6 +48,21 @@ Exemple :
 curl -u admin:lidar-ota -X POST 'http://lidar-scanner.local/api/command?cmd=start'
 curl -u admin:lidar-ota http://lidar-scanner.local/api/status
 ```
+
+### Champs JSON utiles (`/api/status`)
+
+| Champ | Signification |
+|---|---|
+| `state` | `idle`, `homing`, `scanning`, … |
+| `scan_busy` | `true` pendant homing / balayage |
+| `hw_wifi_ok`, `rssi`, `ip` | Connexion Wi‑Fi |
+| `hw_lidar_ok`, `hw_lidar_warn`, `hw_lidar_crc_pct` | Trames UART + qualité CRC |
+| `hw_tmc_ok`, `hw_tmc_version` | Driver TMC2209 sur UART (GPIO 7/15) |
+| `hw_motor_enabled` | `EN` actif (false après estop ou OTA) |
+| `hw_motor_ok`, `hw_motor_warn` | Homing StallGuard réussi |
+| `imu_ok`, `imu_gx/gy/gz`, `imu_tilt_deg`, `imu_shock` | MPU6050 (GPIO 8/9) |
+| `lidar_hz`, `lidar_hz_meas`, `crc_pct` | Consigne / mesure LiDAR, CRC global |
+| `sg_live`, `queue_depth` | StallGuard live, file UDP |
 
 ## Réglages exposés
 

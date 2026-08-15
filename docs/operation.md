@@ -90,7 +90,9 @@ entre les scans.
 3. Mettre de niveau grossièrement à la bulle.
 4. Mettre sous tension et attendre la connexion Wi‑Fi.
 5. Ouvrir `http://lidar-scanner.local/` (ou l'IP du scanner).
-6. Lancer la réception sur la station hôte, puis cliquer **Lancer le scan**.
+6. Vérifier la section **Matériel** : Wi‑Fi, LiDAR, entraînement et IMU
+   cohérents avec le câblage (pastilles OK ou alertes explicites).
+7. Lancer la réception sur la station hôte, puis cliquer **Lancer le scan**.
 
 Voir [web.md](web.md) pour la commande, les diagnostics et les réglages.
 
@@ -115,9 +117,11 @@ Ne pas toucher au trépied pendant le balayage — pas même pour le stabiliser.
 
 | Pas $\psi$ | Durée | Points | Usage |
 |---|---|---|---|
-| 0,8° | 45 s | 202 000 | Reconnaissance, contrôle de couverture |
-| 0,4° | 90 s | 405 000 | **Réglage standard** |
-| 0,2° | 180 s | 810 000 | Relevé de détail, pièce unique |
+| 0,8° | 45 s | 225 000 | Reconnaissance, contrôle de couverture |
+| 0,4° | 90 s | 450 000 | **Réglage standard** |
+| 0,2° | 180 s | 900 000 | Relevé de détail, pièce unique |
+
+Comptage à **5 000 pts/s** (STL-19P à 5 Hz). Voir [geometry.md](geometry.md) § 6.
 
 ## 4. Station hôte
 
@@ -206,6 +210,9 @@ des dizaines de millions de points — pour 15 000 à 50 000 €.
 | Perte de paquets UDP | Wi-Fi saturé | Se rapprocher du point d'accès |
 | Le scan s'arrête en cours | Coupure de la power bank | Vérifier le seuil de veille |
 | Balayage bruyant | StealthChop non actif | Vérifier la liaison UART du TMC2209 |
+| Pastille Entraînement Ko | TMC2209 absent ou EN relâché | Câblage UART GPIO 7/15 ; rehomer après estop |
+| Pastille Entraînement Alerte | TMC OK, homing jamais fait | **Rehomer** depuis le panneau |
+| MPU6050 Ko | I2C absent (GPIO 8/9) | Vérifier alim 3,3 V et adresse 0x68 |
 
 ## 7. Entretien
 

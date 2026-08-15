@@ -82,8 +82,10 @@ Une fois pour toutes :
 
 1. Mettre le plateau de base rigoureusement de niveau (niveau à bulle de
    précision posé dessus, croisé à 90°).
-2. Relever $\mathbf{g}$.
-3. Stocker cette valeur comme référence `g_zero`.
+2. Ouvrir le panneau web : section **Matériel** → **MPU6050** doit être **OK**.
+3. Relever le triplet affiché `g=(gx, gy, gz)` (ou les champs JSON
+   `imu_gx`, `imu_gy`, `imu_gz` via `/api/status`).
+4. Reporter ces valeurs dans `host/calibration.json` sous la clé `g_zero`.
 
 Toute mesure ultérieure s'exprime relativement à `g_zero`, ce qui élimine
 l'erreur de collage.

@@ -86,9 +86,10 @@ lidar-mesh scans/simulate.ply --output scans/simulate_smooth.ply --smooth-iter 2
 ## Calibration
 
 [`calibration.json`](calibration.json) regroupe le bras de levier, les
-décalages angulaires et le vecteur gravité de référence. Ces valeurs sont
-appliquées **au post-traitement** : les corriger et rejouer un scan ne demande
-ni reflashage ni nouvelle acquisition.
+décalages angulaires et le vecteur gravité de référence (`g_zero`, relevable
+depuis la section **Matériel** du panneau web). Ces valeurs sont appliquées
+**au post-traitement** : les corriger et rejouer un scan ne demande ni
+reflashage ni nouvelle acquisition.
 
 Procédures détaillées dans [docs/calibration.md](../docs/calibration.md).
 
@@ -101,7 +102,7 @@ Guide Open3D (fenêtre live, fichiers, ICP, Poisson, dépannage) :
 pytest -q
 ```
 
-39 tests, sans matériel. Ils couvrent le décodage du protocole, la
+38 tests, sans matériel. Ils couvrent le décodage du protocole, la
 transformation géométrique (garde-fou contre la formule sphérique naïve) et
 le simulateur UDP (dont l'enregistrement du nuage).
 

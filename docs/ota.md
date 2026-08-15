@@ -7,7 +7,9 @@ l'intérieur du boîtier.
 Le **premier** flash se fait en USB avec l'amorce (`pio run -e seed -t upload`).
 Elle n'initialise ni le LiDAR ni le moteur : uniquement le Wi-Fi, ArduinoOTA
 et la page web. Les mises à jour suivantes — firmware **et** filesystem
-LittleFS — passent par le réseau.
+LittleFS — passent par le réseau. Le redémarrage à distance est aussi
+disponible depuis le panneau (**Redémarrer**, `POST /api/reboot`) hors
+balayage.
 
 Deux voies coexistent ensuite :
 
@@ -104,6 +106,7 @@ ni `firmware.factory.bin`.
 |---|---|---|
 | `/` | GET | Page de mise à jour |
 | `/info` | GET | État en JSON : version, partitions, mémoire, occupation |
+| `/api/reboot` | POST | Redémarrage ESP32 (refusé pendant balayage ou OTA) |
 | `/update` | POST | Téléversement multipart du firmware |
 | `/updatefs` | POST | Téléversement multipart du filesystem LittleFS |
 

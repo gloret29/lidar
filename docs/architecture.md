@@ -46,7 +46,7 @@ une erreur de conception s'était glissée initialement (voir
 | Tâche | Cœur | Priorité | Rôle |
 |---|---|---|---|
 | `lidar_task` | 1 | 5 | Lecture UART, décodage des trames LD19, mise en file |
-| `motion_task` | 1 | 4 | Nivellement, homing, profil de balayage |
+| `motion_task` | 1 | 4 | Nivellement IMU (10 s), homing StallGuard, profil de balayage |
 | `network_task` | 0 | 3 | Agrégation en datagrammes, émission UDP |
 | `ota_task` / `web_task` | 0 | 2 | Panneau web + OTA firmware **et** LittleFS ([web.md](web.md), [ota.md](ota.md)) |
 | `loop()` | 0 | 1 | Télémétrie sur le port série |
@@ -149,9 +149,9 @@ loin des 37 datagrammes par seconde à absorber.
 | Étage | Débit |
 |---|---|
 | LD19 / STL-19P en sortie UART | 5 000 pts/s, soit ~19,6 ko/s de trames |
-| Points valides après filtrage | environ 4 500 pts/s |
-| Charge utile UDP | 32 ko/s |
-| Avec en-têtes UDP/IP | environ 34 ko/s |
+| Points valides après filtrage | ~5 000 pts/s (CRC + distance valide) |
+| Charge utile UDP | ~32 ko/s |
+| Avec en-têtes UDP/IP | ~34 ko/s |
 
 Très largement dans les capacités d'un 802.11n, y compris en périphérie de
 couverture.
@@ -169,7 +169,7 @@ firmware scanner **et** image LittleFS — passent par le réseau. Voir
 cd host && PYTHONPATH=src .venv/bin/python -m pytest tests/ -q
 ```
 
-35 tests couvrent le décodage du protocole et la transformation géométrique,
+38 tests couvrent le décodage du protocole et la transformation géométrique,
 sans aucun matériel. Ils comprennent notamment un **garde-fou contre le retour
 à la formule sphérique naïve** : c'est l'erreur la plus coûteuse possible sur
 ce projet, car elle produit un nuage plausible mais faux.

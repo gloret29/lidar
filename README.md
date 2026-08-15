@@ -8,8 +8,8 @@ nuage de points 3D.
 
 ![Vue d'assemblage](mechanical/renders/assembly.png)
 
-**Environ 205 € de matériel**, pour un nuage de 200 000 à 400 000 points par
-scan, à ±5 cm, en 45 à 180 secondes.
+**Environ 205 € de matériel**, pour un nuage de 225 000 à 900 000 points par
+scan (selon durée), à ±5 cm, en 45 à 180 secondes.
 
 ## Documentation
 
@@ -30,9 +30,9 @@ scan, à ±5 cm, en 45 à 180 secondes.
 | [docs/printing.md](docs/printing.md) | Réglages d'impression, calibration des ajustements |
 | [docs/mechanical.md](docs/mechanical.md) | Conception cotée, justification des choix |
 | [docs/assembly.md](docs/assembly.md) | Montage mécanique détaillé |
-| [docs/wiring.md](docs/wiring.md) | Brochage, alimentation, **plans SVG**, **projet KiCad**, réglage TMC2209 |
+| [docs/wiring.md](docs/wiring.md) | Brochage, alimentation, plans SVG, réglage TMC2209 |
 | [docs/wifi.md](docs/wifi.md) | Configuration réseau par portail captif |
-| [docs/web.md](docs/web.md) | Panneau web : commande, diagnostics, réglages |
+| [docs/web.md](docs/web.md) | Panneau web : commande, matériel, diagnostics, réglages |
 | [docs/ota.md](docs/ota.md) | Mise à jour du firmware par le réseau |
 
 ### Utiliser
@@ -109,10 +109,13 @@ pio device monitor
 
 Au premier démarrage, se connecter au point d'accès `LiDAR-Scanner-Setup` pour
 configurer le Wi-Fi, l'adresse de la station hôte et le mot de passe OTA.
+Puis téléverser le firmware scanner : `pio run -e ota -t upload` (voir
+[docs/build.md](docs/build.md) § 6.2).
 
 Le scanner **reste au repos** après connexion. Ouvrir
-`http://lidar-scanner.local/` pour lancer un balayage, suivre la télémétrie et
-ajuster StallGuard / courants / vitesse. Voir [docs/web.md](docs/web.md).
+`http://lidar-scanner.local/` pour lancer un balayage, vérifier l'état du
+**matériel** connecté (LiDAR, entraînement, IMU), ajuster les réglages et
+redémarrer si besoin. Voir [docs/web.md](docs/web.md).
 
 Les mises à jour passent par le réseau, sans rebrancher l'USB — soit depuis
 PlatformIO, soit en déposant le `.bin` sur la même page :
@@ -120,6 +123,8 @@ PlatformIO, soit en déposant le `.bin` sur la même page :
 ```bash
 pio run -e ota -t upload      # firmware scanner
 pio run -e ota -t uploadfs    # filesystem LittleFS
+# si lidar-scanner.local ne résout pas :
+pio run -e ota -t upload --upload-port 192.168.x.x
 ```
 
 Voir [docs/ota.md](docs/ota.md).

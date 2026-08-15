@@ -28,6 +28,8 @@ Les mises à jour suivantes, sans USB :
 ```bash
 pio run -e ota -t upload      # firmware scanner
 pio run -e ota -t uploadfs    # image LittleFS (data/)
+# si mDNS échoue :
+pio run -e ota -t upload --upload-port 192.168.x.x
 ```
 
 Pour itérer sur l'amorce elle-même : `pio run -e seed-ota -t upload`.
@@ -47,7 +49,8 @@ y renseigne le réseau local, l'adresse de la station hôte et le mot de passe
 du panneau (OTA inclus). Ces valeurs sont persistées en NVS.
 
 Après connexion, ouvrir `http://lidar-scanner.local/` : commande de balayage,
-diagnostics, réglages StallGuard / courants / vitesse, et OTA.
+section **Matériel** (Wi‑Fi, LiDAR, entraînement, IMU), diagnostics,
+réglages StallGuard / courants / vitesse, redémarrage et OTA.
 
 Voir [docs/wifi.md](../docs/wifi.md), [docs/web.md](../docs/web.md) et
 [docs/ota.md](../docs/ota.md).
@@ -131,19 +134,27 @@ vitesse). La calibration géométrique reste sur l'hôte.
 
 ## État
 
-Le firmware est **structurellement complet mais n'a pas encore tourné sur du
-matériel**. À valider en priorité au premier montage :
+Firmware **0.4.3** — compilé, flashé par OTA sur le prototype ESP32 ; le LiDAR,
+le TMC2209 et le MPU6050 restent à valider une fois le câblage complet.
 
-- [ ] Décodage des trames LD19 / STL-19P (taux de CRC via le panneau)
-- [ ] Consigne PWM → 5 Hz réellement mesurés
-- [ ] Seuil StallGuard (curseur web + lecture live)
-- [ ] Nivellement IMU (10 s avant scan, drapeau LEVEL_VALID)
-- [ ] Détection de choc (> 0,3° pendant / après balayage)
-- [ ] Commande web start/stop/rehome sur trépied
-- [ ] OTA firmware **et** LittleFS, par espota et par la page web
+| Fonction | Code | Validation matérielle |
+|---|---|---|
+| Amorce OTA (`seed`) | OK | OTA firmware + LittleFS |
+| Scanner + panneau web | OK | Wi‑Fi, reboot, section Matériel |
+| Parseur STL-19P / LD19 | OK | CRC % sur panneau |
+| MPU6050 nivellement + choc | OK | `imu_ok` sur panneau |
+| TMC2209 + homing StallGuard | OK | Ligne Entraînement → OK après rehome |
+| Balayage complet | OK | Premier `.pcd` réel |
+
+À vérifier au montage final :
+
+- [ ] LiDAR : CRC ≥ 95 %, Hz mesuré ≈ consigne (5 Hz)
+- [ ] Entraînement : pastille **OK** après **Rehomer** réussi
+- [ ] MPU6050 : pastille **OK**, vecteur **g** affiché
+- [ ] Scan 180° → `.pcd` cohérent dans Open3D
 
 Le premier téléversement se fait obligatoirement **par USB**, avec
 l'environnement `seed`. Les suivants passent par le réseau
-(`-e ota -t upload` / `uploadfs`).
+(`-e ota -t upload` / `uploadfs`) ou la page web.
 
 La géométrie et le protocole sont couverts par les tests de `host/tests/`.

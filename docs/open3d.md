@@ -171,7 +171,7 @@ La première arrivée de points recentre la caméra automatiquement.
 | Observation | Cause probable | Action |
 |---|---|---|
 | Murs **courbes** / cintrage | Bras de levier `tx,ty,tz` faux | [calibration.md](calibration.md) |
-| Pièce **penchée** | Trépied / `g_zero` | Nivellement IMU ou bulle |
+| Pièce **penchée** | Trépied / `g_zero` | Relever `g` sur le panneau web → [calibration.md](calibration.md) § 4 |
 | Angles muraux non droits | Offset ψ / θ | Calibration angulaire |
 | Bande manquante au nadir | Normal (ombre de la base) | Deuxième position |
 | Nuage vide | Mauvais port, mauvais Wi‑Fi, hôte mal adressé | Panneau web + `docs/wifi.md` |

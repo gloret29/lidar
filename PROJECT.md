@@ -96,9 +96,9 @@ Cinq pièces imprimées en PETG, paramétriques (OpenSCAD), avec insert laiton
 | Tâche | Rôle |
 |---|---|
 | `lidar_task` | Décodage des trames LD19 (47 octets, CRC8 polynôme 0x4D) |
-| `motion_task` | Nivellement, homing StallGuard, profil de balayage |
+| `motion_task` | Nivellement IMU (10 s), homing StallGuard, profil de balayage |
 | `network_task` | Agrégation et émission UDP |
-| `ota_task` / panneau web | Commande, diagnostics, réglages NVS, OTA firmware + LittleFS |
+| `ota_task` / panneau web | Commande, matériel, diagnostics, réglages NVS, reboot, OTA |
 
 Les points sont transmis en **polaire brut** $(\rho, \theta)$, avec l'azimut en
 en-tête de datagramme. La conversion cartésienne est faite côté hôte, ce qui
@@ -134,12 +134,12 @@ scanner.
 
 | Volet | Statut |
 |---|---|
-| Géométrie et mathématiques | Validées, 35 tests automatisés |
+| Géométrie et mathématiques | Validées, 38 tests automatisés |
 | Pièces 3D | 6 pièces paramétriques, rendues et vérifiées |
 | Documentation de construction | Complète |
-| Firmware | Amorce OTA compilée ; scanner compilé, **non testé sur matériel** |
+| Firmware | **0.4.3** — amorce OTA et scanner flashés ; Wi‑Fi, panneau web, MPU6050 et OTA validés sur ESP32 ; LiDAR / moteur en attente de câblage complet |
 | Station hôte | Protocole, transform, Open3D, simulateur UDP, tests |
-| Calibration | Procédures écrites, à exécuter sur le prototype |
+| Calibration | Procédures écrites ; `g_zero` relevable depuis le panneau web |
 
 ## Limites connues
 
@@ -148,6 +148,6 @@ scanner.
 - **Vitres** : la variante **STL-19P** détecte le verre (surface mesurée sur
   la vitre). Fermer les volets reste utile pour une surface opaque derrière et
   pour limiter l'éblouissement solaire.
-- **Densité** : environ 300 000 points par scan, contre des dizaines de
-  millions pour un scanner professionnel.
+- **Densité** : environ 450 000 points par scan standard (90 s à 5 000 pts/s),
+  contre des dizaines de millions pour un scanner professionnel.
 - **Nadir** : cône aveugle d'environ 20°, comblé par une seconde station.
