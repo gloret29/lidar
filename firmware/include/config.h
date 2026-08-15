@@ -5,7 +5,7 @@
 //  Voir docs/wiring.md pour la justification du brochage.
 // ============================================================
 
-#define FIRMWARE_VERSION "0.4.2"
+#define FIRMWARE_VERSION "0.4.3"
 
 // ---- WiFiManager : portail captif, aucun identifiant en dur ----
 #define WIFIMANAGER_AP_NAME "LiDAR-Scanner-Setup"

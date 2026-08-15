@@ -94,9 +94,8 @@ label.field input{width:110px;padding:7px 8px;border-radius:7px;border:1px solid
   <dl class="grid">
     <dt>Wi‑Fi</dt><dd id="hw_wifi">…</dd>
     <dt>LiDAR</dt><dd id="hw_lidar">…</dd>
-    <dt>TMC2209</dt><dd id="hw_tmc">…</dd>
+    <dt>Entraînement</dt><dd id="hw_drive">…</dd>
     <dt>MPU6050</dt><dd id="hw_imu">…</dd>
-    <dt>Entraînement</dt><dd id="hw_motor">…</dd>
   </dl>
 </section>
 <section>
@@ -181,17 +180,17 @@ async function refresh(){
     const crcTxt=d.hw_lidar_crc_pct<0?'aucune trame':d.hw_lidar_crc_pct.toFixed(1)+' % CRC';
     $('hw_lidar').innerHTML=hwLine(d.hw_lidar_ok,d.hw_lidar_warn,
       d.lidar_hz_meas.toFixed(2)+' Hz / '+d.lidar_hz.toFixed(1)+' Hz · '+crcTxt,'Init…');
-    $('hw_tmc').innerHTML=hwLine(d.hw_tmc_ok,false,
-      d.hw_tmc_ok?('v0x'+d.hw_tmc_version.toString(16)+' · SG '+(d.sg_result<0?'n/d':d.sg_result)):'UART muette ou absent');
+    const sgTxt=d.sg_result<0?'SG n/d':'SG '+d.sg_result;
+    let driveDetail='TMC2209 absent (UART GPIO 7/15)';
+    if(d.hw_tmc_ok){
+      const ver='v0x'+d.hw_tmc_version.toString(16)+' · '+sgTxt+' · ';
+      if(!d.hw_motor_enabled) driveDetail=ver+'driver coupé (EN relâché)';
+      else if(d.hw_motor_ok) driveDetail=ver+'homing OK';
+      else driveDetail=ver+'rehome requis';
+    }
+    $('hw_drive').innerHTML=hwLine(d.hw_motor_ok,d.hw_motor_warn,driveDetail);
     $('hw_imu').innerHTML=hwLine(d.imu_ok,false,
       d.imu_ok?('g=('+d.imu_gx.toFixed(3)+', '+d.imu_gy.toFixed(3)+', '+d.imu_gz.toFixed(3)+')'):'I2C absent (GPIO 8/9)');
-    let motorDetail='TMC2209 absent ou UART muette';
-    if(d.hw_tmc_ok){
-      if(!d.hw_motor_enabled) motorDetail='driver coupé (EN relâché — E-stop ou OTA)';
-      else if(d.hw_motor_ok) motorDetail='homing réussi · axe prêt';
-      else motorDetail='non testé — utiliser « Rehomer »';
-    }
-    $('hw_motor').innerHTML=hwLine(d.hw_motor_ok,d.hw_motor_warn,motorDetail);
     $('psi').textContent=d.psi_deg.toFixed(2)+' °';
     $('lidar').textContent=d.lidar_hz_meas.toFixed(2)+' Hz (consigne '+d.lidar_hz.toFixed(1)+')';
     const tot=d.frames_ok+d.frames_bad;
