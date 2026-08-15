@@ -44,6 +44,15 @@ void scannerEmergencyStop();
 /// Lecture StallGuard (0..511 typique). -1 si le driver ne répond pas.
 int16_t scannerSgResult();
 
+/// true si le TMC2209 répond sur UART (version valide).
+bool scannerTmcOk();
+
+/// Version du driver lue à l'initialisation (0 si absent).
+uint8_t scannerTmcVersion();
+
+/// true si la broche EN est active (moteur alimenté).
+bool scannerMotorEnabled();
+
 int32_t scannerPsiMdeg();
 ScanState scannerState();
 void scannerSetState(ScanState s);

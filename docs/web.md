@@ -15,7 +15,8 @@ Quatre blocs, un seul écran :
 
 | Section | Rôle |
 |---|---|
-| **Commande** | Lancer, arrêter, rehomer, arrêt d'urgence |
+| **Commande** | Lancer, arrêter, rehomer, arrêt d'urgence, **redémarrer** |
+| **Matériel** | État opérationnel Wi‑Fi, LiDAR, TMC2209, MPU6050, moteur |
 | **Diagnostics** | État, ψ, fréquence LiDAR, CRC, file, StallGuard, RSSI |
 | **Réglages** | Les 6 paramètres de mise au point, persistés en NVS |
 | **OTA** | Téléversement d'un `firmware.bin` ou d'un `littlefs.bin` |
@@ -33,6 +34,7 @@ Toutes les routes exigent l'authentification HTTP basic.
 |---|---|---|---|
 | `/api/status` | GET | — | Instantané JSON (télémétrie + version) |
 | `/api/command?cmd=` | POST | `start` \| `stop` \| `rehome` \| `estop` | File de commandes FreeRTOS |
+| `/api/reboot` | POST | — | Redémarrage (refusé pendant balayage ou OTA) |
 | `/api/settings` | GET | — | Réglages courants |
 | `/api/settings` | POST | formulaire urlencoded | Enregistre + applique |
 | `/api/settings?defaults=1` | POST | — | Restaure les valeurs d'usine |
@@ -68,6 +70,18 @@ Ce qui **n'y figure pas**, volontairement :
   `host/calibration.json`, pour pouvoir rejouer un scan sans rescanner.
 
 ## Diagnostic utile sur place
+
+### Matériel (section dédiée)
+
+| Composant | OK | Alerte / Init | Ko |
+|---|---|---|---|
+| **Wi‑Fi** | Connecté, RSSI affiché | — | Déconnecté |
+| **LiDAR** | CRC ≥ 95 %, Hz proche de la consigne | Trames reçues mais CRC ou Hz douteux ; ou démarrage (< 8 s) | Aucune trame UART |
+| **TMC2209** | UART répond (version ≠ 0) | — | Driver absent ou muette |
+| **MPU6050** | `WHO_AM_I` OK, vecteur g affiché | — | Absent sur I2C (GPIO 8/9) |
+| **Moteur** | EN actif (alimenté) | — | EN relâché (arrêt d'urgence ou OTA) |
+
+### Télémétrie balayage
 
 | Indicateur | Lecture |
 |---|---|

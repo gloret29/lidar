@@ -28,6 +28,14 @@ struct DeviceStatus {
     float imu_gy;
     float imu_gz;
     float imu_tilt_deg;
+    // Santé matérielle (panneau web)
+    bool wifi_ok;
+    bool lidar_ok;
+    bool lidar_warn;
+    bool tmc_ok;
+    bool motor_enabled;
+    uint8_t tmc_version;
+    float lidar_crc_pct;  // 0..100, -1 si aucune trame
 };
 
 void statusSetLidarStats(uint32_t ok, uint32_t bad, uint16_t speed_dhz);

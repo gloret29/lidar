@@ -10,6 +10,7 @@
 
 #include "config.h"
 #include "control.h"
+#include "scanner.h"
 #include "settings.h"
 #include "status.h"
 
@@ -83,8 +84,20 @@ label.field input{width:110px;padding:7px 8px;border-radius:7px;border:1px solid
     <button class="secondary" id="stop">Arrêter</button>
     <button class="secondary" id="rehome">Rehomer</button>
     <button class="danger" id="estop">Arrêt d'urgence</button>
+    <button class="secondary" id="reboot">Redémarrer</button>
   </div>
   <div class="msg" id="cmdmsg"></div>
+</section>
+<section>
+  <h2>Matériel</h2>
+  <p class="hint">État des périphériques connectés à l'ESP32. Actualisé chaque seconde.</p>
+  <dl class="grid">
+    <dt>Wi‑Fi</dt><dd id="hw_wifi">…</dd>
+    <dt>LiDAR</dt><dd id="hw_lidar">…</dd>
+    <dt>TMC2209</dt><dd id="hw_tmc">…</dd>
+    <dt>MPU6050</dt><dd id="hw_imu">…</dd>
+    <dt>Moteur</dt><dd id="hw_motor">…</dd>
+  </dl>
 </section>
 <section>
   <h2>Diagnostics</h2>
@@ -153,12 +166,27 @@ function pill(el,state){
   el.className='pill'+(state==='scanning'||state==='homing'||state==='spinup'||state==='levelling'?' busy'
     :state==='fault'?' fault':state==='idle'||state==='done'?' ok':'');
 }
+function hwLine(ok,warn,detail){
+  const label=ok?'OK':warn?'Init…':'Ko';
+  const cls=ok?'ok':warn?'busy':'fault';
+  return '<span class="pill '+cls+'">'+label+'</span> '+detail;
+}
 async function refresh(){
   try{
     const d=await api('/api/status');
     $('ver').textContent=d.version;
     $('ip').textContent=d.ip;
     pill($('state'),d.state);
+    $('hw_wifi').innerHTML=hwLine(d.hw_wifi_ok,false,d.hw_wifi_ok?(d.rssi+' dBm · '+d.ip):'déconnecté');
+    const crcTxt=d.hw_lidar_crc_pct<0?'aucune trame':d.hw_lidar_crc_pct.toFixed(1)+' % CRC';
+    $('hw_lidar').innerHTML=hwLine(d.hw_lidar_ok,d.hw_lidar_warn,
+      d.lidar_hz_meas.toFixed(2)+' Hz / '+d.lidar_hz.toFixed(1)+' Hz · '+crcTxt);
+    $('hw_tmc').innerHTML=hwLine(d.hw_tmc_ok,false,
+      d.hw_tmc_ok?('v0x'+d.hw_tmc_version.toString(16)+' · SG '+(d.sg_result<0?'n/d':d.sg_result)):'UART muette');
+    $('hw_imu').innerHTML=hwLine(d.imu_ok,false,
+      d.imu_ok?('g=('+d.imu_gx.toFixed(3)+', '+d.imu_gy.toFixed(3)+', '+d.imu_gz.toFixed(3)+')'):'I2C absent (GPIO 8/9)');
+    $('hw_motor').innerHTML=hwLine(d.hw_motor_enabled,false,
+      d.hw_motor_enabled?'alimenté (EN actif)':'coupé (EN relâché)');
     $('psi').textContent=d.psi_deg.toFixed(2)+' °';
     $('lidar').textContent=d.lidar_hz_meas.toFixed(2)+' Hz (consigne '+d.lidar_hz.toFixed(1)+')';
     const tot=d.frames_ok+d.frames_bad;
@@ -175,6 +203,7 @@ async function refresh(){
     const busy=d.scan_busy||d.ota_busy;
     $('start').disabled=busy;
     $('rehome').disabled=busy;
+    $('reboot').disabled=busy;
     $('flash').disabled=busy||!$('file').files[0];
     $('flashfs').disabled=busy||!$('filefs').files[0];
     if(d.ota_busy){setMsg('otamsg','Écriture en flash…','warn');setMsg('otamsgfs','Écriture en flash…','warn')}
@@ -192,6 +221,16 @@ $('start').onclick=()=>cmd('start');
 $('stop').onclick=()=>cmd('stop');
 $('rehome').onclick=()=>cmd('rehome');
 $('estop').onclick=()=>cmd('estop');
+$('reboot').onclick=async()=>{
+  if(!confirm('Redémarrer le scanner ?'))return;
+  setMsg('cmdmsg','Redémarrage en cours…','warn');
+  $('reboot').disabled=true;
+  try{
+    await api('/api/reboot',{method:'POST'});
+  }catch(e){
+    setMsg('cmdmsg','Redémarrage lancé — reconnexion dans ~10 s.','ok');
+  }
+};
 
 async function loadSettings(){
   const s=await api('/api/settings');
@@ -277,7 +316,7 @@ void handleStatus() {
     const DeviceStatus d = statusSnapshot();
     const ScanSettings& s = settings();
 
-    char body[1024];
+    char body[1536];
     snprintf(body, sizeof(body),
              "{\"version\":\"%s\",\"ip\":\"%s\",\"state\":\"%s\","
              "\"psi_deg\":%.3f,\"lidar_hz_meas\":%.2f,\"lidar_hz\":%.2f,"
@@ -287,7 +326,10 @@ void handleStatus() {
              "\"ota_busy\":%s,\"scan_busy\":%s,"
              "\"imu_ok\":%s,\"imu_shock\":%s,"
              "\"imu_gx\":%.4f,\"imu_gy\":%.4f,\"imu_gz\":%.4f,"
-             "\"imu_tilt_deg\":%.3f}",
+             "\"imu_tilt_deg\":%.3f,"
+             "\"hw_wifi_ok\":%s,\"hw_lidar_ok\":%s,\"hw_lidar_warn\":%s,"
+             "\"hw_lidar_crc_pct\":%.1f,\"hw_tmc_ok\":%s,"
+             "\"hw_tmc_version\":%u,\"hw_motor_enabled\":%s}",
              FIRMWARE_VERSION, WiFi.localIP().toString().c_str(),
              scanStateName(d.state), d.psi_deg, d.lidar_hz_meas, s.lidar_hz,
              static_cast<unsigned>(d.frames_ok),
@@ -298,7 +340,10 @@ void handleStatus() {
              static_cast<unsigned>(d.uptime_s), d.ota_busy ? "true" : "false",
              d.scan_busy ? "true" : "false", d.imu_ok ? "true" : "false",
              d.imu_shock ? "true" : "false", d.imu_gx, d.imu_gy, d.imu_gz,
-             d.imu_tilt_deg);
+             d.imu_tilt_deg, d.wifi_ok ? "true" : "false",
+             d.lidar_ok ? "true" : "false", d.lidar_warn ? "true" : "false",
+             d.lidar_crc_pct, d.tmc_ok ? "true" : "false", d.tmc_version,
+             d.motor_enabled ? "true" : "false");
     sendJson(200, body);
 }
 
@@ -333,6 +378,18 @@ void handleCommand() {
         return sendJson(503, "{\"error\":\"file de commandes pleine\"}");
 
     sendJson(200, "{\"ok\":true}");
+}
+
+void handleReboot() {
+    if (!authenticate()) return server.requestAuthentication();
+    if (in_progress) return sendJson(503, "{\"error\":\"ota en cours\"}");
+    if (busy()) return sendJson(409, "{\"error\":\"balayage en cours\"}");
+
+    sendJson(200, "{\"ok\":true}");
+    Serial.println("[web] redémarrage demandé");
+    scannerEmergencyStop();
+    delay(300);
+    ESP.restart();
 }
 
 String settingsJson() {
@@ -513,6 +570,7 @@ bool otaInit(const String& hostname, const String& password, const OtaHooks& h) 
     });
     server.on("/api/status", HTTP_GET, handleStatus);
     server.on("/api/command", HTTP_POST, handleCommand);
+    server.on("/api/reboot", HTTP_POST, handleReboot);
     server.on("/api/settings", HTTP_GET, handleSettingsGet);
     server.on("/api/settings", HTTP_POST, handleSettingsPost);
     server.on("/info", HTTP_GET, handleInfo);

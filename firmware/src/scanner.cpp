@@ -21,6 +21,8 @@ uint64_t next_step_us = 0;
 uint16_t i_scan_ma = CURRENT_SCAN_MA;
 uint16_t i_home_ma = CURRENT_HOMING_MA;
 uint16_t sg_threshold = STALLGUARD_THRESHOLD;
+uint8_t tmc_version = 0;
+bool tmc_ok = false;
 
 inline void pulse() {
     digitalWrite(STEP_PIN, HIGH);
@@ -55,7 +57,9 @@ void scannerInit() {
 
     digitalWrite(EN_PIN, LOW);
     state = ScanState::Idle;
-    Serial.printf("[scanner] TMC2209 version 0x%02X\n", driver.version());
+    tmc_version = driver.version();
+    tmc_ok = (tmc_version != 0 && tmc_version != 0xFF);
+    Serial.printf("[scanner] TMC2209 version 0x%02X\n", tmc_version);
 }
 
 void scannerApplySettings(const ScanSettings& s) {
@@ -165,6 +169,16 @@ int16_t scannerSgResult() {
     if (raw > 1023) return -1;
     return static_cast<int16_t>(raw);
 }
+
+bool scannerTmcOk() {
+    if (!tmc_ok) return false;
+    const uint8_t v = driver.version();
+    return v != 0 && v != 0xFF;
+}
+
+uint8_t scannerTmcVersion() { return tmc_version; }
+
+bool scannerMotorEnabled() { return digitalRead(EN_PIN) == LOW; }
 
 int32_t scannerPsiMdeg() {
     return static_cast<int32_t>(position_steps * 1000.0f / STEPS_PER_DEGREE);
