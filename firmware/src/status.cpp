@@ -36,6 +36,14 @@ void fillHardwareHealth(DeviceStatus& d) {
 
     d.imu_ok = mpu6050Ready();
     d.imu_shock = mpu6050ShockFlag();
+    d.imu_has_ref = mpu6050HasLevelRef();
+    if (d.imu_has_ref) {
+        float g_ref[3];
+        mpu6050GetLevelRef(g_ref);
+        d.imu_ref_gx = g_ref[0];
+        d.imu_ref_gy = g_ref[1];
+        d.imu_ref_gz = g_ref[2];
+    }
 
     const uint32_t total = d.frames_ok + d.frames_bad;
     if (total == 0) {

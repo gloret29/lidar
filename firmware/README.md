@@ -134,7 +134,7 @@ vitesse). La calibration géométrique reste sur l'hôte.
 
 ## État
 
-Firmware **0.4.3** — compilé, flashé par OTA sur le prototype ESP32 ; le LiDAR,
+Firmware **0.4.4** — compilé, flashé par OTA sur le prototype ESP32 ; le LiDAR,
 le TMC2209 et le MPU6050 restent à valider une fois le câblage complet.
 
 | Fonction | Code | Validation matérielle |

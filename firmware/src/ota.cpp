@@ -99,6 +99,19 @@ label.field input{width:110px;padding:7px 8px;border-radius:7px;border:1px solid
   </dl>
 </section>
 <section>
+  <h2>MPU6050</h2>
+  <p class="hint">Base fixe (I2C GPIO 8/9). Relever <strong>g (live)</strong> pour <code>g_zero</code> dans <code>calibration.json</code>.</p>
+  <dl class="grid">
+    <dt>État</dt><dd id="imu_status">…</dd>
+    <dt>g (live)</dt><dd id="imu_g">…</dd>
+    <dt>|g|</dt><dd id="imu_mag">…</dd>
+    <dt>Tangage / roulis</dt><dd id="imu_angles">…</dd>
+    <dt>Réf. scan</dt><dd id="imu_ref">…</dd>
+    <dt>Dérive</dt><dd id="imu_tilt">…</dd>
+    <dt>Choc</dt><dd id="imu_shock">…</dd>
+  </dl>
+</section>
+<section>
   <h2>Diagnostics</h2>
   <dl class="grid">
     <dt>État</dt><dd><span class="pill" id="state">…</span></dd>
@@ -107,7 +120,6 @@ label.field input{width:110px;padding:7px 8px;border-radius:7px;border:1px solid
     <dt>CRC</dt><dd id="crc">…</dd>
     <dt>File / paquets</dt><dd id="queue">…</dd>
     <dt>StallGuard</dt><dd id="sg">…</dd>
-    <dt>IMU</dt><dd id="imu">…</dd>
     <dt>Wi‑Fi / heap</dt><dd id="net">…</dd>
   </dl>
 </section>
@@ -170,6 +182,44 @@ function hwLine(ok,warn,detail,warnLabel){
   const cls=ok?'ok':warn?'busy':'fault';
   return '<span class="pill '+cls+'">'+label+'</span> '+detail;
 }
+function fmtG(gx,gy,gz){
+  return '('+gx.toFixed(4)+', '+gy.toFixed(4)+', '+gz.toFixed(4)+')';
+}
+function gMag(gx,gy,gz){
+  return Math.sqrt(gx*gx+gy*gy+gz*gz);
+}
+function pitchRoll(gx,gy,gz){
+  const pitch=Math.atan2(gx,Math.sqrt(gy*gy+gz*gz))*57.2958;
+  const roll=Math.atan2(gy,gz)*57.2958;
+  return {pitch,roll};
+}
+function refreshImu(d){
+  if(!d.imu_ok){
+    $('imu_status').innerHTML=hwLine(false,false,'I2C absent (GPIO 8/9)');
+    $('imu_g').textContent='—';
+    $('imu_mag').textContent='—';
+    $('imu_angles').textContent='—';
+    $('imu_ref').textContent='—';
+    $('imu_tilt').textContent='—';
+    $('imu_shock').textContent='—';
+    return;
+  }
+  $('imu_status').innerHTML=hwLine(true,false,'WHO_AM_I 0x68');
+  $('imu_g').textContent=fmtG(d.imu_gx,d.imu_gy,d.imu_gz);
+  $('imu_mag').textContent=gMag(d.imu_gx,d.imu_gy,d.imu_gz).toFixed(4)+' g';
+  const pr=pitchRoll(d.imu_gx,d.imu_gy,d.imu_gz);
+  $('imu_angles').textContent=pr.pitch.toFixed(2)+'° / '+pr.roll.toFixed(2)+'°';
+  if(d.imu_has_ref){
+    $('imu_ref').textContent=fmtG(d.imu_ref_gx,d.imu_ref_gy,d.imu_ref_gz);
+    $('imu_tilt').textContent=d.imu_tilt_deg.toFixed(2)+'°';
+  }else{
+    $('imu_ref').textContent='après prochain nivellement (scan)';
+    $('imu_tilt').textContent='—';
+  }
+  $('imu_shock').innerHTML=d.imu_shock
+    ?'<span class="pill fault">Oui</span> (> 0,3° vs réf.)'
+    :'<span class="pill ok">Non</span>';
+}
 async function refresh(){
   try{
     const d=await api('/api/status');
@@ -190,7 +240,8 @@ async function refresh(){
     }
     $('hw_drive').innerHTML=hwLine(d.hw_motor_ok,d.hw_motor_warn,driveDetail);
     $('hw_imu').innerHTML=hwLine(d.imu_ok,false,
-      d.imu_ok?('g=('+d.imu_gx.toFixed(3)+', '+d.imu_gy.toFixed(3)+', '+d.imu_gz.toFixed(3)+')'):'I2C absent (GPIO 8/9)');
+      d.imu_ok?'live · voir section MPU6050':'I2C absent (GPIO 8/9)');
+    refreshImu(d);
     $('psi').textContent=d.psi_deg.toFixed(2)+' °';
     $('lidar').textContent=d.lidar_hz_meas.toFixed(2)+' Hz (consigne '+d.lidar_hz.toFixed(1)+')';
     const tot=d.frames_ok+d.frames_bad;
@@ -198,11 +249,6 @@ async function refresh(){
     $('crc').textContent=d.frames_ok+' ok / '+d.frames_bad+' mauvais ('+pct+' %)';
     $('queue').textContent=d.queue_depth+' · '+d.packets_sent+' paquets';
     $('sg').textContent=d.sg_result<0?'n/d':d.sg_result+' (seuil '+d.stallguard+')';
-    if(!d.imu_ok){$('imu').textContent='absent';}
-    else{
-      const shock=d.imu_shock?' · CHOC':'';
-      $('imu').textContent='g=('+d.imu_gx.toFixed(3)+', '+d.imu_gy.toFixed(3)+', '+d.imu_gz.toFixed(3)+') · '+d.imu_tilt_deg.toFixed(2)+'°'+shock;
-    }
     $('net').textContent=d.rssi+' dBm · '+(d.heap_free/1024).toFixed(0)+' ko';
     const busy=d.scan_busy||d.ota_busy;
     $('start').disabled=busy;
@@ -320,7 +366,7 @@ void handleStatus() {
     const DeviceStatus d = statusSnapshot();
     const ScanSettings& s = settings();
 
-    char body[1536];
+    char body[1792];
     snprintf(body, sizeof(body),
              "{\"version\":\"%s\",\"ip\":\"%s\",\"state\":\"%s\","
              "\"psi_deg\":%.3f,\"lidar_hz_meas\":%.2f,\"lidar_hz\":%.2f,"
@@ -328,8 +374,9 @@ void handleStatus() {
              "\"packets_sent\":%u,\"sg_result\":%d,\"stallguard\":%u,"
              "\"rssi\":%d,\"heap_free\":%u,\"uptime_s\":%u,"
              "\"ota_busy\":%s,\"scan_busy\":%s,"
-             "\"imu_ok\":%s,\"imu_shock\":%s,"
+             "\"imu_ok\":%s,\"imu_shock\":%s,\"imu_has_ref\":%s,"
              "\"imu_gx\":%.4f,\"imu_gy\":%.4f,\"imu_gz\":%.4f,"
+             "\"imu_ref_gx\":%.4f,\"imu_ref_gy\":%.4f,\"imu_ref_gz\":%.4f,"
              "\"imu_tilt_deg\":%.3f,"
              "\"hw_wifi_ok\":%s,\"hw_lidar_ok\":%s,\"hw_lidar_warn\":%s,"
              "\"hw_lidar_crc_pct\":%.1f,\"hw_tmc_ok\":%s,"
@@ -344,8 +391,9 @@ void handleStatus() {
              static_cast<int>(d.rssi), static_cast<unsigned>(d.heap_free),
              static_cast<unsigned>(d.uptime_s), d.ota_busy ? "true" : "false",
              d.scan_busy ? "true" : "false", d.imu_ok ? "true" : "false",
-             d.imu_shock ? "true" : "false", d.imu_gx, d.imu_gy, d.imu_gz,
-             d.imu_tilt_deg, d.wifi_ok ? "true" : "false",
+             d.imu_shock ? "true" : "false", d.imu_has_ref ? "true" : "false",
+             d.imu_gx, d.imu_gy, d.imu_gz, d.imu_ref_gx, d.imu_ref_gy,
+             d.imu_ref_gz, d.imu_tilt_deg, d.wifi_ok ? "true" : "false",
              d.lidar_ok ? "true" : "false", d.lidar_warn ? "true" : "false",
              d.lidar_crc_pct, d.tmc_ok ? "true" : "false", d.tmc_version,
              d.motor_enabled ? "true" : "false",

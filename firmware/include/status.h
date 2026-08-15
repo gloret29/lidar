@@ -24,9 +24,13 @@ struct DeviceStatus {
     bool scan_busy;
     bool imu_ok;
     bool imu_shock;
+    bool imu_has_ref;
     float imu_gx;
     float imu_gy;
     float imu_gz;
+    float imu_ref_gx;
+    float imu_ref_gy;
+    float imu_ref_gz;
     float imu_tilt_deg;
     // Santé matérielle (panneau web)
     bool wifi_ok;

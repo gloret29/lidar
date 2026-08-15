@@ -11,12 +11,13 @@ Ou l'adresse IP affichée au démarrage série.
 
 ## Ce que fait la page
 
-Cinq sections, un seul écran :
+Six sections, un seul écran :
 
 | Section | Rôle |
 |---|---|
 | **Commande** | Lancer, arrêter, rehomer, arrêt d'urgence, **redémarrer** |
 | **Matériel** | État opérationnel Wi‑Fi, LiDAR, entraînement (TMC2209 + moteur), MPU6050 |
+| **MPU6050** | Vecteur gravité live, \|g\|, tangage/roulis, réf. scan, dérive, choc |
 | **Diagnostics** | État, ψ, fréquence LiDAR, CRC, file, StallGuard, RSSI |
 | **Réglages** | Les 6 paramètres de mise au point, persistés en NVS |
 | **OTA** | Téléversement d'un `firmware.bin` ou d'un `littlefs.bin` |
@@ -60,7 +61,8 @@ curl -u admin:lidar-ota http://lidar-scanner.local/api/status
 | `hw_tmc_ok`, `hw_tmc_version` | Driver TMC2209 sur UART (GPIO 7/15) |
 | `hw_motor_enabled` | `EN` actif (false après estop ou OTA) |
 | `hw_motor_ok`, `hw_motor_warn` | Homing StallGuard réussi |
-| `imu_ok`, `imu_gx/gy/gz`, `imu_tilt_deg`, `imu_shock` | MPU6050 (GPIO 8/9) |
+| `imu_ok`, `imu_gx/gy/gz`, `imu_has_ref`, `imu_ref_gx/gy/gz` | MPU6050 live + réf. nivellement |
+| `imu_tilt_deg`, `imu_shock` | Dérive vs réf. scan, trépied bougé (> 0,3°) |
 | `lidar_hz`, `lidar_hz_meas`, `crc_pct` | Consigne / mesure LiDAR, CRC global |
 | `sg_live`, `queue_depth` | StallGuard live, file UDP |
 
@@ -93,7 +95,18 @@ Ce qui **n'y figure pas**, volontairement :
 | **Wi‑Fi** | Connecté, RSSI affiché | — | Déconnecté |
 | **LiDAR** | CRC ≥ 95 %, Hz proche de la consigne | Trames reçues mais CRC ou Hz douteux ; ou démarrage (< 8 s) | Aucune trame UART |
 | **Entraînement** | TMC2209 UART OK **et** homing StallGuard réussi | TMC OK, rehome requis | TMC absent (GPIO 7/15) ou driver coupé |
-| **MPU6050** | `WHO_AM_I` OK, vecteur g affiché | — | Absent sur I2C (GPIO 8/9) |
+| **MPU6050** | `WHO_AM_I` OK | — | Absent sur I2C (GPIO 8/9) |
+
+### MPU6050 (section dédiée)
+
+| Valeur | Usage |
+|---|---|
+| **g (live)** | Relever pour `g_zero` dans `calibration.json` (base de niveau) |
+| **\|g\|** | Doit rester ≈ 1 g au repos |
+| **Tangage / roulis** | Aperçu de l'inclinaison de la base |
+| **Réf. scan** | Vecteur mémorisé au nivellement (10 s) en début de balayage |
+| **Dérive** | Écart angulaire live vs réf. scan |
+| **Choc** | `true` si le trépied a bougé de plus de 0,3° pendant/après scan |
 
 ### Télémétrie balayage
 
