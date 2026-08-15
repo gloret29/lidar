@@ -22,6 +22,12 @@ struct DeviceStatus {
     uint32_t uptime_s;
     bool ota_busy;
     bool scan_busy;
+    bool imu_ok;
+    bool imu_shock;
+    float imu_gx;
+    float imu_gy;
+    float imu_gz;
+    float imu_tilt_deg;
 };
 
 void statusSetLidarStats(uint32_t ok, uint32_t bad, uint16_t speed_dhz);

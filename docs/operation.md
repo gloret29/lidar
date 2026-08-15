@@ -97,11 +97,11 @@ Voir [web.md](web.md) pour la commande, les diagnostics et les réglages.
 ### Séquence d'un balayage
 
 ```
-  1. Nivellement IMU        10 s   moyennage de la gravité (à venir)
+  1. Nivellement IMU        10 s   moyennage de la gravité
   2. Homing StallGuard       5 s   zéro d'azimut absolu
   3. Stabilisation STL-19P   3 s   montée en vitesse
   4. Balayage 0 → fin °  45-180 s  selon vitesse / amplitude
-  5. Contrôle de choc        2 s   relecture de l'IMU (à venir)
+  5. Contrôle de choc        2 s   relecture de l'IMU
   6. Vidange des tampons     2 s
 ```
 

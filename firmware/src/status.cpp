@@ -2,6 +2,7 @@
 
 #include <WiFi.h>
 
+#include "mpu6050.h"
 #include "ota.h"
 
 namespace {
@@ -58,7 +59,23 @@ DeviceStatus statusSnapshot() {
     d.heap_free = ESP.getFreeHeap();
     d.uptime_s = millis() / 1000;
     d.ota_busy = otaInProgress();
-    d.scan_busy = (d.state == ScanState::Homing || d.state == ScanState::Spinup ||
-                   d.state == ScanState::Scanning);
+    d.scan_busy = (d.state == ScanState::Levelling || d.state == ScanState::Homing ||
+                   d.state == ScanState::Spinup || d.state == ScanState::Scanning);
+    d.imu_ok = mpu6050Ready();
+    d.imu_shock = mpu6050ShockFlag();
+
+    float g_live[3] = {0.0f, 0.0f, -1.0f};
+    if (d.imu_ok && mpu6050ReadGravity(g_live)) {
+        d.imu_gx = g_live[0];
+        d.imu_gy = g_live[1];
+        d.imu_gz = g_live[2];
+        if (mpu6050HasLevelRef()) {
+            float g_ref[3];
+            mpu6050GetLevelRef(g_ref);
+            d.imu_tilt_deg = mpu6050TiltDeg(g_ref, g_live);
+        } else {
+            d.imu_tilt_deg = 0.0f;
+        }
+    }
     return d;
 }

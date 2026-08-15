@@ -23,6 +23,7 @@
 #include "config.h"
 #include "control.h"
 #include "ld19.h"
+#include "mpu6050.h"
 #include "ota.h"
 #include "protocol.h"
 #include "scanner.h"
@@ -52,6 +53,33 @@ struct QueuedPoint {
 };
 
 Ld19Parser g_parser;
+
+bool imuAbortRequested() {
+    ScanCommand pending;
+    if (!controlTryRecv(pending)) return false;
+    if (pending == ScanCommand::EStop) {
+        scannerEmergencyStop();
+        return true;
+    }
+    return pending == ScanCommand::Stop;
+}
+
+bool pollScanShock(const float g_ref[3]) {
+    if (!mpu6050Ready()) return false;
+    if (!mpu6050DetectShock(g_ref)) return false;
+    pending_flags |= PKT_FLAG_SHOCK_DETECTED;
+    mpu6050SetShockFlag(true);
+    Serial.println("[main] choc détecté — scan suspect");
+    return true;
+}
+
+void pollScanCommands(bool &estop, bool &stop) {
+    ScanCommand pending;
+    while (controlTryRecv(pending)) {
+        if (pending == ScanCommand::EStop) estop = true;
+        if (pending == ScanCommand::Stop) stop = true;
+    }
+}
 
 void lidarTask(void*) {
     g_parser.begin();
@@ -143,6 +171,22 @@ bool runScanSequence() {
 
     scannerEnable();
     pending_flags |= PKT_FLAG_SCAN_START;
+    mpu6050SetShockFlag(false);
+
+    float g_ref[3] = {0.0f, 0.0f, -1.0f};
+    if (mpu6050Ready()) {
+        scannerSetState(ScanState::Levelling);
+        if (!mpu6050MeasureLevel(g_ref, imuAbortRequested)) {
+            Serial.println("[main] nivellement IMU échoué");
+            pending_flags |= PKT_FLAG_SCAN_END;
+            scannerSetState(ScanState::Fault);
+            return false;
+        }
+        pending_flags |= PKT_FLAG_LEVEL_VALID;
+        mpu6050StoreLevelRef(g_ref);
+    } else {
+        Serial.println("[main] IMU absent — nivellement ignoré");
+    }
 
     if (!scannerHome()) {
         Serial.println("[main] homing échoué");
@@ -168,33 +212,54 @@ bool runScanSequence() {
     Serial.println("[main] montée en vitesse du LiDAR");
     scannerSetState(ScanState::Spinup);
     for (int i = 0; i < 30; i++) {
-        if (controlTryRecv(pending)) {
-            if (pending == ScanCommand::EStop) {
-                scannerEmergencyStop();
-                pending_flags |= PKT_FLAG_SCAN_END;
-                return false;
-            }
-            if (pending == ScanCommand::Stop) {
-                scannerSetState(ScanState::Idle);
-                pending_flags |= PKT_FLAG_SCAN_END;
-                return false;
-            }
+        bool estop = false, stop = false;
+        pollScanCommands(estop, stop);
+        if (estop) {
+            pending_flags |= PKT_FLAG_SCAN_END;
+            return false;
         }
+        if (stop) {
+            scannerSetState(ScanState::Idle);
+            pending_flags |= PKT_FLAG_SCAN_END;
+            return false;
+        }
+        if (mpu6050HasLevelRef()) pollScanShock(g_ref);
         vTaskDelay(pdMS_TO_TICKS(100));
     }
 
     scannerStartSweep();
+    uint32_t last_shock_ms = millis();
     while (scannerState() == ScanState::Scanning) {
-        while (controlTryRecv(pending)) {
-            if (pending == ScanCommand::EStop) {
+        bool estop = false, stop = false;
+        pollScanCommands(estop, stop);
+        if (estop) {
+            scannerEmergencyStop();
+            pending_flags |= PKT_FLAG_SCAN_END;
+            return false;
+        }
+        if (stop) scannerRequestStop();
+        if (mpu6050HasLevelRef() && millis() - last_shock_ms >= 100) {
+            last_shock_ms = millis();
+            pollScanShock(g_ref);
+        }
+        scannerTick();
+        taskYIELD();
+    }
+
+    if (mpu6050HasLevelRef()) {
+        Serial.println("[main] contrôle IMU post-balayage");
+        const uint32_t t0 = millis();
+        while (millis() - t0 < 2000) {
+            pollScanShock(g_ref);
+            bool estop = false, stop = false;
+            pollScanCommands(estop, stop);
+            if (estop) {
                 scannerEmergencyStop();
                 pending_flags |= PKT_FLAG_SCAN_END;
                 return false;
             }
-            if (pending == ScanCommand::Stop) scannerRequestStop();
+            vTaskDelay(pdMS_TO_TICKS(50));
         }
-        scannerTick();
-        taskYIELD();
     }
 
     pending_flags |= PKT_FLAG_SCAN_END;
@@ -275,6 +340,7 @@ void setup() {
 
     scannerInit();
     settingsApplyHardware();
+    mpu6050Init();
 
     wifiCheckResetButton();
     if (!wifiSetup(net_settings)) {

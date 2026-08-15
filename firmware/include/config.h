@@ -50,6 +50,11 @@
 #define I2C_SDA_PIN 8
 #define I2C_SCL_PIN 9
 #define MPU6050_ADDR 0x68
+#define MPU6050_SAMPLE_HZ 100
+#define MPU6050_LEVEL_SAMPLES 1000  // 10 s à 100 Hz
+#define MPU6050_STABLE_CHECK_SAMPLES 50
+#define MPU6050_STABLE_MAX_DEV_G 0.02f  // écart-type instantané max (~0,02 g)
+#define MPU6050_SHOCK_DEG 0.3f
 
 // ---- TMC2209 ----
 #define STEP_PIN 4

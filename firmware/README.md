@@ -71,6 +71,7 @@ firmware/
 │   ├── config.h        brochage et défauts
 │   ├── protocol.h      datagrammes UDP (v2)
 │   ├── ld19.h          analyseur de trames LiDAR
+│   ├── mpu6050.h       nivellement IMU, détection de choc
 │   ├── scanner.h       axe de lacet
 │   ├── settings.h      réglages NVS
 │   ├── control.h       file de commandes
@@ -81,6 +82,7 @@ firmware/
     ├── seed/main.cpp   amorce OTA (premier flash USB)
     ├── main.cpp
     ├── ld19.cpp
+    ├── mpu6050.cpp
     ├── scanner.cpp
     ├── settings.cpp
     ├── control.cpp
@@ -96,6 +98,7 @@ setup()
   ├── réglages NVS
   ├── UART LiDAR + PWM
   ├── TMC2209
+  ├── MPU6050 (I2C)
   ├── WiFiManager
   ├── panneau web + ArduinoOTA
   └── tâches
@@ -134,7 +137,8 @@ matériel**. À valider en priorité au premier montage :
 - [ ] Décodage des trames LD19 / STL-19P (taux de CRC via le panneau)
 - [ ] Consigne PWM → 5 Hz réellement mesurés
 - [ ] Seuil StallGuard (curseur web + lecture live)
-- [ ] Nivellement IMU (code MPU6050 à écrire)
+- [ ] Nivellement IMU (10 s avant scan, drapeau LEVEL_VALID)
+- [ ] Détection de choc (> 0,3° pendant / après balayage)
 - [ ] Commande web start/stop/rehome sur trépied
 - [ ] OTA firmware **et** LittleFS, par espota et par la page web
 

@@ -95,6 +95,7 @@ label.field input{width:110px;padding:7px 8px;border-radius:7px;border:1px solid
     <dt>CRC</dt><dd id="crc">…</dd>
     <dt>File / paquets</dt><dd id="queue">…</dd>
     <dt>StallGuard</dt><dd id="sg">…</dd>
+    <dt>IMU</dt><dd id="imu">…</dd>
     <dt>Wi‑Fi / heap</dt><dd id="net">…</dd>
   </dl>
 </section>
@@ -149,7 +150,7 @@ async function api(path,opts){
 }
 function pill(el,state){
   el.textContent=state;
-  el.className='pill'+(state==='scanning'||state==='homing'||state==='spinup'?' busy'
+  el.className='pill'+(state==='scanning'||state==='homing'||state==='spinup'||state==='levelling'?' busy'
     :state==='fault'?' fault':state==='idle'||state==='done'?' ok':'');
 }
 async function refresh(){
@@ -165,6 +166,11 @@ async function refresh(){
     $('crc').textContent=d.frames_ok+' ok / '+d.frames_bad+' mauvais ('+pct+' %)';
     $('queue').textContent=d.queue_depth+' · '+d.packets_sent+' paquets';
     $('sg').textContent=d.sg_result<0?'n/d':d.sg_result+' (seuil '+d.stallguard+')';
+    if(!d.imu_ok){$('imu').textContent='absent';}
+    else{
+      const shock=d.imu_shock?' · CHOC':'';
+      $('imu').textContent='g=('+d.imu_gx.toFixed(3)+', '+d.imu_gy.toFixed(3)+', '+d.imu_gz.toFixed(3)+') · '+d.imu_tilt_deg.toFixed(2)+'°'+shock;
+    }
     $('net').textContent=d.rssi+' dBm · '+(d.heap_free/1024).toFixed(0)+' ko';
     const busy=d.scan_busy||d.ota_busy;
     $('start').disabled=busy;
@@ -271,14 +277,17 @@ void handleStatus() {
     const DeviceStatus d = statusSnapshot();
     const ScanSettings& s = settings();
 
-    char body[768];
+    char body[1024];
     snprintf(body, sizeof(body),
              "{\"version\":\"%s\",\"ip\":\"%s\",\"state\":\"%s\","
              "\"psi_deg\":%.3f,\"lidar_hz_meas\":%.2f,\"lidar_hz\":%.2f,"
              "\"frames_ok\":%u,\"frames_bad\":%u,\"queue_depth\":%u,"
              "\"packets_sent\":%u,\"sg_result\":%d,\"stallguard\":%u,"
              "\"rssi\":%d,\"heap_free\":%u,\"uptime_s\":%u,"
-             "\"ota_busy\":%s,\"scan_busy\":%s}",
+             "\"ota_busy\":%s,\"scan_busy\":%s,"
+             "\"imu_ok\":%s,\"imu_shock\":%s,"
+             "\"imu_gx\":%.4f,\"imu_gy\":%.4f,\"imu_gz\":%.4f,"
+             "\"imu_tilt_deg\":%.3f}",
              FIRMWARE_VERSION, WiFi.localIP().toString().c_str(),
              scanStateName(d.state), d.psi_deg, d.lidar_hz_meas, s.lidar_hz,
              static_cast<unsigned>(d.frames_ok),
@@ -287,7 +296,9 @@ void handleStatus() {
              static_cast<unsigned>(d.packets_sent), d.sg_result, s.stallguard,
              static_cast<int>(d.rssi), static_cast<unsigned>(d.heap_free),
              static_cast<unsigned>(d.uptime_s), d.ota_busy ? "true" : "false",
-             d.scan_busy ? "true" : "false");
+             d.scan_busy ? "true" : "false", d.imu_ok ? "true" : "false",
+             d.imu_shock ? "true" : "false", d.imu_gx, d.imu_gy, d.imu_gz,
+             d.imu_tilt_deg);
     sendJson(200, body);
 }
 
