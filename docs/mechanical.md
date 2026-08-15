@@ -138,13 +138,12 @@ d'azimut par StallGuard, sans capteur.
 | Moyeu | Ø18, serrage sur 40 mm de tige, alésage Ø8,45, rétreint à Ø12 en tête |
 | Fente de serrage | 1,8 mm + vis M3×25 |
 | Platine | 5 mm d'épaisseur, à x = −22 (= décalage optique) |
-| Fixation LD19 | 4 lumières oblongues de 8 mm, carré 24,9 |
-| Rebord de centrage | 38,6 × 38,6, hauteur 2,5 |
+| Fixation LD19 | 3 × M2,5 — oreilles STL-19P, entraxe **46,8 × 38,59 mm** |
+| Rebord de centrage | **54 × 46,3**, hauteur 2,5 |
 | Secteur de butée | 26° sur Ø48 |
 
-Les lumières oblongues sont **volontaires** : le pattern de perçage exact du
-LD19 doit être relevé sur l'exemplaire réel, et le réglage fin en hauteur du
-centre optique se fait par glissement.
+Les trous M2,5 sont positionnés d'après le **datasheet STL-19P** (3 oreilles,
+46,8 × 38,59 mm). Mesurer quand même le décalage optique sur l'exemplaire réel.
 
 ### C4/C5 — Boîtier électronique
 

@@ -45,13 +45,13 @@ module ghost_shaft() {
 }
 
 module ghost_lidar() {
-    // corps du LD19, couché : base en x = plate_x, corps vers +X
+    // STL-19P couché : face de fixation contre la platine (x = plate_x)
     color("#2b2f33")
         translate([plate_x, -lidar_w / 2, optical_z - lidar_h / 2])
             cube([lidar_thk, lidar_w, lidar_h]);
-    // tête rotative, centrée sur l'axe
+    // dôme rotatif, centré sur l'axe optique
     color("#1a1d20")
-        translate([-1.5, 0, optical_z]) rotate([0, 90, 0]) cylinder(d = 30, h = 3);
+        translate([-1.5, 0, optical_z]) rotate([0, 90, 0]) cylinder(d = 35.3, h = 3);
 }
 
 // ------------------------------------------------------------

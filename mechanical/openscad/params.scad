@@ -53,17 +53,21 @@ coupler_d = 19;
 coupler_l = 25;
 
 // ------------------------------------------------------------
-//  LiDAR LD19
-//  ATTENTION : lidar_optical_offset et le pattern de perçage
-//  doivent être VÉRIFIÉS au pied à coulisse sur votre exemplaire.
+//  LiDAR — STL-19P / FHL-LD19P (LDROBOT, 3 oreilles de fixation)
+//  Câble vers le bas au montage sur le berceau.
+//  ATTENTION : lidar_optical_offset à VÉRIFIER au pied à coulisse.
 //  Voir docs/calibration.md § « Mesure du décalage optique ».
+//  Perçage : datasheet STL-19P § 5.1 (46,8 × 38,59 mm, M2,5).
 // ------------------------------------------------------------
-lidar_w = 38.6;                // empreinte (largeur)
-lidar_h = 38.6;                // empreinte (hauteur, monté sur la tranche)
-lidar_thk = 33.5;              // hauteur du boîtier = épaisseur une fois couché
+lidar_w = 54;                  // envergure Y (oreilles comprises)
+lidar_h = 46.29;               // hauteur Z sur la platine
+lidar_thk = 35;                // profondeur X (corps + dôme)
 lidar_optical_offset = 22;     // plan de balayage / face de fixation  <-- À VÉRIFIER
-lidar_screw_d = 2.6;           // M2.5 (lumières oblongues, tolérant)
-lidar_slot_len = 8;            // longueur des lumières de réglage
+lidar_screw_d = 2.7;           // M2.5 traversant (contre-sens 4,46 × 2 sur capteur)
+lidar_hole_y = 23.4;           // demi-entraxe Y des oreilles latérales (46,8 / 2)
+lidar_side_hole_z = 7.7;       // Z oreilles lat. depuis le bas du footprint (câble en bas)
+lidar_top_hole_z = 43.29;      // Z oreille haute (46,29 − 3)
+lidar_cable_z = 8;             // passage nappe depuis le bas du footprint
 
 // ------------------------------------------------------------
 //  Visserie M3

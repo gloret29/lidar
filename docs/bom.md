@@ -27,7 +27,7 @@ initiale.
 |---|---|---|---|---|
 | B1 | Tige acier rectifiée Ø8 h6, longueur ≥ 120 mm | 1 | 3 € | Tige linéaire d'imprimante 3D, à recouper à **115 mm** |
 | B2 | Accouplement flexible 5 → 8 mm (Ø19 × 25 mm) | 1 | 4 € | Type mâchoires/araignée. Rigide **déconseillé** : il ferait forcer les roulements en cas de défaut d'alignement |
-| B3 | Vis M3×12 tête cylindrique | 4 | — | Moteur sur plateau |
+| B3 | Vis M3×12 tête cylindrique | 4 | — | Moteur sur plateau (taraudé). **Trous traversants :** réutiliser les vis du moteur + 4× écrou M3 |
 | B4 | Vis M3×20 + écrou M3 | 4 | — | Colonne sur plateau |
 | B5 | Vis M3×25 + écrou M3 | 1 | — | Serrage du berceau sur la tige |
 | B6 | Vis M3×8 | 8 | — | Couvercle du boîtier + modules |

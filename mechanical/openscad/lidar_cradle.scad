@@ -1,8 +1,8 @@
 // ============================================================
 //  03 — Berceau LiDAR
-//  Serre sur la tige Ø8 et présente le LD19 COUCHÉ SUR LA TRANCHE,
-//  de sorte que son plan de balayage soit vertical et contienne
-//  l'axe de rotation.
+//  Serre sur la tige Ø8 et présente le STL-19P (LDROBOT) COUCHÉ SUR LA
+//  TRANCHE, plan de balayage vertical contenant l'axe de rotation.
+//  Fixation : 3 oreilles M2,5 (46,8 × 38,59 mm), câble vers le bas.
 //
 //  Repère local : z = 0 à la base du moyeu (= z 140 en global).
 //  Centre optique du LD19 en (0, 0, 65) local.
@@ -25,14 +25,13 @@ web_lo = 24;
 web_hi = 40;
 plate_lo = 32;
 plate_hi = 92;
-plate_hw = 25;      // demi-largeur de la platine en Y
+plate_hw = 29;      // demi-largeur platine (58 mm > envergure 54 mm)
 plate_back = plate_x - cradle_plate_t;   // -27
 
-// Lumière oblongue traversant selon X, allongée selon Z
-module xslot(d, len, depth) {
-    hull()
-        for (s = [-1, 1])
-            translate([0, 0, s * len / 2]) rotate([0, 90, 0]) cylinder(d = d, h = depth);
+// Perçage M2,5 traversant la platine (axe X)
+module lidar_mount_hole() {
+    translate([plate_back - 0.1, 0, 0])
+        rotate([0, 90, 0]) cylinder(d = lidar_screw_d, h = cradle_plate_t + 3);
 }
 
 module lidar_cradle() {
@@ -69,7 +68,7 @@ module lidar_cradle() {
             translate([plate_back, -plate_hw, plate_lo])
                 cube([cradle_plate_t, 2 * plate_hw, plate_hi - plate_lo]);
 
-            // ---------- Rebord de centrage du LD19 (côté +X) ----------
+            // ---------- Rebord de centrage STL-19P (côté +X) ----------
             difference() {
                 translate([plate_x, -(lidar_w / 2 + 2.5), lidar_bottom - 2.5])
                     cube([2.5, lidar_w + 5, lidar_h + 5]);
@@ -97,15 +96,16 @@ module lidar_cradle() {
         translate([12, -9.01, 11.5]) rotate([-90, 0, 0])
             cylinder(d = m3_nut_af / cos(30), h = 3.2, $fn = 6);
 
-        // ---------- Fixation du LD19 : 4 lumières de réglage ----------
-        for (y = [-1, 1], z = [-1, 1])
-            translate([plate_back - 0.1, y * lidar_w / 3.1,
-                       optical_local_z + z * lidar_h / 3.1])
-                xslot(d = lidar_screw_d, len = lidar_slot_len,
-                      depth = cradle_plate_t + 3);
+        // ---------- Fixation STL-19P : 3 oreilles M2,5 (câble vers le bas) ----------
+        translate([0, -lidar_hole_y, lidar_bottom + lidar_side_hole_z])
+            lidar_mount_hole();
+        translate([0, lidar_hole_y, lidar_bottom + lidar_side_hole_z])
+            lidar_mount_hole();
+        translate([0, 0, lidar_bottom + lidar_top_hole_z])
+            lidar_mount_hole();
 
-        // ---------- Passage du câble LiDAR ----------
-        translate([plate_back - 0.1, 0, optical_local_z])
+        // ---------- Passage nappe (connecteur côté bas du capteur) ----------
+        translate([plate_back - 0.1, 0, lidar_bottom + lidar_cable_z])
             rotate([0, 90, 0]) cylinder(d = 9, h = cradle_plate_t + 3);
 
         // ---------- Colliers rilsan de sécurité ----------

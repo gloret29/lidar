@@ -49,7 +49,9 @@ point dur.
    son dégagement.
 3. Orienter la sortie de câble vers le repère gravé (azimut 0°, côté
    passe-câble).
-4. Visser les 4 vis M3×12 **par le dessous**, têtes noyées dans les lamages.
+4. Visser **par le dessous** : vis à travers le plateau et la bride du moteur,
+   **écrou M3** côté moteur (les 17HS4401 courants ont des **trous traversants**,
+   pas de taraudage — les vis fournies avec le moteur conviennent).
 5. Serrer en croix, sans forcer.
 
 Contrôle : l'arbre doit tourner librement, sans point dur, et le moteur ne doit
@@ -125,8 +127,9 @@ résistance de détente : c'est normal.
    [`calibration.md`](calibration.md) § 1.
 2. Si l'écart dépasse 2 mm, corriger `lidar_optical_offset` dans `params.scad`
    et réimprimer le berceau. Sinon, rattraper par les lumières oblongues.
-3. Poser le LD19 dans le rebord de centrage, connecteur vers le bas.
-4. Visser les 4 M2,5 sans bloquer, en laissant le jeu de réglage.
+3. Poser le STL-19P dans le rebord de centrage, **câble / nappe vers le bas**
+   (trou Ø 9 mm de la platine).
+4. Visser les **3 M2,5** dans les oreilles (latérales + haute, loin du câble).
 5. Centrer le plan optique sur la hauteur cible, puis serrer.
 6. Passer le câble par le trou central de la platine.
 
