@@ -23,6 +23,7 @@ uint16_t i_home_ma = CURRENT_HOMING_MA;
 uint16_t sg_threshold = STALLGUARD_THRESHOLD;
 uint8_t tmc_version = 0;
 bool tmc_ok = false;
+volatile bool homed_ok = false;
 
 inline void pulse() {
     digitalWrite(STEP_PIN, HIGH);
@@ -106,6 +107,7 @@ bool scannerHome() {
             position_steps = 0;
             driver.rms_current(i_scan_ma);
             state = ScanState::Idle;
+            homed_ok = true;
             Serial.printf("[scanner] butée trouvée après %d pas\n", i);
             return true;
         }
@@ -113,6 +115,7 @@ bool scannerHome() {
 
     driver.rms_current(i_scan_ma);
     state = ScanState::Fault;
+    homed_ok = false;
     Serial.println("[scanner] ÉCHEC du homing : aucun contact détecté");
     return false;
 }
@@ -156,6 +159,7 @@ void scannerTick() {
 void scannerEmergencyStop() {
     stop_requested = true;
     digitalWrite(EN_PIN, HIGH);
+    homed_ok = false;
     if (state == ScanState::Scanning || state == ScanState::Homing ||
         state == ScanState::Spinup)
         state = ScanState::Fault;
@@ -179,6 +183,8 @@ bool scannerTmcOk() {
 uint8_t scannerTmcVersion() { return tmc_version; }
 
 bool scannerMotorEnabled() { return digitalRead(EN_PIN) == LOW; }
+
+bool scannerHomedOk() { return homed_ok; }
 
 int32_t scannerPsiMdeg() {
     return static_cast<int32_t>(position_steps * 1000.0f / STEPS_PER_DEGREE);

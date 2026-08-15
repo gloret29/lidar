@@ -34,6 +34,8 @@ struct DeviceStatus {
     bool lidar_warn;
     bool tmc_ok;
     bool motor_enabled;
+    bool motor_ok;
+    bool motor_warn;
     uint8_t tmc_version;
     float lidar_crc_pct;  // 0..100, -1 si aucune trame
 };

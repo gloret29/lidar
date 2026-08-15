@@ -96,7 +96,7 @@ label.field input{width:110px;padding:7px 8px;border-radius:7px;border:1px solid
     <dt>LiDAR</dt><dd id="hw_lidar">…</dd>
     <dt>TMC2209</dt><dd id="hw_tmc">…</dd>
     <dt>MPU6050</dt><dd id="hw_imu">…</dd>
-    <dt>Moteur</dt><dd id="hw_motor">…</dd>
+    <dt>Entraînement</dt><dd id="hw_motor">…</dd>
   </dl>
 </section>
 <section>
@@ -166,8 +166,8 @@ function pill(el,state){
   el.className='pill'+(state==='scanning'||state==='homing'||state==='spinup'||state==='levelling'?' busy'
     :state==='fault'?' fault':state==='idle'||state==='done'?' ok':'');
 }
-function hwLine(ok,warn,detail){
-  const label=ok?'OK':warn?'Init…':'Ko';
+function hwLine(ok,warn,detail,warnLabel){
+  const label=ok?'OK':warn?(warnLabel||'Alerte'):'Ko';
   const cls=ok?'ok':warn?'busy':'fault';
   return '<span class="pill '+cls+'">'+label+'</span> '+detail;
 }
@@ -180,13 +180,18 @@ async function refresh(){
     $('hw_wifi').innerHTML=hwLine(d.hw_wifi_ok,false,d.hw_wifi_ok?(d.rssi+' dBm · '+d.ip):'déconnecté');
     const crcTxt=d.hw_lidar_crc_pct<0?'aucune trame':d.hw_lidar_crc_pct.toFixed(1)+' % CRC';
     $('hw_lidar').innerHTML=hwLine(d.hw_lidar_ok,d.hw_lidar_warn,
-      d.lidar_hz_meas.toFixed(2)+' Hz / '+d.lidar_hz.toFixed(1)+' Hz · '+crcTxt);
+      d.lidar_hz_meas.toFixed(2)+' Hz / '+d.lidar_hz.toFixed(1)+' Hz · '+crcTxt,'Init…');
     $('hw_tmc').innerHTML=hwLine(d.hw_tmc_ok,false,
-      d.hw_tmc_ok?('v0x'+d.hw_tmc_version.toString(16)+' · SG '+(d.sg_result<0?'n/d':d.sg_result)):'UART muette');
+      d.hw_tmc_ok?('v0x'+d.hw_tmc_version.toString(16)+' · SG '+(d.sg_result<0?'n/d':d.sg_result)):'UART muette ou absent');
     $('hw_imu').innerHTML=hwLine(d.imu_ok,false,
       d.imu_ok?('g=('+d.imu_gx.toFixed(3)+', '+d.imu_gy.toFixed(3)+', '+d.imu_gz.toFixed(3)+')'):'I2C absent (GPIO 8/9)');
-    $('hw_motor').innerHTML=hwLine(d.hw_motor_enabled,false,
-      d.hw_motor_enabled?'alimenté (EN actif)':'coupé (EN relâché)');
+    let motorDetail='TMC2209 absent ou UART muette';
+    if(d.hw_tmc_ok){
+      if(!d.hw_motor_enabled) motorDetail='driver coupé (EN relâché — E-stop ou OTA)';
+      else if(d.hw_motor_ok) motorDetail='homing réussi · axe prêt';
+      else motorDetail='non testé — utiliser « Rehomer »';
+    }
+    $('hw_motor').innerHTML=hwLine(d.hw_motor_ok,d.hw_motor_warn,motorDetail);
     $('psi').textContent=d.psi_deg.toFixed(2)+' °';
     $('lidar').textContent=d.lidar_hz_meas.toFixed(2)+' Hz (consigne '+d.lidar_hz.toFixed(1)+')';
     const tot=d.frames_ok+d.frames_bad;
@@ -329,7 +334,8 @@ void handleStatus() {
              "\"imu_tilt_deg\":%.3f,"
              "\"hw_wifi_ok\":%s,\"hw_lidar_ok\":%s,\"hw_lidar_warn\":%s,"
              "\"hw_lidar_crc_pct\":%.1f,\"hw_tmc_ok\":%s,"
-             "\"hw_tmc_version\":%u,\"hw_motor_enabled\":%s}",
+             "\"hw_tmc_version\":%u,\"hw_motor_enabled\":%s,"
+             "\"hw_motor_ok\":%s,\"hw_motor_warn\":%s}",
              FIRMWARE_VERSION, WiFi.localIP().toString().c_str(),
              scanStateName(d.state), d.psi_deg, d.lidar_hz_meas, s.lidar_hz,
              static_cast<unsigned>(d.frames_ok),
@@ -343,7 +349,8 @@ void handleStatus() {
              d.imu_tilt_deg, d.wifi_ok ? "true" : "false",
              d.lidar_ok ? "true" : "false", d.lidar_warn ? "true" : "false",
              d.lidar_crc_pct, d.tmc_ok ? "true" : "false", d.tmc_version,
-             d.motor_enabled ? "true" : "false");
+             d.motor_enabled ? "true" : "false",
+             d.motor_ok ? "true" : "false", d.motor_warn ? "true" : "false");
     sendJson(200, body);
 }
 

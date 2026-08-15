@@ -16,7 +16,7 @@ Quatre blocs, un seul écran :
 | Section | Rôle |
 |---|---|
 | **Commande** | Lancer, arrêter, rehomer, arrêt d'urgence, **redémarrer** |
-| **Matériel** | État opérationnel Wi‑Fi, LiDAR, TMC2209, MPU6050, moteur |
+| **Matériel** | État opérationnel Wi‑Fi, LiDAR, TMC2209, MPU6050, entraînement |
 | **Diagnostics** | État, ψ, fréquence LiDAR, CRC, file, StallGuard, RSSI |
 | **Réglages** | Les 6 paramètres de mise au point, persistés en NVS |
 | **OTA** | Téléversement d'un `firmware.bin` ou d'un `littlefs.bin` |
@@ -79,7 +79,7 @@ Ce qui **n'y figure pas**, volontairement :
 | **LiDAR** | CRC ≥ 95 %, Hz proche de la consigne | Trames reçues mais CRC ou Hz douteux ; ou démarrage (< 8 s) | Aucune trame UART |
 | **TMC2209** | UART répond (version ≠ 0) | — | Driver absent ou muette |
 | **MPU6050** | `WHO_AM_I` OK, vecteur g affiché | — | Absent sur I2C (GPIO 8/9) |
-| **Moteur** | EN actif (alimenté) | — | EN relâché (arrêt d'urgence ou OTA) |
+| **Entraînement** | TMC2209 OK **et** homing StallGuard réussi | TMC OK, pas encore homé | TMC absent, ou homing échoué |
 
 ### Télémétrie balayage
 

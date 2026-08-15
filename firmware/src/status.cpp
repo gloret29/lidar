@@ -19,6 +19,21 @@ void fillHardwareHealth(DeviceStatus& d) {
     d.tmc_ok = scannerTmcOk();
     d.tmc_version = scannerTmcVersion();
     d.motor_enabled = scannerMotorEnabled();
+
+    if (!d.tmc_ok) {
+        d.motor_ok = false;
+        d.motor_warn = false;
+    } else if (!d.motor_enabled) {
+        d.motor_ok = false;
+        d.motor_warn = false;
+    } else if (scannerHomedOk()) {
+        d.motor_ok = true;
+        d.motor_warn = false;
+    } else {
+        d.motor_ok = false;
+        d.motor_warn = true;
+    }
+
     d.imu_ok = mpu6050Ready();
     d.imu_shock = mpu6050ShockFlag();
 

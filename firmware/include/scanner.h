@@ -53,6 +53,9 @@ uint8_t scannerTmcVersion();
 /// true si la broche EN est active (moteur alimenté).
 bool scannerMotorEnabled();
 
+/// true si le dernier homing StallGuard a réussi.
+bool scannerHomedOk();
+
 int32_t scannerPsiMdeg();
 ScanState scannerState();
 void scannerSetState(ScanState s);
