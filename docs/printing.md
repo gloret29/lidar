@@ -106,6 +106,9 @@ puis régénérer les STL avec `make`. Une vingtaine de minutes de plateau
 
 ## Pose de l'insert 1/4"-20
 
+Utiliser un insert **1/4"-20 UNC × 10 × 8 mm** (diamètre extérieur Ø8 mm,
+longueur 10 mm) — pas un 6×8 trop étroit pour le logement Ø8,4 × 13 mm.
+
 1. Fer à souder à panne large, 230 °C (PETG) ou 210 °C (PLA).
 2. Présenter l'insert, filetage vers l'extérieur, dans le logement Ø8,4 du
    bossage, **par le dessous**.
@@ -127,4 +130,4 @@ doute, le rechauffer et recommencer — le panier contient 50 inserts.
 - [ ] La bride de colonne repose à plat sur le plateau (aucun basculement)
 - [ ] L'insert 1/4"-20 est affleurant et d'équerre
 - [ ] Le berceau serre fermement sur la tige, sans jeu de rotation
-- [ ] Le rebord de centrage accueille le LD19 sans forcer
+- [ ] Le rebord de centrage (**54 × 46,3 mm**) accueille le STL-19P sans forcer

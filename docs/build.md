@@ -44,7 +44,8 @@ USB initial) deviennent pénibles une fois le boîtier fermé ou la tête monté
 Lire, dans cet ordre :
 
 1. [README.md](../README.md) — vue d’ensemble  
-2. [geometry.md](geometry.md) — pourquoi le LD19 est sur la tranche, et pourquoi
+2. [geometry.md](geometry.md) — pourquoi le LiDAR est sur la tranche (STL-19P),
+   et pourquoi
    θ = élévation / ψ = azimut  
 3. [architecture.md](architecture.md) — qui fait quoi (ESP32 vs PC)
 
@@ -62,13 +63,13 @@ Ouvrir [bom.md](bom.md) et cocher, section par section :
 
 **A — Déjà commandé**
 
-- [ ] A1 LD19 (FHL-LD19 / P)
+- [ ] A1 STL-19P (FHL-LD19P)
 - [ ] A2 ESP32-S3 DevKitC-1 **N16R8**
 - [ ] A3 Driver TMC2209
-- [ ] A4 Moteur NEMA 17
+- [ ] A4 Moteur NEMA 17 **pas à pas 4 fils** (pas de BLDC brushless)
 - [ ] A5 MPU6050
 - [ ] A6 Roulements 608ZZ (×2 min.)
-- [ ] A7 Insert laiton 1/4"-20 UNC
+- [ ] A7 Insert laiton 1/4"-20 UNC **× 10 × 8 mm**
 - [ ] A8 Trigger USB-C PD
 - [ ] A9 Buck 12 V → 5 V 3 A
 - [ ] A10 Power bank USB-C PD
@@ -100,16 +101,18 @@ Ouvrir [bom.md](bom.md) et cocher, section par section :
 - [ ] Clés Allen 1,5 / 2 / 2,5 mm
 - [ ] Scie à métaux ou Dremel (recoupe tige)
 
-**E — Vigilance achat** : relire [bom.md](bom.md) § E (variante LD19, N16R8, accouplement flexible).
+**E — Vigilance achat** : relire [bom.md](bom.md) § E (variante STL-19P, moteur
+pas à pas, N16R8, accouplement flexible).
 
 ### 1.2 Points critiques à l’achat
 
 | Pièce | Vigilance |
 |---|---|
 | ESP32-S3 | Variante **N16R8** (16 Mo flash / 8 Mo PSRAM) |
+| Moteur | **Pas à pas 4 fils** NEMA 17 (STEP/DIR) — pas de BLDC 42BL3802 |
 | Accouplement | **Flexible** 5→8 mm, pas rigide |
 | Tige | Acier rectifié Ø8, à recouper à **115 mm** |
-| LD19 | FHL-LD19 (ou P) ; noter le filetage des trous (souvent M2,5) |
+| LiDAR | **STL-19P** : 3 oreilles M2,5, 5 000 Hz, détection verre |
 
 **Contrôle.** Toute la section **B** est chez toi avant le montage final.
 La section **C** se coche au fur et à mesure des impressions. On peut
@@ -196,19 +199,19 @@ Suivre **strictement** l’ordre du guide de montage. Résumé :
 |---|---|---|
 | 1 | Recouper la tige à **115 mm**, ébavurer | Longueur exacte |
 | 2 | Pose à chaud de l’insert 1/4"-20 dans le plateau | Vis trépied d’équerre |
-| 3 | NEMA 17 sous le plateau (4× M3×12) | Arbre libre, moteur stable |
+| 3 | NEMA 17 sous le plateau (4× M3 + écrou M3) | Arbre libre, moteur stable |
 | 4 | Deux 608ZZ dans la colonne (par le haut) | Portage sur épaulements |
 | 5 | Colonne sur plateau (4× M3×20) | Bride à plat, pas de jeu |
 | 6 | Accouplement flexible 5→8 | Vis serrées, pas de contrainte |
 | 7 | Tige dans les roulements + accouplement | Tourne libre, sans frottement |
-| 8 | Berceau + LD19 sur la tige | Plan optique vertical, serrage M3 |
+| 8 | Berceau + STL-19P sur la tige | Plan optique vertical, 3× M2,5, serrage M3 |
 | 9 | Boîtier électronique (sans fermer le couvercle) | Sanglage trépied plus tard |
 
 **Contrôle final mécanique.**
 
 - [ ] La tête tourne à la main sur ~180° jusqu’à la butée  
 - [ ] Aucun frottement câble / colonne  
-- [ ] Le LD19 ne touche pas la colonne ni le plateau  
+- [ ] Le STL-19P ne touche pas la colonne ni le plateau  
 - [ ] Le trépied reçoit bien le plateau (test à blanc)
 
 ---

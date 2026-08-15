@@ -4,7 +4,7 @@
 
 ```
    ┌──────────────────── Tête tournante ────────────────────┐
-   │   LD19  (plan de balayage vertical, 5 Hz, 4500 pts/s)   │
+   │   STL-19P  (plan vertical, 5 Hz, 5000 pts/s)   │
    └────────────────────────┬───────────────────────────────┘
                             │ UART 230400
    ┌────────────────────────┴───────────────────────────────┐
@@ -52,7 +52,7 @@ une erreur de conception s'était glissée initialement (voir
 | `loop()` | 0 | 1 | Télémétrie sur le port série |
 
 La file entre `lidar_task` et `network_task` compte 2 048 entrées, soit environ
-450 ms de marge à 4 500 pts/s. En cas de saturation, `lidar_task` **abandonne
+410 ms de marge à 5 000 pts/s. En cas de saturation, `lidar_task` **abandonne
 le point** plutôt que de bloquer : perdre un point est sans conséquence, perdre
 la synchronisation de l'UART corromprait toute une salve de trames.
 
@@ -148,8 +148,8 @@ loin des 37 datagrammes par seconde à absorber.
 
 | Étage | Débit |
 |---|---|
-| LD19 en sortie UART | 4 500 pts/s, soit 17,6 ko/s de trames |
-| Points valides après filtrage | environ 4 000 pts/s |
+| LD19 / STL-19P en sortie UART | 5 000 pts/s, soit ~19,6 ko/s de trames |
+| Points valides après filtrage | environ 4 500 pts/s |
 | Charge utile UDP | 32 ko/s |
 | Avec en-têtes UDP/IP | environ 34 ko/s |
 

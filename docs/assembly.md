@@ -27,7 +27,7 @@ Pour l’ordre global du projet (logiciel, câblage, premier scan), voir
 3. Vérifier la rectitude en la roulant sur une surface plane.
 4. Dégraisser à l'alcool.
 
-> **115 mm, pas plus.** Une tige trop longue pénètre dans le corps du LD19 et
+> **115 mm, pas plus.** Une tige trop longue pénètre dans le corps du STL-19P et
 > l'empêche de se plaquer sur le berceau.
 
 ## Étape 2 — Insert de trépied
@@ -118,11 +118,11 @@ résistance de détente : c'est normal.
 
 > C'est la dernière occasion d'accéder à l'accouplement.
 
-## Étape 8 — LD19 sur le berceau
+## Étape 8 — STL-19P sur le berceau
 
-![Étape 8 — LD19 dans le berceau](assembly/step-08.png)
+![Étape 8 — STL-19P dans le berceau](assembly/step-08.png)
 
-1. **Relever au pied à coulisse la hauteur du plan optique** du LD19 par
+1. **Relever au pied à coulisse la hauteur du plan optique** du STL-19P par
    rapport à sa face de fixation. Valeur supposée : 22 mm. Voir
    [`calibration.md`](calibration.md) § 1.
 2. Si l'écart dépasse 2 mm, corriger `lidar_optical_offset` dans `params.scad`
@@ -177,7 +177,7 @@ Câbler **hors tension**, en suivant [`wiring.md`](wiring.md).
 
 Dans cet ordre, sans jamais brûler d'étape.
 
-**12a — Sans le moteur.** Alimenter, vérifier au moniteur série que le LD19
+**12a — Sans le moteur.** Alimenter, vérifier au moniteur série que le STL-19P
 émet des trames valides et que le portail Wi-Fi apparaît. Configurer le réseau.
 
 **12b — Moteur à faible courant.** Régler 300 mA, faire tourner de 10° dans les
@@ -192,7 +192,7 @@ jusqu'à une détection franche et répétable sur dix essais.
 
 - [ ] La tête tourne librement sur 180°, sans point dur
 - [ ] Aucun câble en tension ni frottant
-- [ ] Le plan de balayage du LD19 contient bien l'axe de rotation
+- [ ] Le plan de balayage du STL-19P contient bien l'axe de rotation
 - [ ] Le homing est répétable à mieux que 0,5° sur dix essais
 - [ ] Le trépied est stable, le scanner ne bascule pas en rotation
 - [ ] Aucun échauffement anormal après 5 min de fonctionnement

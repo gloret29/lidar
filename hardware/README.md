@@ -22,7 +22,7 @@ python3 hardware/generate_kicad.py
 | U2 | Trigger PD → 12 V |
 | U4 | Buck 12 V → 5 V |
 | U1 | ESP32-S3 DevKitC-1 N16R8 |
-| LD1 | LiDAR LD19 (tête tournante) |
+| LD1 | LiDAR STL-19P / LD19 (tête tournante) |
 | U5 | MPU6050 (base fixe) |
 | U3 | TMC2209 |
 | M1 | NEMA 17 |

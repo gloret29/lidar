@@ -1,7 +1,8 @@
 # Scanner 3D LiDAR DIY
 
-Scanner d'intérieur sur trépied photo, à base d'un LiDAR 2D LD19 dont le plan
-de balayage vertical est mis en rotation autour d'un axe vertical. L'ESP32-S3
+Scanner d'intérieur sur trépied photo, à base d'un LiDAR 2D **STL-19P**
+(FHL-LD19P, famille LD19) dont le plan de balayage vertical est mis en rotation
+autour d'un axe vertical. L'ESP32-S3
 acquiert les mesures et les diffuse en Wi-Fi ; la station hôte reconstruit le
 nuage de points 3D.
 
@@ -44,9 +45,10 @@ scan, à ±5 cm, en 45 à 180 secondes.
 
 ## Principe
 
-Le LD19 est un LiDAR **2D** : il balaie 360° dans un plan. Monté **sur la
-tranche**, ce plan devient vertical ; en le faisant pivoter de 180° autour de
-l'axe vertical, on couvre la sphère complète exactement une fois.
+Le STL-19P est un LiDAR **2D** (protocole LD19) : il balaie 360° dans un plan,
+à **5 000 mesures/s**, avec détection du verre. Monté **sur la tranche**, ce
+plan devient vertical ; en le faisant pivoter de 180° autour de l'axe vertical,
+on couvre la sphère complète exactement une fois.
 
 Conséquence contre-intuitive mais essentielle : **l'angle interne du LiDAR est
 l'élévation, et l'angle moteur est l'azimut**.
@@ -171,9 +173,10 @@ points, pour 15 000 à 50 000 €.
 
 ## Matériel
 
-ESP32-S3 DevKitC-1 (N16R8) · LiDAR LD19 · NEMA 17 17HS4401 · TMC2209 ·
-MPU6050 · 2 × roulements 608ZZ · power bank USB-C PD + trigger 12 V + buck 5 V ·
-châssis imprimé en 3D avec insert 1/4"-20.
+ESP32-S3 DevKitC-1 (N16R8) · LiDAR STL-19P (FHL-LD19P) · NEMA 17 pas à pas
+(17HS4401 ou équivalent 4 fils) · TMC2209 · MPU6050 · 2 × roulements 608ZZ ·
+power bank USB-C PD + trigger 12 V + buck 5 V · châssis imprimé en 3D avec
+insert laiton 1/4"-20 × 10 × 8 mm.
 
 Nomenclature détaillée, y compris les compléments à acquérir, dans
 [docs/bom.md](docs/bom.md).

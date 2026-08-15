@@ -5,23 +5,24 @@
 La préparation compte davantage que les réglages : la plupart des défauts d'un
 relevé d'intérieur viennent de la scène, pas du capteur.
 
-### Fenêtres — fermer les volets
+### Fenêtres — fermer les volets (recommandé)
 
-Le verre est quasi transparent pour un LiDAR à 905 nm. Sans volet, le faisceau
-traverse et rapporte des points situés dans le jardin, ou rien du tout.
+Le STL-19P (**FHL-LD19P**) **détecte le verre** : le faisceau peut mesurer la
+surface vitrée elle-même plutôt que de la traverser. Sans volet, on obtient
+souvent un plan sur la vitre — parfois souhaitable, parfois confus selon
+l'angle d'incidence.
 
-Volets fermés, on obtient deux bénéfices :
+Volets fermés, on obtient en plus :
 
-1. Une surface opaque exploitable derrière la vitre.
-2. La suppression de l'éblouissement. Le LD19 tolère 30 klux, alors qu'une
+1. Une surface opaque exploitable derrière la vitre (tablier du volet).
+2. La suppression de l'éblouissement. Le capteur tolère 30 klux, alors qu'une
    tache de soleil direct dépasse 100 klux et provoque des décrochages locaux.
 
-**Nuance** : le verre reste présent. Le faisceau le traverse et rebondit sur le
-tablier du volet, quelques centimètres en retrait. Les fenêtres apparaîtront
-donc comme des renfoncements de 3 à 15 cm. Sans conséquence pour un plan
-d'étage. On peut aussi observer une double surface là où le faisceau arrive
-perpendiculairement à la vitre, celle-ci renvoyant environ 4 % en spéculaire ;
-le filtrage statistique l'absorbe.
+**Nuance** : même avec détection du verre, le tablier fermé peut apparaître
+quelques centimètres en retrait si le faisceau le voit à travers une interstice.
+Les fenêtres peuvent aussi montrer une double surface là où le faisceau arrive
+perpendiculairement à la vitre (~4 % en spéculaire) ; le filtrage statistique
+l'absorbe en général.
 
 ### Miroirs — les couvrir
 
@@ -98,7 +99,7 @@ Voir [web.md](web.md) pour la commande, les diagnostics et les réglages.
 ```
   1. Nivellement IMU        10 s   moyennage de la gravité (à venir)
   2. Homing StallGuard       5 s   zéro d'azimut absolu
-  3. Stabilisation LD19      3 s   montée en vitesse
+  3. Stabilisation STL-19P   3 s   montée en vitesse
   4. Balayage 0 → fin °  45-180 s  selon vitesse / amplitude
   5. Contrôle de choc        2 s   relecture de l'IMU (à venir)
   6. Vidange des tampons     2 s
@@ -210,11 +211,11 @@ des dizaines de millions de points — pour 15 000 à 50 000 €.
 
 | Fréquence | Opération |
 |---|---|
-| Avant chaque scan | Nettoyer la fenêtre optique du LD19 au chiffon microfibre |
+| Avant chaque scan | Nettoyer la fenêtre optique du STL-19P au chiffon microfibre |
 | Mensuel | Vérifier le serrage du berceau et de l'accouplement |
 | Mensuel | Contrôler l'usure du câble tournant |
 | Semestriel | Refaire la calibration complète |
 | Au besoin | Remplacer les 608ZZ (il en reste 38 au tiroir) |
 
-Le LD19 est donné pour plus de 10 000 h, soit largement au-delà d'un usage
+Le STL-19P est donné pour plus de 10 000 h, soit largement au-delà d'un usage
 amateur.

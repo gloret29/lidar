@@ -9,7 +9,7 @@ l'axe de rotation (lacet).
 ## 1. Chaîne cinématique
 
 ```
-                    LD19 (couché, plan de balayage vertical)
+                    STL-19P (couché, plan de balayage vertical)
                        │  centre optique : z = 205, sur l'axe
                   ┌────┴────┐
                   │ berceau │  C3 — serre sur la tige
@@ -32,7 +32,7 @@ l'axe de rotation (lacet).
 ```
 
 Hauteur totale au-dessus de la semelle du trépied : **229 mm**.
-Masse de la tête tournante : environ 110 g (LD19 47 g + berceau 45 g + tige).
+Masse de la tête tournante : environ 110 g (STL-19P ~47 g + berceau 45 g + tige).
 
 ## 2. Décisions de conception
 
@@ -98,13 +98,13 @@ La platine du berceau, elle, est parallèle au plan de balayage et décalée de
 | Diamètre | 126 |
 | Épaisseur | 8 |
 | Bossage trépied | Ø30 × 16 vers le bas |
-| Logement d'insert | Ø8,4 × 13, par le dessous |
-| Fixation moteur | 4 × M3, carré 31, têtes noyées par le dessous |
+| Logement d'insert | Ø8,4 × 13, par le dessous — insert **1/4"-20 × 10 × 8 mm** |
+| Fixation moteur | 4 × M3 traversants, carré 31 — **écrou M3** côté bride NEMA |
 | Fixation colonne | 4 × M3 sur Ø106, écrous noyés par le dessous |
 | Passage de câbles | Lumière 18 × 8 à 180° |
 
-Les têtes de vis du moteur sont noyées sous le plateau pour ne pas gêner la
-semelle de trépied.
+Les vis du moteur passent par le plateau ; l'**écrou M3** se pose côté bride
+NEMA (trous traversants sur les 17HS4401 courants).
 
 ### C2 — Colonne à roulements
 
@@ -138,7 +138,7 @@ d'azimut par StallGuard, sans capteur.
 | Moyeu | Ø18, serrage sur 40 mm de tige, alésage Ø8,45, rétreint à Ø12 en tête |
 | Fente de serrage | 1,8 mm + vis M3×25 |
 | Platine | 5 mm d'épaisseur, à x = −22 (= décalage optique) |
-| Fixation LD19 | 3 × M2,5 — oreilles STL-19P, entraxe **46,8 × 38,59 mm** |
+| Fixation STL-19P | 3 × M2,5 — oreilles, entraxe **46,8 × 38,59 mm** |
 | Rebord de centrage | **54 × 46,3**, hauteur 2,5 |
 | Secteur de butée | 26° sur Ø48 |
 
@@ -161,15 +161,15 @@ ont été validées par rendu.
 
 | Contrainte | Marge |
 |---|---|
-| Sommet de la tige (z 180) sous le corps du LD19 (z 185,7) | 5,7 mm |
-| Voile du berceau (z ≤ 180) sous le LD19 | 5,7 mm |
+| Sommet de la tige (z 180) sous le corps du STL-19P (z 181,9) | **1,9 mm** |
+| Voile du berceau (z ≤ 179) sous le corps (z ≥ 182) | **~3 mm** |
 | Cavité de la colonne Ø62 / diagonale NEMA 17 Ø59,8 | 1,1 mm au rayon |
 | Paroi de la colonne au droit de la cavité | 4,2 mm mini |
 | Vis de colonne (R 53) hors du cône (R 48) | 5 mm, têtes accessibles |
 | Nervures dorsales du berceau côté −X | hors volume LiDAR |
 
 **La tige ne doit pas dépasser 115 mm** : au-delà elle pénètre dans le corps
-du LD19.
+du STL-19P (encombrement plus haut que l'ancien LD19 plat 38,6 mm).
 
 ## 6. Impression 3D
 

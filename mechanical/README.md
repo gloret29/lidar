@@ -66,7 +66,7 @@ Les deux paramètres à ajuster impérativement avant d'imprimer :
 | `test_fits` | **À imprimer en premier** : calibration des ajustements | 15 min |
 | `base_plate` | Interface trépied, support moteur, embase colonne | Retournée |
 | `bearing_tower` | Porte les deux 608ZZ, **définit l'axe** | 5 périmètres, 40 % |
-| `lidar_cradle` | Présente le LD19 sur la tranche | Couchée |
+| `lidar_cradle` | Présente le STL-19P (3 oreilles M2,5) sur la tranche | Couchée |
 | `electronics_box` + `_lid` | Boîtier sanglé sur le trépied | Standard |
 
 Voir [docs/mechanical.md](../docs/mechanical.md) pour les cotes et la
@@ -76,6 +76,6 @@ réglages, [docs/assembly.md](../docs/assembly.md) pour le montage.
 ## Vérification
 
 Les six pièces sont rendues sans erreur par OpenSCAD et produisent des solides
-manifold. Les contraintes de non-collision (tige contre corps du LD19, voile
+manifold. Les contraintes de non-collision (tige contre corps du STL-19P, voile
 contre LiDAR, cavité contre moteur, têtes de vis contre cône) sont listées avec
 leurs marges dans [docs/mechanical.md](../docs/mechanical.md) § 5.

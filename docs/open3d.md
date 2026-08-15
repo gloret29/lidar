@@ -306,7 +306,7 @@ PY
 | UDP brut | Polaire | Jamais un fichier Open3D — reste sur le fil |
 
 - Distances Open3D : **mètres**  
-- Origine : centre optique du LD19 (après bras de levier)  
+- Origine : centre optique du STL-19P (après bras de levier)  
 - **Z** : vertical après redressement `g_zero` (vers le haut une fois nivelé ; le vecteur gravité de calage est `(0,0,-1)` dans le fichier de config)
 
 Modifier `calibration.json` puis **rejouer** un enregistrement n’est pas automatisé
@@ -374,7 +374,7 @@ recouvrement au prochain scan plutôt que de forcer `--voxel`.
 | Poisson très long | baisser `--depth`, ou voxel plus gros en entrée |
 | Trop de points (> 2 M fusionnés) | voxel avant register / mesh |
 
-Le firmware envoie ~4 500 pts/s ; un scan 90 s ≈ **400 k points**. Open3D
+Le firmware envoie ~5 000 pts/s ; un scan 90 s ≈ **450 k points**. Open3D
 gère ça sans peine sur une machine récente.
 
 ## 10. Dépannage Open3D

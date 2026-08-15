@@ -131,7 +131,7 @@ vitesse). La calibration géométrique reste sur l'hôte.
 Le firmware est **structurellement complet mais n'a pas encore tourné sur du
 matériel**. À valider en priorité au premier montage :
 
-- [ ] Décodage des trames LD19 (taux de CRC via le panneau)
+- [ ] Décodage des trames LD19 / STL-19P (taux de CRC via le panneau)
 - [ ] Consigne PWM → 5 Hz réellement mesurés
 - [ ] Seuil StallGuard (curseur web + lecture live)
 - [ ] Nivellement IMU (code MPU6050 à écrire)

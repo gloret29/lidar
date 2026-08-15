@@ -13,7 +13,8 @@ Budget matériel : environ **205 €**. Précision visée : **±5 cm**.
 
 ## Architecture retenue
 
-Le LD19 est monté **couché sur la tranche** : son plan de balayage est vertical
+Le STL-19P (FHL-LD19P, protocole LD19) est monté **couché sur la tranche** :
+son plan de balayage est vertical
 et contient l'axe de rotation. L'ensemble pivote de 180° autour de l'**axe
 vertical**, entraîné en prise directe par un NEMA 17.
 
@@ -46,8 +47,10 @@ confondu avec la verticale.
 
 ### Mesure optique
 
-LiDAR 2D DToF **LDRobot LD19** : portée 0,02 à 12 m, 4 500 mesures/s, 360°,
-UART 3,3 V à 230 400 bauds, précision ±45 mm, tolérance 30 klux.
+LiDAR 2D DToF **LDRobot STL-19P** (FHL-LD19P) : portée 0,02 à 12 m,
+**5 000 mesures/s**, 360°, **détection du verre**, UART 3,3 V à 230 400 bauds,
+précision ±45 mm, tolérance 30 klux. Fixation mécanique : **3 oreilles M2,5**
+(gauche, droite, haut — câble en bas), corps **54 × 46,29 × 35 mm**.
 
 Vitesse de rotation pilotable par PWM de 5 à 13 Hz. Le firmware la règle à
 **5 Hz**, ce qui double la résolution angulaire (0,4° au lieu de 0,8°) sans
@@ -55,9 +58,13 @@ contrepartie sur trépied.
 
 ### Entraînement
 
-NEMA 17 **17HS4401** piloté par **TMC2209** en 1/16 de pas, StealthChop2, en
-prise directe. Résolution : 0,1125° par micro-pas, soit 3,5 fois plus fin que
-le pas de balayage. Guidage par deux roulements **608ZZ** sur tige acier Ø8.
+NEMA 17 **pas à pas 4 fils** (ex. **17HS4401**) piloté par **TMC2209** en
+1/16 de pas, StealthChop2, en prise directe. Résolution : 0,1125° par
+micro-pas, soit 3,5 fois plus fin que le pas de balayage. Guidage par deux
+roulements **608ZZ** sur tige acier Ø8.
+
+> **Incompatible** : moteur brushless BLDC type 42BL3802 (Amazon B097JKJ9VV) —
+> pas de pilotage STEP/DIR, ne convient pas au TMC2209 ni au firmware.
 
 Prise de référence d'azimut par **StallGuard4** contre une butée imprimée :
 aucun capteur de fin de course.
@@ -114,7 +121,7 @@ scanner.
 
 ## Contraintes de conception
 
-1. Le centre optique du LD19 doit être aussi proche que possible de l'axe de
+1. Le centre optique du STL-19P doit être aussi proche que possible de l'axe de
    rotation. Le résidu se compense en post-traitement : ignoré, il courbe les
    murs de façon **systématique**, donc non filtrable.
 2. Le moteur est la référence angulaire. L'IMU ne sert qu'au nivellement.
@@ -138,8 +145,9 @@ scanner.
 
 - **Miroirs** : produisent une pièce virtuelle complète et géométriquement
   cohérente. Aucun filtrage ne les élimine ; il faut les couvrir.
-- **Vitres** : le LD19 standard ne les détecte pas. Volets fermés, on mesure le
-  tablier quelques centimètres en retrait.
+- **Vitres** : la variante **STL-19P** détecte le verre (surface mesurée sur
+  la vitre). Fermer les volets reste utile pour une surface opaque derrière et
+  pour limiter l'éblouissement solaire.
 - **Densité** : environ 300 000 points par scan, contre des dizaines de
   millions pour un scanner professionnel.
 - **Nadir** : cône aveugle d'environ 20°, comblé par une seconde station.

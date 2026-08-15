@@ -136,9 +136,9 @@ flowchart TB
 
 ---
 
-## 3. LiDAR LD19
+## 3. LiDAR STL-19P (protocole LD19)
 
-Connecteur JST 4 points côté capteur.
+Connecteur JST 4 points côté capteur. Brochage identique à la famille LD19.
 
 | LD19 | Vers | Fil (typique) |
 |---|---|---|

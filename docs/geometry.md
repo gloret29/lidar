@@ -8,6 +8,10 @@ détecter après coup.
 
 ## 1. Principe du balayage
 
+Le LD19 désigne ici la **famille de capteurs** (protocole UART commun). Le
+prototype utilise la variante **STL-19P** (FHL-LD19P, 5 000 Hz, détection
+verre, 3 oreilles M2,5).
+
 Le LD19 est un LiDAR **2D** : il mesure une distance $\rho$ dans un plan, en
 tournant sur 360° autour de son propre axe. Pour obtenir un volume 3D, il faut
 déplacer ce plan.
@@ -143,10 +147,11 @@ Z &= \rho\sin\theta + t_z
 \end{aligned}
 $$
 
-**Pourquoi c'est important** : le boîtier du LD19 fait 38,6 mm de côté. Un
-décalage résiduel de 20 à 30 mm est du même ordre que la précision du capteur
-(±45 mm). Mais contrairement au bruit, cette erreur est **systématique** : elle
-ne se moyenne pas, elle courbe légèrement les murs et fausse les angles.
+**Pourquoi c'est important** : le boîtier du STL-19P fait **54 × 46 mm**
+(oreilles comprises). Un décalage résiduel de 20 à 30 mm est du même ordre que
+la précision du capteur (±45 mm). Mais contrairement au bruit, cette erreur est
+**systématique** : elle ne se moyenne pas, elle courbe légèrement les murs et
+fausse les angles.
 
 Le berceau est conçu pour amener $\mathbf{t}$ aussi près de zéro que possible.
 Le résidu se mesure et se compense en post-traitement : voir
@@ -188,22 +193,22 @@ angulaire ; l'IMU sert au **nivellement** et à la **détection de choc**.
 
 ## 6. Résolution et durée de scan
 
-Le LD19 échantillonne à 4 500 Hz quelle que soit sa vitesse de rotation, elle
-même réglable de 5 à 13 Hz par PWM. Sur trépied le temps n'est pas critique :
-**descendre à 5 Hz double la densité angulaire gratuitement**.
+Le STL-19P échantillonne à **5 000 Hz** quelle que soit sa vitesse de rotation,
+elle-même réglable de 5 à 13 Hz par PWM. Sur trépied le temps n'est pas
+critique : **descendre à 5 Hz double la densité angulaire gratuitement**.
 
-| Vitesse LD19 | Points / tour | Résolution en $\theta$ | Tour |
+| Vitesse STL-19P | Points / tour | Résolution en $\theta$ | Tour |
 |---|---|---|---|
-| 10 Hz (défaut) | 450 | 0,80° | 100 ms |
-| 5 Hz | 900 | 0,40° | 200 ms |
+| 10 Hz (défaut) | 500 | 0,72° | 100 ms |
+| 5 Hz | 1 000 | 0,36° | 200 ms |
 
 Pour un balayage de 180° en azimut :
 
 | Pas en $\psi$ | Tranches | Points (à 5 Hz) | Durée |
 |---|---|---|---|
-| 0,8° | 225 | 202 000 | 45 s |
-| 0,4° | 450 | 405 000 | 90 s |
-| 0,2° | 900 | 810 000 | 180 s |
+| 0,8° | 225 | 225 000 | 45 s |
+| 0,4° | 450 | 450 000 | 90 s |
+| 0,2° | 900 | 900 000 | 180 s |
 
 Espacement des points à 5 m avec un pas de 0,4° : environ **35 mm** dans les
 deux directions.

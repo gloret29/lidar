@@ -4,11 +4,11 @@ Cinq mesures à effectuer une fois pour toutes. Elles conditionnent directement
 la justesse du nuage : sans elles, le scanner produira un résultat
 géométriquement cohérent mais faux.
 
-## 1. Décalage optique du LD19 ($t_x$)
+## 1. Décalage optique du STL-19P ($t_x$)
 
 **La mesure la plus importante.** C'est la distance entre la face de fixation du
-LD19 et son plan de balayage. Le berceau est dimensionné pour 22 mm ; la valeur
-réelle doit être vérifiée.
+STL-19P et son plan de balayage. Le berceau est dimensionné pour 22 mm ; la
+valeur réelle doit être vérifiée.
 
 Méthode directe :
 

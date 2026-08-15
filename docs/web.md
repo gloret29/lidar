@@ -51,7 +51,7 @@ curl -u admin:lidar-ota http://lidar-scanner.local/api/status
 
 | Champ | Bornes | Effet |
 |---|---|---|
-| `lidar_hz` | 5…13 | Consigne PWM du LD19 |
+| `lidar_hz` | 5…13 | Consigne PWM du LiDAR (STL-19P / LD19) |
 | `speed` | 0,5…10 °/s | Vitesse d'azimut pendant le balayage |
 | `end_deg` | 10…360 ° | Amplitude (180 ° couvre la sphère une fois) |
 | `sg` | 1…255 | Seuil StallGuard du homing |
