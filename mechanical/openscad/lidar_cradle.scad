@@ -27,11 +27,19 @@ plate_lo = 32;
 plate_hi = 92;
 plate_hw = 29;      // demi-largeur platine (58 mm > envergure 54 mm)
 plate_back = plate_x - cradle_plate_t;   // -27
+plate_front = plate_x;                   // -22 : face de fixation LiDAR
 
-// Perçage M2,5 traversant la platine (axe X)
-module lidar_mount_hole() {
-    translate([plate_back - 0.1, 0, 0])
-        rotate([0, 90, 0]) cylinder(d = lidar_screw_d, h = cradle_plate_t + 3);
+// Perçage M2,5 traversant toute l'épaisseur de la platine (+ marge)
+module lidar_mount_hole(y, z) {
+    translate([plate_back - 1, y, z])
+        rotate([0, 90, 0])
+            cylinder(d = lidar_screw_d, h = plate_front - plate_back + 2);
+}
+
+// Fenêtre câble côté +X (rebord), sans chevaucher les 3 trous M2,5
+module lidar_cable_window() {
+    translate([plate_front - 1, -lidar_cable_w / 2, lidar_bottom + lidar_cable_z - lidar_cable_h / 2])
+        cube([lidar_thk + 5, lidar_cable_w, lidar_cable_h]);
 }
 
 module lidar_cradle() {
@@ -76,12 +84,12 @@ module lidar_cradle() {
                     cube([3, lidar_w + 0.5, lidar_h + 0.5]);
             }
 
-            // ---------- Nervures dorsales (côté -X, hors volume LiDAR) ----------
+            // ---------- Nervures dorsales (écartées des trous M2,5 à Y ±23,4) ----------
             for (s = [-1, 1])
-                translate([plate_back, s * (plate_hw - 5) - 2.5, plate_lo])
+                translate([plate_back, s * 18 - 2, plate_lo])
                     hull() {
-                        cube([0.1, 5, plate_hi - plate_lo]);
-                        translate([-13, 0, 0]) cube([0.1, 5, 26]);
+                        cube([0.1, 4, plate_hi - plate_lo]);
+                        translate([-13, 0, 0]) cube([0.1, 4, 26]);
                     }
         }
 
@@ -97,19 +105,12 @@ module lidar_cradle() {
             cylinder(d = m3_nut_af / cos(30), h = 3.2, $fn = 6);
 
         // ---------- Fixation STL-19P : 3 oreilles M2,5 (câble vers le bas) ----------
-        translate([0, -lidar_hole_y, lidar_bottom + lidar_side_hole_z])
-            lidar_mount_hole();
-        translate([0, lidar_hole_y, lidar_bottom + lidar_side_hole_z])
-            lidar_mount_hole();
-        translate([0, 0, lidar_bottom + lidar_top_hole_z])
-            lidar_mount_hole();
+        lidar_mount_hole(-lidar_hole_y, lidar_bottom + lidar_side_hole_z);
+        lidar_mount_hole(lidar_hole_y, lidar_bottom + lidar_side_hole_z);
+        lidar_mount_hole(0, lidar_bottom + lidar_top_hole_z);
 
-        // ---------- Passage nappe / connecteur ZH1.5T (côté câble) ----------
-        translate([plate_back - 0.1, 0, lidar_bottom + lidar_cable_z])
-            rotate([0, 90, 0]) cylinder(d = lidar_cable_d, h = cradle_plate_t + 3);
-        // dégagement dans le rebord de centrage
-        translate([plate_x - 0.5, -lidar_cable_d / 2 - 1, lidar_bottom + lidar_cable_z - lidar_cable_d / 2])
-            cube([4, lidar_cable_d + 2, lidar_cable_d + 2]);
+        // ---------- Passage nappe / connecteur ZH1.5T (rebord +X, hors perçages) ----------
+        lidar_cable_window();
 
         // ---------- Colliers rilsan de sécurité ----------
         for (z = [plate_lo + 8, plate_hi - 9])

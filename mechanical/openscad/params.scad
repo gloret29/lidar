@@ -69,7 +69,8 @@ lidar_hole_y = 23.4;           // demi-entraxe Y oreilles latérales (46,8 / 2)
 lidar_side_hole_z = 31.92;     // Z oreilles lat. depuis le bas du footprint
 lidar_top_hole_z = 42.69;      // Z oreille opposée au câble (46,29 − 3,6)
 lidar_cable_z = 38.59;         // connecteur ZH1.5T (face câble) depuis le bas
-lidar_cable_d = 14;            // passage nappe + connecteur (était 9 mm, trop juste)
+lidar_cable_w = 12;            // fenêtre câble dans le rebord (sans manger les M2,5)
+lidar_cable_h = 10;
 
 // ------------------------------------------------------------
 //  Visserie M3

@@ -128,7 +128,7 @@ résistance de détente : c'est normal.
 2. Si l'écart dépasse 2 mm, corriger `lidar_optical_offset` dans `params.scad`
    et réimprimer le berceau. Sinon, rattraper par les lumières oblongues.
 3. Poser le STL-19P dans le rebord de centrage, **câble / nappe vers le bas**
-   (ouverture **Ø14 mm** à 38,59 mm sur la platine).
+   (fenêtre câble **12 × 10 mm** dans le rebord à 38,59 mm).
 4. Visser les **3 M2,5** dans les oreilles (latérales + haute, loin du câble).
 5. Centrer le plan optique sur la hauteur cible, puis serrer.
 6. Passer le câble par le trou central de la platine.
