@@ -19,6 +19,7 @@ déforme dès 50 °C — proscrit dans une voiture en été.
 | Pièce | Périmètres | Remplissage | Orientation | Supports |
 |---|---|---|---|---|
 | `test_fits` | **2** | **10 %** | Telle quelle | Non |
+| `test_lidar_fit` | **2** | **10 %** | Telle quelle, rebord vers le haut | Non |
 | `base_plate` | 4 | 30 % | **Retournée**, bossage vers le haut | Non |
 | `bearing_tower` | **5** | **40 %** | Bride sur le plateau | Non |
 | `lidar_cradle` | 4 | 35 % | **Couchée**, platine à plat | Sous le moyeu |
@@ -40,6 +41,16 @@ Viser **20 à 30 min** de plateau :
 | Vitesse | Profil « draft » du slicer | OK pour un coupon jetable |
 
 Ne pas appliquer ces réglages agressifs à `bearing_tower` ni au berceau.
+
+### `test_lidar_fit` — empreinte STL-19P
+
+Coupon plat (~62 × 53 × 7,5 mm) pour valider le capteur **sans réimprimer le berceau**.
+
+```bash
+cd mechanical/openscad && make ../stl/test_lidar_fit.stl
+```
+
+Même couche 0,28 mm / 2 périmètres / 10 % que `test_fits`. Poser le STL-19P dans le rebord, **nappe vers la fente**. Contrôler : 3 vis M2,5, nappe qui sort, capteur sans forcer.
 
 ### `bearing_tower` — la pièce critique
 
@@ -132,4 +143,4 @@ doute, le rechauffer et recommencer — le panier contient 50 inserts.
 - [ ] Le berceau serre fermement sur la tige, sans jeu de rotation
 - [ ] Le rebord de centrage (**54 × 46,3 mm**) accueille le STL-19P sans forcer
 - [ ] **3** vis M2,5 traversantes (2 à **6,67 mm** du bas / câble, 1 à **42,69 mm**)
-- [ ] Encoche câble ouverte **en bas** du rebord (pas de trou au milieu de la platine)
+- [ ] Encoche câble **traversante** en bas de la platine (fente 16 mm, ouverte vers le bord)

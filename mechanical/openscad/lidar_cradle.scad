@@ -36,10 +36,18 @@ module lidar_mount_hole(y, z) {
             cylinder(d = lidar_screw_d, h = 20);
 }
 
-// Encoche câble : le ZH1.5T sort par la FACE BAS (2 oreilles), pas à travers la platine
-module lidar_cable_notch() {
-    translate([plate_front - 0.5, -lidar_cable_w / 2, lidar_bottom - 4])
-        cube([lidar_thk + 6, lidar_cable_w, lidar_cable_h + 4]);
+// Passage nappe ZH1.5T : fente traversante platine + rebord, ouverte vers le bas
+module lidar_cable_slot() {
+    z0 = plate_lo - 1;
+    z1 = lidar_bottom + lidar_cable_h;
+    x0 = plate_back - 1;
+    xh = cradle_plate_t + 8;
+    translate([x0, -lidar_cable_w / 2, z0])
+        cube([xh, lidar_cable_w, z1 - z0]);
+    // arrondi en haut de la fente (visible des deux faces)
+    translate([x0, 0, z1])
+        rotate([0, 90, 0])
+            cylinder(d = lidar_cable_w, h = xh);
 }
 
 module lidar_cradle() {
@@ -109,8 +117,8 @@ module lidar_cradle() {
         lidar_mount_hole(lidar_hole_y, lidar_bottom + lidar_side_hole_z);
         lidar_mount_hole(0, lidar_bottom + lidar_top_hole_z);
 
-        // ---------- Encoche connecteur ZH1.5T (bas du rebord, côté 2 oreilles) ----------
-        lidar_cable_notch();
+        // ---------- Passage nappe (fente ouverte en bas, traverse platine + rebord) ----------
+        lidar_cable_slot();
 
         // ---------- Colliers rilsan de sécurité ----------
         for (z = [plate_lo + 8, plate_hi - 9])

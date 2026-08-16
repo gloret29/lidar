@@ -72,8 +72,8 @@ lidar_hole_y = 23.4;           // 46,8 / 2
 // 31,92 = oreilles lat. → bord opposé du corps ⇒ 38,59 − 31,92 depuis le câble
 lidar_side_hole_z = 6.67;
 lidar_top_hole_z = 42.69;      // oreille simple, depuis le même bord câble
-lidar_cable_w = 18;            // encoche rebord, face connecteur (bas)
-lidar_cable_h = 12;
+lidar_cable_w = 16;            // passage nappe : fente dans platine + rebord
+lidar_cable_h = 14;            // hauteur depuis le bas du footprint
 
 // ------------------------------------------------------------
 //  Visserie M3

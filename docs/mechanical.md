@@ -139,7 +139,7 @@ d'azimut par StallGuard, sans capteur.
 | Fente de serrage | 1,8 mm + vis M3×25 |
 | Platine | 5 mm d'épaisseur, à x = −22 (= décalage optique) |
 | Fixation STL-19P | 3 × M2,5 — 2 oreilles à **6,67 mm** du bord câble, 1 à **42,69 mm** |
-| Passage câble | Encoche **18 × 12 mm** dans le **bas** du rebord (face ZH1.5T) |
+| Passage câble | Fente **16 mm** ouverte en bas, **traversante** platine + rebord |
 | Rebord de centrage | **54 × 46,3**, hauteur 2,5 |
 | Secteur de butée | 26° sur Ø48 |
 

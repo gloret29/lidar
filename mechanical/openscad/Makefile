@@ -14,7 +14,7 @@ OPENSCAD ?= openscad
 STL_DIR  := ../stl
 PNG_DIR  := ../renders
 
-PARTS := test_fits base_plate bearing_tower lidar_cradle electronics_box electronics_lid
+PARTS := test_fits test_lidar_fit base_plate bearing_tower lidar_cradle electronics_box electronics_lid
 
 STLS := $(addprefix $(STL_DIR)/,$(addsuffix .stl,$(PARTS)))
 PNGS := $(addprefix $(PNG_DIR)/,$(addsuffix .png,$(PARTS)))

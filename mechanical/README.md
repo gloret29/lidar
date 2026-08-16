@@ -12,6 +12,7 @@ mechanical/
 │   ├── params.scad       TOUTES les cotes, point d'entrée unique
 │   ├── lib.scad          primitives réutilisables
 │   ├── test_fits.scad    coupon de calibration
+│   ├── test_lidar_fit.scad  coupon empreinte STL-19P
 │   ├── base_plate.scad   01 — plateau de base
 │   ├── bearing_tower.scad 02 — colonne à roulements
 │   ├── lidar_cradle.scad 03 — berceau LiDAR
@@ -64,6 +65,7 @@ Les deux paramètres à ajuster impérativement avant d'imprimer :
 | Pièce | Rôle | Impression |
 |---|---|---|
 | `test_fits` | **À imprimer en premier** : calibration des ajustements | 15 min |
+| `test_lidar_fit` | Empreinte STL-19P (trous + nappe) sans le berceau | ~20 min, à plat |
 | `base_plate` | Interface trépied, support moteur, embase colonne | Retournée |
 | `bearing_tower` | Porte les deux 608ZZ, **définit l'axe** | 5 périmètres, 40 % |
 | `lidar_cradle` | Présente le STL-19P (3 oreilles M2,5) sur la tranche | Couchée |
