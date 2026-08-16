@@ -69,9 +69,10 @@ lidar_thk = 34.8;              // profondeur X
 lidar_optical_offset = 22;     // plan de balayage / face de fixation  <-- À VÉRIFIER
 lidar_screw_d = 2.8;           // M2,5 traversant, jeu impression
 lidar_hole_y = 23.4;           // 46,8 / 2
-// 31,92 = oreilles lat. → bord opposé du corps ⇒ 38,59 − 31,92 depuis le câble
-lidar_side_hole_z = 6.67;
-lidar_top_hole_z = 42.69;      // oreille simple, depuis le même bord câble
+// Entraxe vertical paire câble → oreille simple = 31,92 (pas 38,59 = corps)
+lidar_hole_span_z = 31.92;
+lidar_top_hole_z = 42.69;      // oreille simple, depuis le bord câble
+lidar_side_hole_z = lidar_top_hole_z - lidar_hole_span_z;  // 10,77
 lidar_cable_w = 16;            // passage nappe : fente dans platine + rebord
 lidar_cable_h = 14;            // hauteur depuis le bas du footprint
 

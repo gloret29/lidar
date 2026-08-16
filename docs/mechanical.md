@@ -138,14 +138,15 @@ d'azimut par StallGuard, sans capteur.
 | Moyeu | Ø18, serrage sur 40 mm de tige, alésage Ø8,45, rétreint à Ø12 en tête |
 | Fente de serrage | 1,8 mm + vis M3×25 |
 | Platine | 5 mm d'épaisseur, à x = −22 (= décalage optique) |
-| Fixation STL-19P | 3 × M2,5 — 2 oreilles à **6,67 mm** du bord câble, 1 à **42,69 mm** |
+| Fixation STL-19P | 3 × M2,5 — 2 oreilles à **10,77 mm** du bord câble, 1 à **42,69 mm** (entraxe 31,92) |
 | Passage câble | Fente **16 mm** ouverte en bas, **traversante** platine + rebord |
 | Rebord de centrage | **54 × 46,3**, hauteur 2,5 |
 | Secteur de butée | 26° sur Ø48 |
 
 Les trous M2,5 suivent le **datasheet STL-19P § 5.1** (face de fixation) :
-corps 38,59 × 38,59, entraxe latéral 46,8 mm. Le connecteur et les **2 oreilles**
-sont du même côté (bas du berceau) ; l'oreille simple est à l'opposé.
+corps 38,59 × 38,59, entraxe latéral 46,8 mm, entraxe vertical **31,92 mm**.
+Le connecteur et les **2 oreilles** sont du même côté (bas du berceau) ;
+l'oreille simple est à l'opposé.
 Mesurer quand même le décalage optique sur l'exemplaire réel.
 
 ### C4/C5 — Boîtier électronique
