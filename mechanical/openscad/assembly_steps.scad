@@ -50,8 +50,8 @@ module ghost_lidar_holes() {
         translate([plate_x, 0, optical_z - lidar_h / 2 + lidar_top_hole_z])
             rotate([0, 90, 0]) cylinder(d = lidar_screw_d, h = 8, center = true);
     color("#f39c12", 0.25)
-        translate([plate_front - 1, -lidar_cable_w / 2, optical_z - lidar_h / 2 + lidar_cable_z - lidar_cable_h / 2])
-            cube([lidar_thk + 5, lidar_cable_w, lidar_cable_h]);
+        translate([plate_x - 0.5, -lidar_cable_w / 2, optical_z - lidar_h / 2 - 4])
+            cube([lidar_thk + 6, lidar_cable_w, lidar_cable_h + 4]);
 }
 
 module ghost_lidar() {

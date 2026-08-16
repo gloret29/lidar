@@ -57,20 +57,23 @@ coupler_l = 25;
 //  Câble vers le bas au montage sur le berceau.
 //  ATTENTION : lidar_optical_offset à VÉRIFIER au pied à coulisse.
 //  Voir docs/calibration.md § « Mesure du décalage optique ».
-//  Perçage : datasheet STL-19P § 5.1 (cotes depuis le bord « back » = bas
-//  au montage, câble en bas). Entraxe latéral 46,8 mm ; connecteur à 38,59 mm.
+//  Perçage : datasheet STL-19P § 5.1, vue de la face de fixation.
+//  Repère : bord des 2 oreilles + connecteur ZH1.5T = bas du berceau.
+//  Corps 38,59 × 38,59 ; envergure 54 ; longueur hors-tout 46,29.
+//  3 × Φ2,5 通孔, lamage capteur Φ4,46 × 2 (pas sur le berceau).
 // ------------------------------------------------------------
-lidar_w = 54;                  // envergure Y (oreilles comprises)
-lidar_h = 46.29;               // hauteur Z sur la platine (face de fixation)
-lidar_thk = 34.8;              // profondeur X (datasheet 34,80 mm)
+lidar_w = 54;                  // envergure Y (2 oreilles)
+lidar_h = 46.29;               // longueur Z hors-tout (oreille simple comprise)
+lidar_body = 38.59;            // côté du corps, hors oreille simple
+lidar_thk = 34.8;              // profondeur X
 lidar_optical_offset = 22;     // plan de balayage / face de fixation  <-- À VÉRIFIER
-lidar_screw_d = 2.7;           // M2,5 traversant (3× Φ2,5)
-lidar_hole_y = 23.4;           // demi-entraxe Y oreilles latérales (46,8 / 2)
-lidar_side_hole_z = 31.92;     // Z oreilles lat. depuis le bas du footprint
-lidar_top_hole_z = 42.69;      // Z oreille opposée au câble (46,29 − 3,6)
-lidar_cable_z = 38.59;         // connecteur ZH1.5T (face câble) depuis le bas
-lidar_cable_w = 12;            // fenêtre câble dans le rebord (sans manger les M2,5)
-lidar_cable_h = 10;
+lidar_screw_d = 2.8;           // M2,5 traversant, jeu impression
+lidar_hole_y = 23.4;           // 46,8 / 2
+// 31,92 = oreilles lat. → bord opposé du corps ⇒ 38,59 − 31,92 depuis le câble
+lidar_side_hole_z = 6.67;
+lidar_top_hole_z = 42.69;      // oreille simple, depuis le même bord câble
+lidar_cable_w = 18;            // encoche rebord, face connecteur (bas)
+lidar_cable_h = 12;
 
 // ------------------------------------------------------------
 //  Visserie M3

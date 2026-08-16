@@ -29,17 +29,17 @@ plate_hw = 29;      // demi-largeur platine (58 mm > envergure 54 mm)
 plate_back = plate_x - cradle_plate_t;   // -27
 plate_front = plate_x;                   // -22 : face de fixation LiDAR
 
-// Perçage M2,5 traversant toute l'épaisseur de la platine (+ marge)
+// Perçage M2,5 : traverse platine + rebord (axe X)
 module lidar_mount_hole(y, z) {
-    translate([plate_back - 1, y, z])
+    translate([plate_back - 2, y, z])
         rotate([0, 90, 0])
-            cylinder(d = lidar_screw_d, h = plate_front - plate_back + 2);
+            cylinder(d = lidar_screw_d, h = 20);
 }
 
-// Fenêtre câble côté +X (rebord), sans chevaucher les 3 trous M2,5
-module lidar_cable_window() {
-    translate([plate_front - 1, -lidar_cable_w / 2, lidar_bottom + lidar_cable_z - lidar_cable_h / 2])
-        cube([lidar_thk + 5, lidar_cable_w, lidar_cable_h]);
+// Encoche câble : le ZH1.5T sort par la FACE BAS (2 oreilles), pas à travers la platine
+module lidar_cable_notch() {
+    translate([plate_front - 0.5, -lidar_cable_w / 2, lidar_bottom - 4])
+        cube([lidar_thk + 6, lidar_cable_w, lidar_cable_h + 4]);
 }
 
 module lidar_cradle() {
@@ -109,8 +109,8 @@ module lidar_cradle() {
         lidar_mount_hole(lidar_hole_y, lidar_bottom + lidar_side_hole_z);
         lidar_mount_hole(0, lidar_bottom + lidar_top_hole_z);
 
-        // ---------- Passage nappe / connecteur ZH1.5T (rebord +X, hors perçages) ----------
-        lidar_cable_window();
+        // ---------- Encoche connecteur ZH1.5T (bas du rebord, côté 2 oreilles) ----------
+        lidar_cable_notch();
 
         // ---------- Colliers rilsan de sécurité ----------
         for (z = [plate_lo + 8, plate_hi - 9])

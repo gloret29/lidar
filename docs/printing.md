@@ -131,5 +131,5 @@ doute, le rechauffer et recommencer — le panier contient 50 inserts.
 - [ ] L'insert 1/4"-20 est affleurant et d'équerre
 - [ ] Le berceau serre fermement sur la tige, sans jeu de rotation
 - [ ] Le rebord de centrage (**54 × 46,3 mm**) accueille le STL-19P sans forcer
-- [ ] **3** vis M2,5 traversantes (lat. **31,92 mm**, haute **42,69 mm** depuis le bas)
-- [ ] Fenêtre câble visible dans le rebord à **38,59 mm** (pas de trou central Ø14)
+- [ ] **3** vis M2,5 traversantes (2 à **6,67 mm** du bas / câble, 1 à **42,69 mm**)
+- [ ] Encoche câble ouverte **en bas** du rebord (pas de trou au milieu de la platine)
