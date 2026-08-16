@@ -2,7 +2,7 @@
 //  03 — Berceau LiDAR
 //  Serre sur la tige Ø8 et présente le STL-19P (LDROBOT) COUCHÉ SUR LA
 //  TRANCHE, plan de balayage vertical contenant l'axe de rotation.
-//  Fixation : 3 oreilles M2,5 (46,8 × 38,59 mm), câble vers le bas.
+//  Fixation : 3 oreilles M2,5 (datasheet § 5.1), câble vers le bas.
 //
 //  Repère local : z = 0 à la base du moyeu (= z 140 en global).
 //  Centre optique du LD19 en (0, 0, 65) local.
@@ -104,9 +104,12 @@ module lidar_cradle() {
         translate([0, 0, lidar_bottom + lidar_top_hole_z])
             lidar_mount_hole();
 
-        // ---------- Passage nappe (connecteur côté bas du capteur) ----------
+        // ---------- Passage nappe / connecteur ZH1.5T (côté câble) ----------
         translate([plate_back - 0.1, 0, lidar_bottom + lidar_cable_z])
-            rotate([0, 90, 0]) cylinder(d = 9, h = cradle_plate_t + 3);
+            rotate([0, 90, 0]) cylinder(d = lidar_cable_d, h = cradle_plate_t + 3);
+        // dégagement dans le rebord de centrage
+        translate([plate_x - 0.5, -lidar_cable_d / 2 - 1, lidar_bottom + lidar_cable_z - lidar_cable_d / 2])
+            cube([4, lidar_cable_d + 2, lidar_cable_d + 2]);
 
         // ---------- Colliers rilsan de sécurité ----------
         for (z = [plate_lo + 8, plate_hi - 9])

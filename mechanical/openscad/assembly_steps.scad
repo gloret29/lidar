@@ -40,6 +40,20 @@ module ghost_shaft() {
     color("#d8dce0") cylinder(d = shaft_d, h = shaft_len);
 }
 
+// Ghost des trous de fixation (validation cotes datasheet § 5.1)
+module ghost_lidar_holes() {
+    color("#e74c3c", 0.35)
+        for (y = [-1, 1])
+            translate([plate_x, y * lidar_hole_y, optical_z - lidar_h / 2 + lidar_side_hole_z])
+                rotate([0, 90, 0]) cylinder(d = lidar_screw_d, h = 8, center = true);
+    color("#e74c3c", 0.35)
+        translate([plate_x, 0, optical_z - lidar_h / 2 + lidar_top_hole_z])
+            rotate([0, 90, 0]) cylinder(d = lidar_screw_d, h = 8, center = true);
+    color("#f39c12", 0.25)
+        translate([plate_x, 0, optical_z - lidar_h / 2 + lidar_cable_z])
+            rotate([0, 90, 0]) cylinder(d = lidar_cable_d, h = 8, center = true);
+}
+
 module ghost_lidar() {
     color("#2b2f33")
         translate([plate_x, -lidar_w / 2, optical_z - lidar_h / 2])
@@ -113,6 +127,7 @@ module step08() {
     translate([0, 0, hub_z0]) {
         color("#e8a33d") lidar_cradle();
         ghost_lidar();
+        ghost_lidar_holes();
     }
 }
 

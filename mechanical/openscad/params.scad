@@ -57,17 +57,19 @@ coupler_l = 25;
 //  Câble vers le bas au montage sur le berceau.
 //  ATTENTION : lidar_optical_offset à VÉRIFIER au pied à coulisse.
 //  Voir docs/calibration.md § « Mesure du décalage optique ».
-//  Perçage : datasheet STL-19P § 5.1 (46,8 × 38,59 mm, M2,5).
+//  Perçage : datasheet STL-19P § 5.1 (cotes depuis le bord « back » = bas
+//  au montage, câble en bas). Entraxe latéral 46,8 mm ; connecteur à 38,59 mm.
 // ------------------------------------------------------------
 lidar_w = 54;                  // envergure Y (oreilles comprises)
-lidar_h = 46.29;               // hauteur Z sur la platine
-lidar_thk = 35;                // profondeur X (corps + dôme)
+lidar_h = 46.29;               // hauteur Z sur la platine (face de fixation)
+lidar_thk = 34.8;              // profondeur X (datasheet 34,80 mm)
 lidar_optical_offset = 22;     // plan de balayage / face de fixation  <-- À VÉRIFIER
-lidar_screw_d = 2.7;           // M2.5 traversant (contre-sens 4,46 × 2 sur capteur)
-lidar_hole_y = 23.4;           // demi-entraxe Y des oreilles latérales (46,8 / 2)
-lidar_side_hole_z = 7.7;       // Z oreilles lat. depuis le bas du footprint (câble en bas)
-lidar_top_hole_z = 43.29;      // Z oreille haute (46,29 − 3)
-lidar_cable_z = 8;             // passage nappe depuis le bas du footprint
+lidar_screw_d = 2.7;           // M2,5 traversant (3× Φ2,5)
+lidar_hole_y = 23.4;           // demi-entraxe Y oreilles latérales (46,8 / 2)
+lidar_side_hole_z = 31.92;     // Z oreilles lat. depuis le bas du footprint
+lidar_top_hole_z = 42.69;      // Z oreille opposée au câble (46,29 − 3,6)
+lidar_cable_z = 38.59;         // connecteur ZH1.5T (face câble) depuis le bas
+lidar_cable_d = 14;            // passage nappe + connecteur (était 9 mm, trop juste)
 
 // ------------------------------------------------------------
 //  Visserie M3
