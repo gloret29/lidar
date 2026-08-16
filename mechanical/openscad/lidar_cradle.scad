@@ -21,8 +21,8 @@ optical_local_z = optical_z - hub_z0;  // 65
 lidar_bottom = optical_local_z - lidar_h / 2;   // 45.7
 clear_z = lidar_bottom - 3;                     // 42.7 : plafond du voile
 
-web_lo = 24;
-web_hi = 40;
+web_lo = 8;            // sous le rétreint du moyeu (d=18 jusqu'à z=30)
+web_hi = 32;
 plate_lo = 32;
 plate_hi = 92;
 plate_hw = 29;      // demi-largeur platine (58 mm > envergure 54 mm)
@@ -70,12 +70,18 @@ module lidar_cradle() {
                     rotate([0, 0, -13]) translate([-40, -80, -1]) cube([80, 80, 12]);
                 }
 
-            // ---------- Deux voiles (de part et d'autre de la fente nappe) ----------
+            // ---------- Épaulement : le voile naît DANS le moyeu ----------
+            // Bloc -X qui traverse la paroi (r=9), hors fente de collier (+X).
+            translate([-11, -10, web_lo])
+                cube([13, 20, web_hi - web_lo]);  // x -11..+2 : hors fente collier
+
+            // ---------- Deux bras vers la platine (hors fente nappe Y ±8) ----------
             for (s = [-1, 1]) {
                 hull() {
-                    translate([-8, s * 6, web_lo]) cube([10, 5, web_hi - web_lo]);
-                    translate([plate_back, s * 15 - 3, plate_lo])
-                        cube([5, 6, 14]);
+                    translate([-12, s * 7 - 4, web_lo])
+                        cube([10, 8, web_hi - web_lo]);
+                    translate([plate_back, s * 16 - 5, plate_lo])
+                        cube([6, 10, 16]);
                 }
             }
 
