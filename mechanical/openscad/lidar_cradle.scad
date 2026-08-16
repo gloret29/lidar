@@ -61,36 +61,31 @@ module lidar_cradle() {
             // ---------- Oreilles de serrage ----------
             translate([5, -9, 4]) cube([14, 18, 15]);
 
-            // ---------- Secteur de butée (référence d'azimut) ----------
+            // ---------- Secteur de butée (chevauche le moyeu) ----------
             rotate([0, 0, 180])
                 difference() {
                     cylinder(d = 48, h = 10);
-                    translate([0, 0, -1]) cylinder(d = hub_d - 0.01, h = 12);
+                    translate([0, 0, -1]) cylinder(d = hub_d - 2, h = 12);
                     rotate([0, 0, 13]) translate([-40, 0, -1]) cube([80, 80, 12]);
                     rotate([0, 0, -13]) translate([-40, -80, -1]) cube([80, 80, 12]);
                 }
 
-            // ---------- Voile de liaison moyeu <-> platine ----------
-            hull() {
-                translate([-2, -web_hw, web_lo]) cube([4, 2 * web_hw, web_hi - web_lo]);
-                translate([plate_back, -web_hw, web_lo])
-                    cube([4, 2 * web_hw, web_hi - web_lo]);
+            // ---------- Deux voiles (de part et d'autre de la fente nappe) ----------
+            for (s = [-1, 1]) {
+                hull() {
+                    translate([-8, s * 6, web_lo]) cube([10, 5, web_hi - web_lo]);
+                    translate([plate_back, s * 15 - 3, plate_lo])
+                        cube([5, 6, 14]);
+                }
             }
-            // nervure centrale du voile
-            translate([plate_back, -3.5, web_lo - 6])
-                cube([abs(plate_back), 7, clear_z - web_lo + 6]);
 
             // ---------- Platine de fixation du LiDAR ----------
             translate([plate_back, -plate_hw, plate_lo])
                 cube([cradle_plate_t, 2 * plate_hw, plate_hi - plate_lo]);
 
-            // ---------- Rebord de centrage STL-19P (côté +X) ----------
-            difference() {
-                translate([plate_x, -(lidar_w / 2 + 2.5), lidar_bottom - 2.5])
-                    cube([2.5, lidar_w + 5, lidar_h + 5]);
-                translate([plate_x - 0.1, -lidar_w / 2 - 0.25, lidar_bottom - 0.25])
-                    cube([3, lidar_w + 0.5, lidar_h + 0.5]);
-            }
+            // ---------- Rebord de centrage (bloc plein, évidé plus bas) ----------
+            translate([plate_x - 1, -(lidar_w / 2 + 2.5), lidar_bottom - 2.5])
+                cube([3.5, lidar_w + 5, lidar_h + 5]);
 
             // ---------- Nervures dorsales (écartées des trous M2,5 à Y ±23,4) ----------
             for (s = [-1, 1])
@@ -112,7 +107,9 @@ module lidar_cradle() {
         translate([12, -9.01, 11.5]) rotate([-90, 0, 0])
             cylinder(d = m3_nut_af / cos(30), h = 3.2, $fn = 6);
 
-        // ---------- Fixation STL-19P : 3 oreilles M2,5 (câble vers le bas) ----------
+        // ---------- Logement STL-19P (évide le rebord, pas la platine) ----------
+        translate([plate_x, -lidar_w / 2 - 0.25, lidar_bottom - 0.25])
+            cube([5, lidar_w + 0.5, lidar_h + 0.5]);
         lidar_mount_hole(-lidar_hole_y, lidar_bottom + lidar_side_hole_z);
         lidar_mount_hole(lidar_hole_y, lidar_bottom + lidar_side_hole_z);
         lidar_mount_hole(0, lidar_bottom + lidar_top_hole_z);

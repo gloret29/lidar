@@ -24,14 +24,13 @@ module test_lidar_fit() {
         union() {
             translate([-plate_w / 2, -lidar_h / 2 - rim_t, 0])
                 cube([plate_w, plate_l, plate_t]);
-
-            difference() {
-                translate([-(lidar_w / 2 + rim_t), -(lidar_h / 2 + rim_t), plate_t])
-                    cube([lidar_w + 2 * rim_t, lidar_h + 2 * rim_t, rim_h]);
-                translate([-(lidar_w / 2 + 0.25), -(lidar_h / 2 + 0.25), plate_t - 0.1])
-                    cube([lidar_w + 0.5, lidar_h + 0.5, rim_h + 0.3]);
-            }
+            translate([-(lidar_w / 2 + rim_t), -(lidar_h / 2 + rim_t), plate_t - 1])
+                cube([lidar_w + 2 * rim_t, lidar_h + 2 * rim_t, rim_h + 1]);
         }
+
+        // Logement capteur (évide le rebord)
+        translate([-(lidar_w / 2 + 0.25), -(lidar_h / 2 + 0.25), plate_t])
+            cube([lidar_w + 0.5, lidar_h + 0.5, rim_h + 0.3]);
 
         // 2 oreilles côté câble (Y = −lidar_h/2)
         y_side = -lidar_h / 2 + lidar_side_hole_z;
