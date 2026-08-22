@@ -60,7 +60,7 @@
 #define STEP_PIN 4
 #define DIR_PIN 5
 #define EN_PIN 6
-#define TMC_TX_PIN 7   // via résistance 1 kOhm vers PDN_UART
+#define TMC_TX_PIN 7   // via résistance 1 kOhm vers PDN (TWOTREES V2.0, pas USART)
 #define TMC_RX_PIN 15
 #define TMC_DIAG_PIN 16
 #define TMC_ADDRESS 0

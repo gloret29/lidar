@@ -133,7 +133,7 @@ def signals_svg() -> str:
     body += '<text x="40" y="320" class="label">Résistance UART TMC</text>\n'
     body += """
     <rect x="40" y="330" width="420" height="70" rx="6" class="box"/>
-    <text x="50" y="352" class="small">GPIO7 (TX) ──[ 1 kΩ ]──┬── PDN_UART (TMC2209)</text>
+    <text x="50" y="352" class="small">GPIO7 (TX) ──[ 1 kΩ ]──┬── PDN (TWOTREES, pas USART)</text>
     <text x="50" y="372" class="small">GPIO15 (RX) ────────────┘</text>
     <text x="50" y="390" class="note">MS1 = MS2 = GND → adresse UART 0. EN actif à l’état bas.</text>
     """
@@ -154,9 +154,9 @@ def pinout_svg() -> str:
         ("4", "STEP", "TMC2209 STEP", "Orange"),
         ("5", "DIR", "TMC2209 DIR", "Violet"),
         ("6", "EN", "TMC2209 EN", "Gris"),
-        ("7", "TMC TX", "PDN_UART via 1 kΩ", "Brun"),
-        ("15", "TMC RX", "PDN_UART direct", "Brun"),
-        ("16", "DIAG", "TMC2209 DIAG", "Rose"),
+        ("7", "TMC TX", "PDN via 1 kΩ (pas USART)", "Brun"),
+        ("15", "TMC RX", "PDN direct", "Brun"),
+        ("16", "DIAG", "Pastille DIAG (triangle)", "Rose"),
         ("0", "BOOT", "Reset Wi‑Fi (maintenu)", "—"),
         ("GND", "Masse", "Tous les GND", "Noir"),
         ("3V3", "3,3 V", "MPU + TMC VIO", "Rouge clair"),

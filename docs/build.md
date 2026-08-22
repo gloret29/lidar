@@ -241,7 +241,7 @@ Suivre le tableau de [wiring.md](wiring.md) (GPIO S3) :
 |---|---|
 | LD19 UART RX + PWM | GPIO 18, 17 |
 | TMC STEP / DIR / EN | GPIO 4, 5, 6 |
-| TMC UART | GPIO 7, 15 (+ DIAG 16) |
+| TMC UART | GPIO 7, 15 → **PDN** (pas USART) + DIAG 16 (pastille) |
 | MPU6050 I2C | GPIO 8, 9 |
 | Wi‑Fi reset | BOOT (GPIO 0) |
 

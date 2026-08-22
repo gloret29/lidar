@@ -155,7 +155,8 @@ Câbler **hors tension**, en suivant [`wiring.md`](wiring.md).
    dissipateur, buck et trigger PD à l'opposé.
 2. Fixer par vis autotaraudeuses dans les bossages, ou par rilsan.
 3. Coller le MPU6050 **à plat au fond**, face parallèle au plateau.
-4. Souder la résistance de 1 kΩ sur la ligne TX du TMC2209.
+4. Souder la résistance de 1 kΩ sur la ligne TX vers **PDN** (pas USART).
+   Souder un fil sur la pastille **DIAG** (triangle près de RP1) vers GPIO 16.
 5. Mesurer les tensions du trigger PD (12 V) et du buck (5 V) **avant** de les
    relier aux consommateurs.
 6. Fermer le couvercle, 4 vis M3×8.

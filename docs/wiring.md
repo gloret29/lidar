@@ -86,9 +86,9 @@ Consommation totale : environ 8 à 12 W en balayage.
 | TMC STEP | 4 | Sortie | Orange | |
 | TMC DIR | 5 | Sortie | Violet | |
 | TMC EN | 6 | Sortie | Gris | Actif à l'état bas |
-| TMC UART TX | 7 | Sortie | Brun | Via résistance **1 kΩ** → PDN_UART |
-| TMC UART RX | 15 | Entrée | Brun | Directement sur PDN_UART |
-| TMC DIAG | 16 | Entrée | Rose | StallGuard |
+| TMC UART TX | 7 | Sortie | Brun | Via résistance **1 kΩ** → **PDN** (pas USART) |
+| TMC UART RX | 15 | Entrée | Brun | Directement sur **PDN** |
+| TMC DIAG | 16 | Entrée | Rose | Pastille DIAG (triangle près de RP1) |
 | BOOT | 0 | Entrée | — | Reset Wi‑Fi si maintenu au démarrage |
 | GND | — | — | Noir | Masse commune |
 | 3V3 | — | Sortie | Rouge clair | MPU + TMC VIO |
@@ -184,30 +184,59 @@ mesure l'écart une fois pour toutes.
 
 ---
 
-## 5. TMC2209 et NEMA 17
+## 5. TMC2209 TWOTREES V2.0 et NEMA 17
 
-| TMC2209 | Connexion |
+Module **TWOTREES TMC2209 V2.0** (16 broches, dissipateur au centre, **RP1**
+en bas). Orientation : sérigraphie `TWOTREES` en haut, **EN** en bas à droite.
+
+```
+        GND    DIR
+        VIO    STEP
+        M2B    CLK      ← laisser en l'air
+        M2A    USART    ← ne pas câbler (UART alternatif)
+        M1A    PDN      ← UART (usine)
+        M1B    MS2
+        GND    MS1
+         VM    EN
+              RP1  (Vref)
+         pastilles triangle : DIAG / INDEX / VREF
+```
+
+| Broche module | Connexion |
 |---|---|
 | VM | 12 V (trigger PD) |
-| GND | Masse commune |
-| VIO | 3,3 V |
+| GND (les deux) | Masse commune |
+| VIO | 3,3 V (ESP32) |
+| M1A / M1B | Bobine A du NEMA 17 |
+| M2A / M2B | Bobine B du NEMA 17 |
 | STEP | GPIO 4 |
 | DIR | GPIO 5 |
-| EN | GPIO 6 |
-| PDN_UART | GPIO 15, et GPIO 7 via 1 kΩ |
-| DIAG | GPIO 16 |
-| MS1 / MS2 | GND / GND (adresse 0) |
-| A+ A− B+ B− | Moteur NEMA 17 |
+| EN | GPIO 6 (actif bas) |
+| **PDN** | GPIO 15, et GPIO 7 via **1 kΩ** |
+| USART | NC — UART usine = **PDN** (4ᵉ broche depuis EN) |
+| CLK | NC |
+| MS1 / MS2 | GND / GND (adresse UART 0) |
+| DIAG (pastille) | GPIO 16 — StallGuard |
+| RP1 | Vref (repli si pas d'UART) |
+
+**PDN, pas USART.** Les deux existent sur ce module. L'UART usine est **PDN**
+(4ᵉ broche en partant de EN). USART est la 5ᵉ, hors service sans modifier un
+strap. Brancher GPIO 7/15 sur USART = driver muet.
+
+**DIAG** n'est pas sur le header 16 broches. Souder un fil sur la pastille
+**DIAG** du triangle près de RP1 (les deux autres = INDEX et VREF). Sans ce
+fil, le homing StallGuard du firmware ne voit jamais la butée.
 
 ### Liaison UART à un fil
 
 ```
-   ESP32 TX (GPIO 7) ──[ 1 kΩ ]──┬── PDN_UART (TMC2209)
+   ESP32 TX (GPIO 7) ──[ 1 kΩ ]──┬── PDN  (TWOTREES TMC2209 V2.0)
                                  │
    ESP32 RX (GPIO 15) ───────────┘
 ```
 
-La résistance évite le conflit lorsque le driver répond. Sans cette liaison, il
+La résistance évite le conflit lorsque le driver répond. L'UART ne répond
+que si **VM (12 V) et VIO (3,3 V)** sont présents. Sans cette liaison, il
 faudrait régler le courant au potentiomètre et renoncer à StallGuard.
 
 L'UART apporte :
@@ -243,7 +272,8 @@ $$V_{\text{ref}} \approx 1{,}25 \times I_{\text{RMS}} \approx 0{,}88\ \text{V}$$
 4. Brancher **3,3 V** sur MPU6050 et TMC VIO.  
 5. Signaux LD19 (TX→18, PWM←17).  
 6. I2C MPU (8/9).  
-7. TMC STEP/DIR/EN/DIAG + UART avec 1 kΩ.  
+7. TMC STEP/DIR/EN + UART sur **PDN** (1 kΩ) + DIAG (pastille).  
+   Ne pas câbler USART ni CLK.  
 8. **12 V** sur TMC VM.  
 9. Phases moteur en dernier (ou après un premier boot sans moteur).
 

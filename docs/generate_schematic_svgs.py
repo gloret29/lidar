@@ -236,7 +236,7 @@ def signals_schematic() -> str:
 
     # TMC2209 (right)
     body += ic_block(620, 80, 120, 200, "U3", "TMC2209", [],
-                     ["STEP", "DIR", "EN", "PDN_UART", "DIAG", "MS1", "MS2", "VM", "VIO", "GND"])
+                     ["STEP", "DIR", "EN", "PDN", "DIAG", "MS1", "MS2", "VM", "VIO", "GND"])
     step_y = pin_y_left(4)
     dir_y = pin_y_left(5)
     en_y = pin_y_left(6)
@@ -276,8 +276,8 @@ def signals_schematic() -> str:
     body += motor(760, 360, "M1", "NEMA 17")
     body += line(740, 168, 760, 338)
     body += line(740, 188, 748, 338)
-    body += text(700, 250, "A+/A−", "small", "middle")
-    body += text(700, 270, "B+/B−", "small", "middle")
+    body += text(700, 250, "M1A/M1B", "small", "middle")
+    body += text(700, 270, "M2A/M2B", "small", "middle")
 
     # GND common note
     body += line(620, 260, 620, 400)
