@@ -36,13 +36,19 @@ uint32_t intervalFor(float deg_per_s) {
     return static_cast<uint32_t>(1e6f / steps_per_s);
 }
 
+// TMC2209 : DIAG serait actif si SG_RESULT ≤ 2 × SGTHRS. Même critère en UART.
+bool stallViaUart() {
+    const uint32_t sg = driver.SG_RESULT();
+    if (sg > 1023) return false;
+    return sg <= static_cast<uint32_t>(sg_threshold) * 2;
+}
+
 }  // namespace
 
 void scannerInit() {
     pinMode(STEP_PIN, OUTPUT);
     pinMode(DIR_PIN, OUTPUT);
     pinMode(EN_PIN, OUTPUT);
-    pinMode(TMC_DIAG_PIN, INPUT);
     digitalWrite(EN_PIN, HIGH);
 
     tmc_serial.begin(115200, SERIAL_8N1, TMC_RX_PIN, TMC_TX_PIN);
@@ -80,6 +86,12 @@ bool scannerHome() {
     stop_requested = false;
     state = ScanState::Homing;
     digitalWrite(EN_PIN, LOW);
+    if (!scannerTmcOk()) {
+        state = ScanState::Fault;
+        homed_ok = false;
+        Serial.println("[scanner] ÉCHEC du homing : TMC2209 absent (UART PDN)");
+        return false;
+    }
     driver.rms_current(i_home_ma);
     driver.SGTHRS(sg_threshold);
 
@@ -97,7 +109,7 @@ bool scannerHome() {
         }
         pulse();
         delayMicroseconds(interval);
-        if (i > settle && digitalRead(TMC_DIAG_PIN) == HIGH) {
+        if (i > settle && (i % 4) == 0 && stallViaUart()) {
             delay(50);
             digitalWrite(DIR_PIN, HIGH);
             for (int32_t k = 0; k < static_cast<int32_t>(STEPS_PER_DEGREE * 2); k++) {

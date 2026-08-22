@@ -26,7 +26,7 @@ void scannerApplySettings(const ScanSettings& s);
 /// Réactive le driver après un arrêt d'urgence.
 void scannerEnable();
 
-/// Prise de référence par StallGuard contre la butée mécanique.
+/// Prise de référence StallGuard via UART (SG_RESULT), sans broche DIAG.
 bool scannerHome();
 
 /// Démarre un balayage continu selon les réglages courants.

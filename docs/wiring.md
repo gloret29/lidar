@@ -26,7 +26,7 @@ Figures vectorielles dans [`wiring/`](wiring/) :
 |---|---|---|
 | Ensemble | [wiring/01_ensemble.svg](wiring/01_ensemble.svg) | Tête / boîtier / énergie / hôte |
 | Alimentation | [wiring/02_alimentation.svg](wiring/02_alimentation.svg) | 12 V, 5 V, 3,3 V, masse |
-| Signaux | [wiring/03_signaux.svg](wiring/03_signaux.svg) | UART, I2C, STEP/DIR/EN, DIAG |
+| Signaux | [wiring/03_signaux.svg](wiring/03_signaux.svg) | UART, I2C, STEP/DIR/EN |
 | Brochage | [wiring/04_brochage.svg](wiring/04_brochage.svg) | Table GPIO fil par fil |
 
 ![Ensemble](wiring/01_ensemble.svg)
@@ -88,7 +88,6 @@ Consommation totale : environ 8 à 12 W en balayage.
 | TMC EN | 6 | Sortie | Gris | Actif à l'état bas |
 | TMC UART TX | 7 | Sortie | Brun | Via résistance **1 kΩ** → **PDN** (pas USART) |
 | TMC UART RX | 15 | Entrée | Brun | Directement sur **PDN** |
-| TMC DIAG | 16 | Entrée | Rose | Pastille DIAG (triangle près de RP1) |
 | BOOT | 0 | Entrée | — | Reset Wi‑Fi si maintenu au démarrage |
 | GND | — | — | Noir | Masse commune |
 | 3V3 | — | Sortie | Rouge clair | MPU + TMC VIO |
@@ -112,7 +111,6 @@ flowchart TB
     G6[GPIO6 EN]
     G7[GPIO7 TX]
     G15[GPIO15 RX]
-    G16[GPIO16 DIAG]
   end
   LD19["LD19"] --> G18
   G17 --> LD19
@@ -123,7 +121,6 @@ flowchart TB
   G6 --> TMC
   G7 -->|1 kΩ| TMC
   G15 --- TMC
-  TMC --> G16
   TMC --> MOT["NEMA 17"]
 ```
 
@@ -201,7 +198,7 @@ en bas). Orientation : sérigraphie `TWOTREES` en haut, **EN** en bas à droite.
         GND    MS1
          VM    EN
               RP1  (Vref)
-         pastilles triangle : DIAG / INDEX / VREF
+         triangle DIAG/INDEX/VREF : NC
 ```
 
 | Broche module | Connexion |
@@ -220,16 +217,15 @@ en bas). Orientation : sérigraphie `TWOTREES` en haut, **EN** en bas à droite.
 | USART | NC — UART usine = **PDN** (4ᵉ broche depuis EN) |
 | CLK | NC |
 | MS1 / MS2 | GND / GND (adresse UART 0) |
-| DIAG (pastille) | GPIO 16 — StallGuard |
+| DIAG | NC — homing via UART (`SG_RESULT`) |
 | RP1 | Vref (repli si pas d'UART) |
 
 **PDN, pas USART.** Les deux existent sur ce module. L'UART usine est **PDN**
 (4ᵉ broche en partant de EN). USART est la 5ᵉ, hors service sans modifier un
 strap. Brancher GPIO 7/15 sur USART = driver muet.
 
-**DIAG** n'est pas sur le header 16 broches. Souder un fil sur la pastille
-**DIAG** du triangle près de RP1 (les deux autres = INDEX et VREF). Sans ce
-fil, le homing StallGuard du firmware ne voit jamais la butée.
+**DIAG** n'est pas utilisé. Le homing StallGuard lit `SG_RESULT` sur l'UART
+(PDN). Les 3 trous près de RP1 restent en l'air.
 
 ### Câble NEMA 17 (4 fils, UL1007 AWG26)
 
@@ -291,8 +287,8 @@ $$V_{\text{ref}} \approx 1{,}25 \times I_{\text{RMS}} \approx 0{,}88\ \text{V}$$
 4. Brancher **3,3 V** sur MPU6050 et TMC VIO.  
 5. Signaux LD19 (TX blanc → GPIO 18, PWM noir ← GPIO 17).  
 6. I2C MPU (8/9).  
-7. TMC STEP/DIR/EN + UART sur **PDN** (1 kΩ) + DIAG (pastille).  
-   Ne pas câbler USART ni CLK.  
+7. TMC STEP/DIR/EN + UART sur **PDN** (1 kΩ).  
+   Ne pas câbler USART, CLK ni DIAG.  
 8. **12 V** sur TMC VM.  
 9. Phases moteur en dernier (ou après un premier boot sans moteur).
 

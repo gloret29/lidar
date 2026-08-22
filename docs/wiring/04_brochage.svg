@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="680" height="516" viewBox="0 0 680 516">
+<svg xmlns="http://www.w3.org/2000/svg" width="680" height="488" viewBox="0 0 680 488">
   <title>Brochage ESP32-S3</title>
-  <rect width="680" height="516" fill="#f7f7f5"/>
+  <rect width="680" height="488" fill="#f7f7f5"/>
   <style>
     .box { fill:#fff; stroke:#222; stroke-width:1.5; }
     .box-pwr { fill:#fff8f0; stroke:#8b4513; stroke-width:1.5; }
@@ -72,30 +72,25 @@
 <text x="288" y="320" class="small">PDN direct</text>
 <text x="488" y="320" class="small">Brun</text>
 <rect x="40" y="330" width="600" height="28" fill="#f3f3ef" stroke="#ccc"/>
-<text x="48" y="348" class="small">16</text>
-<text x="128" y="348" class="small">DIAG</text>
-<text x="288" y="348" class="small">Pastille DIAG (triangle)</text>
-<text x="488" y="348" class="small">Rose</text>
+<text x="48" y="348" class="small">0</text>
+<text x="128" y="348" class="small">BOOT</text>
+<text x="288" y="348" class="small">Reset Wi‑Fi (maintenu)</text>
+<text x="488" y="348" class="small">—</text>
 <rect x="40" y="358" width="600" height="28" fill="#fff" stroke="#ccc"/>
-<text x="48" y="376" class="small">0</text>
-<text x="128" y="376" class="small">BOOT</text>
-<text x="288" y="376" class="small">Reset Wi‑Fi (maintenu)</text>
-<text x="488" y="376" class="small">—</text>
+<text x="48" y="376" class="small">GND</text>
+<text x="128" y="376" class="small">Masse</text>
+<text x="288" y="376" class="small">Tous les GND</text>
+<text x="488" y="376" class="small">Noir</text>
 <rect x="40" y="386" width="600" height="28" fill="#f3f3ef" stroke="#ccc"/>
-<text x="48" y="404" class="small">GND</text>
-<text x="128" y="404" class="small">Masse</text>
-<text x="288" y="404" class="small">Tous les GND</text>
-<text x="488" y="404" class="small">Noir</text>
+<text x="48" y="404" class="small">3V3</text>
+<text x="128" y="404" class="small">3,3 V</text>
+<text x="288" y="404" class="small">MPU + TMC VIO</text>
+<text x="488" y="404" class="small">Rouge clair</text>
 <rect x="40" y="414" width="600" height="28" fill="#fff" stroke="#ccc"/>
-<text x="48" y="432" class="small">3V3</text>
-<text x="128" y="432" class="small">3,3 V</text>
-<text x="288" y="432" class="small">MPU + TMC VIO</text>
-<text x="488" y="432" class="small">Rouge clair</text>
-<rect x="40" y="442" width="600" height="28" fill="#f3f3ef" stroke="#ccc"/>
-<text x="48" y="460" class="small">5V</text>
-<text x="128" y="460" class="small">5 V VIN</text>
-<text x="288" y="460" class="small">Depuis buck</text>
-<text x="488" y="460" class="small">Rouge</text>
-<text x="40" y="500" class="note">Alimentations LD19 5 V et TMC VM 12 V viennent du buck / trigger, pas des pins ESP32.</text>
+<text x="48" y="432" class="small">5V</text>
+<text x="128" y="432" class="small">5 V VIN</text>
+<text x="288" y="432" class="small">Depuis buck</text>
+<text x="488" y="432" class="small">Rouge</text>
+<text x="40" y="472" class="note">Alimentations LD19 5 V et TMC VM 12 V viennent du buck / trigger, pas des pins ESP32.</text>
 
 </svg>

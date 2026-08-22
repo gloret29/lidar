@@ -118,7 +118,7 @@ def mcu_esp32(x, y) -> str:
     w, h = 120, 420
     left = ["3V3", "GND", "5V/VIN", "GPIO0 BOOT", "GPIO4 STEP", "GPIO5 DIR",
             "GPIO6 EN", "GPIO7 TMC TX", "GPIO8 SDA", "GPIO9 SCL"]
-    right = ["GPIO15 TMC RX", "GPIO16 DIAG", "GPIO17 PWM", "GPIO18 RX",
+    right = ["GPIO15 TMC RX", "GPIO16 NC", "GPIO17 PWM", "GPIO18 RX",
              "GND", "3V3", "5V/VIN", "NC", "NC", "NC"]
     t = ic_block(x, y, w, h, "U1", "ESP32-S3 DevKitC-1", left, right)
     t += text(x + w / 2, y + h - 18, "N16R8", "note", "middle")
@@ -236,13 +236,12 @@ def signals_schematic() -> str:
 
     # TMC2209 (right)
     body += ic_block(620, 80, 120, 200, "U3", "TMC2209", [],
-                     ["STEP", "DIR", "EN", "PDN", "DIAG", "MS1", "MS2", "VM", "VIO", "GND"])
+                     ["STEP", "DIR", "EN", "PDN", "MS1", "MS2", "VM", "VIO", "GND"])
     step_y = pin_y_left(4)
     dir_y = pin_y_left(5)
     en_y = pin_y_left(6)
     tx_y_mcu = pin_y_left(7)
     rx_y = pin_y_right(0)
-    diag_y = pin_y_right(1)
     body += line(mcu_x + 120 + 24, step_y, 620, 108)
     body += text(520, step_y - 6, "GPIO4", "small", "middle")
     body += line(mcu_x + 120 + 24, dir_y, 620, 128)
@@ -261,15 +260,12 @@ def signals_schematic() -> str:
     body += text(545, tx_y_mcu + 22, "GPIO7 TX", "small", "middle")
     body += text(545, rx_y - 8, "GPIO15 RX", "small", "middle")
 
-    body += line(mcu_x + 120 + 24, diag_y, 620, 188)
-    body += text(520, diag_y - 6, "GPIO16", "small", "middle")
-
     # MS1 MS2 to GND
-    body += line(620, 208, 590, 208)
-    body += line(590, 208, 590, 240)
+    body += line(620, 188, 590, 188)
+    body += line(590, 188, 590, 240)
     body += ground(590, 240)
-    body += line(620, 228, 575, 228)
-    body += line(575, 228, 575, 240)
+    body += line(620, 208, 575, 208)
+    body += line(575, 208, 575, 240)
     body += text(555, 252, "MS1=MS2=GND", "note", "middle")
 
     # Motor
@@ -301,7 +297,7 @@ def full_schematic() -> str:
     body += ic_block(40, 200, 100, 70, "U5", "MPU6050", ["SDA", "SCL", "3V3", "GND"], [])
 
     # Right column: driver + motor
-    body += ic_block(620, 100, 110, 130, "U3", "TMC2209", ["VM 12V", "VIO 3V3", "GND"], ["STEP", "DIR", "EN", "UART", "DIAG"])
+    body += ic_block(620, 100, 110, 130, "U3", "TMC2209", ["VM 12V", "VIO 3V3", "GND"], ["STEP", "DIR", "EN", "UART"])
     body += motor(760, 300, "M1", "NEMA 17")
 
     # Power (top)

@@ -137,7 +137,7 @@ scanner.
 | Géométrie et mathématiques | Validées, 38 tests automatisés |
 | Pièces 3D | 6 pièces paramétriques, rendues et vérifiées |
 | Documentation de construction | Complète |
-| Firmware | **0.4.3** — amorce OTA et scanner flashés ; Wi‑Fi, panneau web, MPU6050 et OTA validés sur ESP32 ; LiDAR / moteur en attente de câblage complet |
+| Firmware | **0.4.5** — homing StallGuard par UART (sans DIAG) ; LiDAR / moteur en attente de câblage UART |
 | Station hôte | Protocole, transform, Open3D, simulateur UDP, tests |
 | Calibration | Procédures écrites ; `g_zero` relevable depuis le panneau web |
 

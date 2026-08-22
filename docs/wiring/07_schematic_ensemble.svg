@@ -41,7 +41,7 @@
 <path d="M440,108.0 L464,108.0" class="wire"/>
 <text x="468" y="112.0" text-anchor="start" class="pin">GPIO15 TMC RX</text>
 <path d="M440,145.0 L464,145.0" class="wire"/>
-<text x="468" y="149.0" text-anchor="start" class="pin">GPIO16 DIAG</text>
+<text x="468" y="149.0" text-anchor="start" class="pin">GPIO16 NC</text>
 <path d="M440,182.0 L464,182.0" class="wire"/>
 <text x="468" y="186.0" text-anchor="start" class="pin">GPIO17 PWM</text>
 <path d="M440,219.0 L464,219.0" class="wire"/>
@@ -92,14 +92,12 @@
 <text x="592" y="205.33333333333334" text-anchor="end" class="pin">GND</text>
 <path d="M730,148.0 L754,148.0" class="wire"/>
 <text x="758" y="152.0" text-anchor="start" class="pin">STEP</text>
-<path d="M730,164.0 L754,164.0" class="wire"/>
-<text x="758" y="168.0" text-anchor="start" class="pin">DIR</text>
-<path d="M730,180.0 L754,180.0" class="wire"/>
-<text x="758" y="184.0" text-anchor="start" class="pin">EN</text>
-<path d="M730,196.0 L754,196.0" class="wire"/>
-<text x="758" y="200.0" text-anchor="start" class="pin">UART</text>
-<path d="M730,212.0 L754,212.0" class="wire"/>
-<text x="758" y="216.0" text-anchor="start" class="pin">DIAG</text>
+<path d="M730,168.0 L754,168.0" class="wire"/>
+<text x="758" y="172.0" text-anchor="start" class="pin">DIR</text>
+<path d="M730,188.0 L754,188.0" class="wire"/>
+<text x="758" y="192.0" text-anchor="start" class="pin">EN</text>
+<path d="M730,208.0 L754,208.0" class="wire"/>
+<text x="758" y="212.0" text-anchor="start" class="pin">UART</text>
 <circle cx="760" cy="300" r="22" class="sym-fill"/>
 <text x="760" y="305" text-anchor="middle" class="label">M</text>
 <text x="732" y="272" text-anchor="start" class="ref">M1</text>

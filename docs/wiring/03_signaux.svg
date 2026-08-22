@@ -36,7 +36,7 @@
 <rect x="640" y="80" width="180" height="90" rx="6" class="box-mot"/>
 <text x="730.0" y="98" text-anchor="middle" class="label">TMC2209</text>
 <text x="730.0" y="113" text-anchor="middle" class="small">STEP/DIR/EN</text>
-<text x="730.0" y="128" text-anchor="middle" class="small">UART + DIAG</text>
+<text x="730.0" y="128" text-anchor="middle" class="small">UART StallGuard</text>
 <rect x="640" y="230" width="180" height="60" rx="6" class="box-mot"/>
 <text x="730.0" y="248" text-anchor="middle" class="label">NEMA 17</text>
 <text x="730.0" y="263" text-anchor="middle" class="small">N/B = A  V/R = B</text>
@@ -56,8 +56,6 @@
 <text x="585" y="175" text-anchor="middle" class="note">EN 6</text>
 <path d="M520,215 L640,155" class="sig2"/>
 <text x="560" y="200" text-anchor="middle" class="note">UART 7/15</text>
-<path d="M520,225 L640,170" class="sig"/>
-<text x="575" y="220" text-anchor="middle" class="note">DIAG 16</text>
 <path d="M730,170 L730,230" class="v12"/>
 <text x="750" y="200" text-anchor="middle" class="note">phases</text>
 <text x="40" y="320" class="label">Résistance UART TMC</text>

@@ -112,7 +112,7 @@ def signals_svg() -> str:
 
     body += rect(40, 60, 160, 70, "box-sen", ["LD19 (tête)", "UART 230400", "PWM 30 kHz"])
     body += rect(40, 200, 160, 70, "box-sen", ["MPU6050", "I2C 0x68", "base fixe"])
-    body += rect(640, 80, 180, 90, "box-mot", ["TMC2209", "STEP/DIR/EN", "UART + DIAG"])
+    body += rect(640, 80, 180, 90, "box-mot", ["TMC2209", "STEP/DIR/EN", "UART StallGuard"])
     body += rect(640, 230, 180, 60, "box-mot", ["NEMA 17", "N/B = A  V/R = B"])
 
     # LD19
@@ -126,7 +126,6 @@ def signals_svg() -> str:
     body += polyline([(520, 195), (640, 125)], "sig2", "DIR 5", 580, 155)
     body += polyline([(520, 205), (640, 140)], "sig", "EN 6", 585, 175)
     body += polyline([(520, 215), (640, 155)], "sig2", "UART 7/15", 560, 200)
-    body += polyline([(520, 225), (640, 170)], "sig", "DIAG 16", 575, 220)
     # Motor
     body += polyline([(730, 170), (730, 230)], "v12", "phases", 750, 200)
 
@@ -156,7 +155,6 @@ def pinout_svg() -> str:
         ("6", "EN", "TMC2209 EN", "Gris"),
         ("7", "TMC TX", "PDN via 1 kΩ (pas USART)", "Brun"),
         ("15", "TMC RX", "PDN direct", "Brun"),
-        ("16", "DIAG", "Pastille DIAG (triangle)", "Rose"),
         ("0", "BOOT", "Reset Wi‑Fi (maintenu)", "—"),
         ("GND", "Masse", "Tous les GND", "Noir"),
         ("3V3", "3,3 V", "MPU + TMC VIO", "Rouge clair"),

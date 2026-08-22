@@ -134,8 +134,7 @@ vitesse). La calibration géométrique reste sur l'hôte.
 
 ## État
 
-Firmware **0.4.4** — compilé, flashé par OTA sur le prototype ESP32 ; le LiDAR,
-le TMC2209 et le MPU6050 restent à valider une fois le câblage complet.
+Firmware **0.4.5** — homing StallGuard par UART (`SG_RESULT`), sans broche DIAG.
 
 | Fonction | Code | Validation matérielle |
 |---|---|---|
