@@ -39,7 +39,7 @@
 <text x="730.0" y="128" text-anchor="middle" class="small">UART + DIAG</text>
 <rect x="640" y="230" width="180" height="60" rx="6" class="box-mot"/>
 <text x="730.0" y="248" text-anchor="middle" class="label">NEMA 17</text>
-<text x="730.0" y="263" text-anchor="middle" class="small">A+/A− B+/B−</text>
+<text x="730.0" y="263" text-anchor="middle" class="small">N/B = A  V/R = B</text>
 <path d="M200,80 L340,180" class="sig"/>
 <text x="250" y="110" text-anchor="middle" class="note">TX → GPIO18</text>
 <path d="M200,100 L340,195" class="sig2"/>

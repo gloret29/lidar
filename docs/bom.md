@@ -87,7 +87,8 @@ vitres et miroirs.
 17 **4 fils** piloté en STEP/DIR par TMC2209. Un moteur brushless BLDC (ex.
 42BL3802-23A) est **incompatible** — à remplacer avant tout montage électrique.
 Modèles courants : Creality 42-40, STEPPERONLINE 17HE15, ou tout 17HS4401
-équivalent.
+équivalent. Câble 4 fils : **noir A+**, **bleu A−**, **vert B+**, **rouge B−**
+(voir [wiring.md](wiring.md) § 5).
 
 **Trigger PD.** Vérifier que le module retenu délivre bien 12 V et non
 seulement 5/9 V. Les modules à DIP switch sont les plus souples.

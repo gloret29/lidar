@@ -162,8 +162,8 @@
 <text x="760" y="398" text-anchor="middle" class="small">NEMA 17</text>
 <path d="M740,168 L760,338" class="wire"/>
 <path d="M740,188 L748,338" class="wire"/>
-<text x="700" y="250" text-anchor="middle" class="small">M1A/M1B</text>
-<text x="700" y="270" text-anchor="middle" class="small">M2A/M2B</text>
+<text x="700" y="250" text-anchor="middle" class="small">M1A/M1B N/B</text>
+<text x="700" y="270" text-anchor="middle" class="small">M2A/M2B V/R</text>
 <path d="M620,260 L620,400" class="wire"/>
 <path d="M620,400 L80,400" class="wire"/>
 <path d="M80,400 L80,410" class="wire"/>

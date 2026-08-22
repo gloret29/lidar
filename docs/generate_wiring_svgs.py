@@ -113,7 +113,7 @@ def signals_svg() -> str:
     body += rect(40, 60, 160, 70, "box-sen", ["LD19 (tête)", "UART 230400", "PWM 30 kHz"])
     body += rect(40, 200, 160, 70, "box-sen", ["MPU6050", "I2C 0x68", "base fixe"])
     body += rect(640, 80, 180, 90, "box-mot", ["TMC2209", "STEP/DIR/EN", "UART + DIAG"])
-    body += rect(640, 230, 180, 60, "box-mot", ["NEMA 17", "A+/A− B+/B−"])
+    body += rect(640, 230, 180, 60, "box-mot", ["NEMA 17", "N/B = A  V/R = B"])
 
     # LD19
     body += polyline([(200, 80), (340, 180)], "sig", "TX → GPIO18", 250, 110)

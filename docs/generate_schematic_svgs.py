@@ -276,8 +276,8 @@ def signals_schematic() -> str:
     body += motor(760, 360, "M1", "NEMA 17")
     body += line(740, 168, 760, 338)
     body += line(740, 188, 748, 338)
-    body += text(700, 250, "M1A/M1B", "small", "middle")
-    body += text(700, 270, "M2A/M2B", "small", "middle")
+    body += text(700, 250, "M1A/M1B N/B", "small", "middle")
+    body += text(700, 270, "M2A/M2B V/R", "small", "middle")
 
     # GND common note
     body += line(620, 260, 620, 400)

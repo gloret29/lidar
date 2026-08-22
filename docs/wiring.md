@@ -207,8 +207,10 @@ en bas). Orientation : sérigraphie `TWOTREES` en haut, **EN** en bas à droite.
 | VM | 12 V (trigger PD) |
 | GND (les deux) | Masse commune |
 | VIO | 3,3 V (ESP32) |
-| M1A / M1B | Bobine A du NEMA 17 |
-| M2A / M2B | Bobine B du NEMA 17 |
+| M1A | **A+** noir (BLK) |
+| M1B | **A−** bleu (BLU) |
+| M2A | **B+** vert (GRN) |
+| M2B | **B−** rouge (RED) |
 | STEP | GPIO 4 |
 | DIR | GPIO 5 |
 | EN | GPIO 6 (actif bas) |
@@ -226,6 +228,21 @@ strap. Brancher GPIO 7/15 sur USART = driver muet.
 **DIAG** n'est pas sur le header 16 broches. Souder un fil sur la pastille
 **DIAG** du triangle près de RP1 (les deux autres = INDEX et VREF). Sans ce
 fil, le homing StallGuard du firmware ne voit jamais la butée.
+
+### Câble NEMA 17 (4 fils, UL1007 AWG26)
+
+Côté moteur **PHR-6** (broches 2 et 5 vides) ; côté libre 4 fils (ou M20-4).
+
+| Couleur | Signal | PHR-6 | TMC2209 |
+|---|---|---|---|
+| Noir | A+ | 1 | **M1A** |
+| Vert | B+ | 3 | **M2A** |
+| Bleu | A− | 4 | **M1B** |
+| Rouge | B− | 6 | **M2B** |
+
+Une bobine = une paire : noir+bleu (A), vert+rouge (B). Ne pas mélanger les
+paires. Si le sens de rotation est inversé au premier essai, inverser **une**
+paire (ex. M1A ↔ M1B) ou inverser DIR dans le firmware — pas les deux.
 
 ### Liaison UART à un fil
 
