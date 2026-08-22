@@ -35,7 +35,7 @@
 <text x="340.0" y="193" text-anchor="middle" class="small">12 V → 5 V / 3 A</text>
 <rect x="480" y="140" width="150" height="50" rx="6" class="box-sen"/>
 <text x="555.0" y="158" text-anchor="middle" class="label">LD19</text>
-<text x="555.0" y="173" text-anchor="middle" class="small">VCC 5 V</text>
+<text x="555.0" y="173" text-anchor="middle" class="small">P5V vert</text>
 <rect x="480" y="210" width="150" height="50" rx="6" class="box-mcu"/>
 <text x="555.0" y="228" text-anchor="middle" class="label">ESP32-S3</text>
 <text x="555.0" y="243" text-anchor="middle" class="small">5V / VIN</text>

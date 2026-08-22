@@ -67,7 +67,7 @@ def power_svg() -> str:
     body += rect(260, 50, 160, 56, "box-pwr", ["Trigger PD", "→ 12 V DC"])
     body += rect(480, 50, 150, 56, "box-mot", ["TMC2209", "VM = 12 V"])
     body += rect(260, 160, 160, 56, "box-pwr", ["Buck", "12 V → 5 V / 3 A"])
-    body += rect(480, 140, 150, 50, "box-sen", ["LD19", "VCC 5 V"])
+    body += rect(480, 140, 150, 50, "box-sen", ["LD19", "P5V vert"])
     body += rect(480, 210, 150, 50, "box-mcu", ["ESP32-S3", "5V / VIN"])
     body += rect(700, 210, 140, 50, "box-sen", ["MPU6050", "3,3 V"])
     body += rect(700, 140, 140, 50, "box-mot", ["TMC2209", "VIO 3,3 V"])
@@ -147,8 +147,8 @@ def pinout_svg() -> str:
     """Tableau visuel broche par broche."""
     rows = [
         ("GPIO", "Fonction", "Vers", "Fil conseillé"),
-        ("18", "LD19 RX", "TX du LD19", "Jaune"),
-        ("17", "LD19 PWM", "PWM du LD19", "Blanc"),
+        ("18", "LD19 RX", "TX STL-19P (blanc)", "Blanc"),
+        ("17", "LD19 PWM", "PWM STL-19P (noir)", "Noir"),
         ("8", "I2C SDA", "MPU6050 SDA", "Bleu"),
         ("9", "I2C SCL", "MPU6050 SCL", "Vert"),
         ("4", "STEP", "TMC2209 STEP", "Orange"),

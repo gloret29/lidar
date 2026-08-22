@@ -149,7 +149,7 @@ def power_schematic() -> str:
     body += line(235, 238, 235, rail_5)
     body += dot(235, rail_5)
 
-    body += ic_block(560, 170, 90, 50, "LD1", "LD19", ["VCC 5 V"], ["GND"])
+    body += ic_block(560, 170, 90, 50, "LD1", "LD19", ["P5V vert"], ["GND jaune"])
     body += line(536, 218, 560, 218)
     body += line(536, 218, 536, rail_5)
     body += dot(536, rail_5)
@@ -204,7 +204,7 @@ def signals_schematic() -> str:
         return mcu_y + 48 + idx * (370 / 9)
 
     # LD19 (top left)
-    body += ic_block(40, 40, 90, 90, "LD1", "LD19 LiDAR", ["TX", "PWM in", "VCC", "GND"], [])
+    body += ic_block(40, 40, 90, 90, "LD1", "LD19 LiDAR", ["TX blanc", "PWM noir", "P5V vert", "GND jaune"], [])
     body += text(85, 150, "tête tournante", "note", "middle")
     tx_y = pin_y_right(3)  # GPIO18 RX
     pwm_y = pin_y_right(2)  # GPIO17 PWM
@@ -297,7 +297,7 @@ def full_schematic() -> str:
     body += mcu_esp32(320, 60)
 
     # Left column: sensors
-    body += ic_block(40, 80, 100, 70, "LD1", "LD19", ["TX", "PWM", "5V", "GND"], [])
+    body += ic_block(40, 80, 100, 70, "LD1", "LD19", ["TX blanc", "PWM noir", "P5V vert", "GND jaune"], [])
     body += ic_block(40, 200, 100, 70, "U5", "MPU6050", ["SDA", "SCL", "3V3", "GND"], [])
 
     # Right column: driver + motor

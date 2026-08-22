@@ -65,9 +65,9 @@
 <text x="605.0" y="186" text-anchor="middle" class="ref">LD1</text>
 <text x="605.0" y="202" text-anchor="middle" class="label">LD19</text>
 <path d="M536,218.0 L560,218.0" class="wire"/>
-<text x="532" y="222.0" text-anchor="end" class="pin">VCC 5 V</text>
+<text x="532" y="222.0" text-anchor="end" class="pin">P5V vert</text>
 <path d="M650,218.0 L674,218.0" class="wire"/>
-<text x="678" y="222.0" text-anchor="start" class="pin">GND</text>
+<text x="678" y="222.0" text-anchor="start" class="pin">GND jaune</text>
 <path d="M536,218 L560,218" class="wire"/>
 <path d="M536,218 L536,220" class="wire"/>
 <circle cx="536" cy="220" r="2.8" fill="#111"/>

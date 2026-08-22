@@ -46,7 +46,7 @@ flowchart LR
   PB["Power bank<br/>USB-C PD 100 W"] --> TR["Trigger PD<br/>12 V"]
   TR --> TMCV["TMC2209 VM"]
   TR --> BUCK["Buck<br/>12 V → 5 V 3 A"]
-  BUCK --> LD["LD19 VCC 5 V"]
+  BUCK --> LD["LD19 P5V 5 V"]
   BUCK --> ESP["ESP32-S3 5V/VIN"]
   ESP --> MPU["MPU6050 3,3 V"]
   ESP --> VIO["TMC2209 VIO 3,3 V"]
@@ -60,7 +60,7 @@ flowchart LR
             ├──────────────────────► TMC2209  VM
             │
             └──► Buck 12 V → 5 V 3 A
-                       ├────────────► LD19        VCC (5 V, 180 mA)
+                       ├────────────► LD19        P5V (5 V, vert)
                        └────────────► ESP32-S3    5V / VIN
                                           │
                                           └──3,3 V──► MPU6050
@@ -79,8 +79,8 @@ Consommation totale : environ 8 à 12 W en balayage.
 
 | Fonction | GPIO | Sens | Fil conseillé | Remarques |
 |---|---|---|---|---|
-| LiDAR UART RX | 18 | Entrée | Jaune | Reçoit le TX du LD19 |
-| LiDAR PWM | 17 | Sortie | Blanc | 30 kHz, vitesse de rotation |
+| LiDAR UART RX | 18 | Entrée | Blanc | TX du STL-19P |
+| LiDAR PWM | 17 | Sortie | Noir | PWM du STL-19P |
 | I2C SDA | 8 | E/S | Bleu | MPU6050 |
 | I2C SCL | 9 | Sortie | Vert | MPU6050 |
 | TMC STEP | 4 | Sortie | Orange | |
@@ -133,12 +133,14 @@ flowchart TB
 
 Connecteur JST 4 points côté capteur. Brochage identique à la famille LD19.
 
-| LD19 | Vers | Fil (typique) |
+| STL-19P (ZH1.5T) | Vers | Fil **de cet exemplaire** |
 |---|---|---|
-| VCC (5 V) | Sortie buck 5 V | Rouge |
-| GND | Masse commune | Noir |
-| TX | GPIO 18 | Jaune / vert |
-| PWM | GPIO 17 | Blanc |
+| **P5V** | Sortie buck 5 V | **Vert** |
+| **GND** | Masse commune | **Jaune** |
+| **TX** | GPIO 18 | **Blanc** |
+| **PWM** | GPIO 17 | **Noir** |
+
+Le **jaune est la masse**, pas le 5 V. Le **noir est le PWM**, pas la masse.
 
 Le LD19 communique en **UART 230 400 bauds, 8N1**, niveaux 3,3 V, compatibles
 directement avec l'ESP32-S3. La liaison est **unidirectionnelle** : le capteur
@@ -285,9 +287,9 @@ $$V_{\text{ref}} \approx 1{,}25 \times I_{\text{RMS}} \approx 0{,}88\ \text{V}$$
 
 1. **Masses** : relier tous les GND (trigger, buck, ESP, TMC, LD19).  
 2. **Mesurer** 12 V (trigger) et 5 V (buck) à vide.  
-3. Brancher **5 V** sur ESP32 VIN et LD19 VCC.  
+3. Brancher **5 V** sur ESP32 VIN et LD19 **P5V** (fil vert).  
 4. Brancher **3,3 V** sur MPU6050 et TMC VIO.  
-5. Signaux LD19 (TX→18, PWM←17).  
+5. Signaux LD19 (TX blanc → GPIO 18, PWM noir ← GPIO 17).  
 6. I2C MPU (8/9).  
 7. TMC STEP/DIR/EN + UART sur **PDN** (1 kΩ) + DIAG (pastille).  
    Ne pas câbler USART ni CLK.  

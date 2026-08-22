@@ -63,13 +63,13 @@
 <text x="85.0" y="56" text-anchor="middle" class="ref">LD1</text>
 <text x="85.0" y="72" text-anchor="middle" class="label">LD19 LiDAR</text>
 <path d="M16,88.0 L40,88.0" class="wire"/>
-<text x="12" y="92.0" text-anchor="end" class="pin">TX</text>
+<text x="12" y="92.0" text-anchor="end" class="pin">TX blanc</text>
 <path d="M16,98.0 L40,98.0" class="wire"/>
-<text x="12" y="102.0" text-anchor="end" class="pin">PWM in</text>
+<text x="12" y="102.0" text-anchor="end" class="pin">PWM noir</text>
 <path d="M16,108.0 L40,108.0" class="wire"/>
-<text x="12" y="112.0" text-anchor="end" class="pin">VCC</text>
+<text x="12" y="112.0" text-anchor="end" class="pin">P5V vert</text>
 <path d="M16,118.0 L40,118.0" class="wire"/>
-<text x="12" y="122.0" text-anchor="end" class="pin">GND</text>
+<text x="12" y="122.0" text-anchor="end" class="pin">GND jaune</text>
 <text x="85" y="150" text-anchor="middle" class="note">tête tournante</text>
 <path d="M130,62 L220,62" class="wire"/>
 <path d="M220,62 L220,221.33333333333334" class="wire"/>

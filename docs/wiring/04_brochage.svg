@@ -29,13 +29,13 @@
 <rect x="40" y="78" width="600" height="28" fill="#fff" stroke="#ccc"/>
 <text x="48" y="96" class="small">18</text>
 <text x="128" y="96" class="small">LD19 RX</text>
-<text x="288" y="96" class="small">TX du LD19</text>
-<text x="488" y="96" class="small">Jaune</text>
+<text x="288" y="96" class="small">TX STL-19P (blanc)</text>
+<text x="488" y="96" class="small">Blanc</text>
 <rect x="40" y="106" width="600" height="28" fill="#f3f3ef" stroke="#ccc"/>
 <text x="48" y="124" class="small">17</text>
 <text x="128" y="124" class="small">LD19 PWM</text>
-<text x="288" y="124" class="small">PWM du LD19</text>
-<text x="488" y="124" class="small">Blanc</text>
+<text x="288" y="124" class="small">PWM STL-19P (noir)</text>
+<text x="488" y="124" class="small">Noir</text>
 <rect x="40" y="134" width="600" height="28" fill="#fff" stroke="#ccc"/>
 <text x="48" y="152" class="small">8</text>
 <text x="128" y="152" class="small">I2C SDA</text>

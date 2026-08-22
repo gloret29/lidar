@@ -80,8 +80,9 @@ Consommation : environ 220 g de PETG, 9 h d'impression au total.
 
 L'exemplaire reçu est le **STL-19P** (FHL-LD19P) : 5 000 Hz, détection du
 verre, **3 oreilles M2,5** (pas 4 fentes). Le berceau `lidar_cradle` est
-dimensionné pour cette variante. Voir [operation.md](operation.md) pour les
-vitres et miroirs.
+dimensionné pour cette variante. Nappe : **P5V vert**, **GND jaune**,
+**TX blanc**, **PWM noir** (voir [wiring.md](wiring.md) § 3).
+Voir [operation.md](operation.md) pour les vitres et miroirs.
 
 **Moteur pas à pas obligatoire.** Le châssis et le firmware supposent un NEMA
 17 **4 fils** piloté en STEP/DIR par TMC2209. Un moteur brushless BLDC (ex.
